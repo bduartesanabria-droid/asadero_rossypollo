@@ -1,0 +1,36 @@
+{% extends 'base.html' %}
+{% block title %}Admin - Partidos{% endblock %}
+{% block content %}
+<div class="container py-5">
+  <h1 class="mb-4" style="color: hsl(210, 70%, 50%);">Gestión de Partidos</h1>
+  <a href="{{ url_for('main.create_match') }}" class="btn btn-primary mb-3">+ Nuevo Partido</a>
+  <table class="table table-hover table-striped">
+    <thead class="table-dark">
+      <tr>
+        <th>Equipo Local</th>
+        <th>Equipo Visitante</th>
+        <th>Fecha</th>
+        <th>Grupo</th>
+        <th>Resultado</th>
+        <th>Estado</th>
+        <th>Acciones</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for match in matches %}
+      <tr>
+        <td>{{ match.home_team }}</td>
+        <td>{{ match.away_team }}</td>
+        <td>{{ match.match_date.strftime('%Y-%m-%d %H:%M UTC') }}</td>
+        <td>{{ match.group or '' }}</td>
+        <td>{% if match.home_score is not none %}{{ match.home_score }} - {{ match.away_score }}{% else %}–{% endif %}</td>
+        <td>{{ 'Bloqueado' if match.is_locked else 'Abierto' }}</td>
+        <td>
+          <a href="{{ url_for('main.edit_match', match_id=match.id) }}" class="btn btn-sm btn-outline-secondary {% if match.is_locked %}disabled{% endif %}">Editar</a>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

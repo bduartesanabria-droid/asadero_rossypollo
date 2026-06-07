@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+
+{% block title %}Perfil - Asadero Rossy Pollo{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8 col-lg-6">
+            <div class="card border-0 shadow-lg text-center py-4">
+                <div class="card-body p-4 p-md-5">
+                    <div class="avatar bg-primary text-white rounded-circle d-flex align-items-center justify-content-center mx-auto mb-4" style="width: 90px; height: 90px; font-weight: 700; font-size: 2.2rem; box-shadow: 0 4px 12px rgba(212, 92, 63, 0.2);">
+                        {{ current_user.username[0]|upper }}
+                    </div>
+                    
+                    <h2 class="fw-bold mb-2">{{ current_user.username }}</h2>
+                    <p class="text-secondary mb-4"><i class="far fa-envelope me-2"></i>{{ current_user.email }}</p>
+                    
+                    <div class="d-flex justify-content-center gap-2 mb-4">
+                        {% if current_user.is_admin %}
+                            <span class="badge bg-primary">
+                                <i class="fas fa-shield-halved me-1"></i>Administrador
+                            </span>
+                        {% else %}
+                            <span class="badge bg-secondary bg-opacity-10 text-muted border border-secondary-subtle">
+                                <i class="far fa-user me-1"></i>Autor/Lector
+                            </span>
+                        {% endif %}
+                        <span class="badge bg-light text-muted border border-light-subtle">
+                            <i class="far fa-calendar me-1"></i>Desde {{ current_user.created_at.strftime('%d/%m/%Y') }}
+                        </span>
+                    </div>
+                    
+                    <hr class="my-4 border-light-subtle">
+                    
+                    <div class="d-flex justify-content-center gap-2">
+                        <a href="{{ url_for('auth.edit_profile') }}" class="btn btn-primary">
+                            <i class="far fa-edit me-1"></i> Editar Perfil
+                        </a>
+                        <a href="{{ url_for('main.dashboard') }}" class="btn btn-outline-secondary">
+                            <i class="far fa-file-lines me-1"></i> Mis Artículos
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

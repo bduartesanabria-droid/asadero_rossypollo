@@ -1,0 +1,109 @@
+{% extends "base.html" %}
+
+{% block title %}Categoría: {{ category.name }} - Asadero Rossy Pollo{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <!-- Header de la categoría -->
+    <div class="mb-5 py-4 border-bottom border-light-subtle">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="{{ url_for('main.index') }}" class="text-decoration-none">Inicio</a></li>
+                <li class="breadcrumb-item active" aria-current="page">Categorías</li>
+            </ol>
+        </nav>
+        <h1 class="fw-bold display-5 text-primary">
+            <i class="far fa-folder-open me-2"></i>{{ category.name }}
+        </h1>
+        <p class="lead text-muted">{{ category.description or 'Artículos interesantes y guías en esta categoría.' }}</p>
+    </div>
+    
+    <div class="row justify-content-center">
+        <div class="col-md-9">
+            {% if posts.items %}
+                {% for post in posts.items %}
+                    <div class="card mb-4 border-0">
+                        <div class="card-body p-4">
+                            <div class="d-flex align-items-center justify-content-between mb-3">
+                                <span class="badge bg-primary">
+                                    <i class="fas fa-tag me-1"></i>{{ category.name }}
+                                </span>
+                                <span class="small text-muted">
+                                    <i class="far fa-calendar-alt me-1"></i>{{ post.created_at.strftime('%d/%m/%Y') }}
+                                </span>
+                            </div>
+                            
+                            <h3 class="card-title h4 fw-bold mb-3">
+                                <a href="{{ url_for('main.view_post', slug=post.slug) }}" class="text-decoration-none text-dark">
+                                    {{ post.title }}
+                                </a>
+                            </h3>
+                            
+                            <p class="card-text text-muted">{{ post.excerpt or post.content[:200] }}...</p>
+                            
+                            <div class="d-flex align-items-center justify-content-between mt-4 pt-3 border-top border-light-subtle">
+                                <div class="d-flex align-items-center">
+                                    <div class="avatar bg-primary text-white rounded-circle d-flex align-items-center justify-content-center me-2" style="width: 32px; height: 32px; font-weight: 700; font-size: 0.85rem;">
+                                        {{ post.author.username[0]|upper }}
+                                    </div>
+                                    <span class="small text-secondary">Por <strong>{{ post.author.username }}</strong></span>
+                                </div>
+                                <div class="d-flex align-items-center small text-muted">
+                                    <span class="me-3"><i class="far fa-eye me-1"></i>{{ post.views }} vistas</span>
+                                    <a href="{{ url_for('main.view_post', slug=post.slug) }}" class="text-decoration-none fw-bold text-primary">
+                                        Leer más <i class="fas fa-arrow-right ms-1"></i>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+
+                <!-- Paginación -->
+                {% if posts.pages > 1 %}
+                    <nav aria-label="Page navigation" class="mt-4">
+                        <ul class="pagination justify-content-center">
+                            {% if posts.has_prev %}
+                                <li class="page-item">
+                                    <a class="page-link" href="{{ url_for('main.view_category', slug=category.slug, page=posts.prev_num) }}">
+                                        <i class="fas fa-chevron-left me-1"></i> Anterior
+                                    </a>
+                                </li>
+                            {% endif %}
+                            
+                            {% for page_num in posts.iter_pages() %}
+                                {% if page_num %}
+                                    <li class="page-item {% if page_num == posts.page %}active{% endif %}">
+                                        <a class="page-link" href="{{ url_for('main.view_category', slug=category.slug, page=page_num) }}">
+                                            {{ page_num }}
+                                        </a>
+                                    </li>
+                                {% endif %}
+                            {% endfor %}
+                            
+                            {% if posts.has_next %}
+                                <li class="page-item">
+                                    <a class="page-link" href="{{ url_for('main.view_category', slug=category.slug, page=posts.next_num) }}">
+                                        Siguiente <i class="fas fa-chevron-right ms-1"></i>
+                                    </a>
+                                </li>
+                            {% endif %}
+                        </ul>
+                    </nav>
+                {% endif %}
+            {% else %}
+                <div class="card p-5 text-center border-0">
+                    <div class="card-body">
+                        <i class="far fa-folder-open text-muted mb-3" style="font-size: 3rem;"></i>
+                        <h4 class="fw-bold">No hay artículos en esta categoría todavía</h4>
+                        <p class="text-muted">¡Vuelve pronto para descubrir nuevos contenidos sobre {{ category.name }}!</p>
+                        <a href="{{ url_for('main.index') }}" class="btn btn-primary btn-sm mt-3">
+                            <i class="fas fa-arrow-left me-1"></i> Volver al inicio
+                        </a>
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

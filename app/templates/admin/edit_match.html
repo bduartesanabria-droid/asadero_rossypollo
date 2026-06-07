@@ -1,0 +1,18 @@
+{% extends 'base.html' %}
+{% block title %}Editar Partido - Admin{% endblock %}
+{% block content %}
+<div class="container mx-auto py-8">
+  <h1 class="text-3xl font-bold mb-6">Editar Partido</h1>
+  <form method="POST" class="grid gap-4">
+    <div class="grid grid-cols-2 gap-4">
+      <input type="text" name="home_team" class="form-control" placeholder="Equipo Local" value="{{ match.home_team }}" required>
+      <input type="text" name="away_team" class="form-control" placeholder="Equipo Visitante" value="{{ match.away_team }}" required>
+    </div>
+    <input type="datetime-local" name="match_date" class="form-control" value="{{ match.match_date.isoformat()|replace('Z','') }}" required>
+    <input type="number" name="home_score" class="form-control" placeholder="Goles Local" value="{{ match.home_score or '' }}">
+    <input type="number" name="away_score" class="form-control" placeholder="Goles Visitante" value="{{ match.away_score or '' }}">
+    <input type="text" name="group" class="form-control" placeholder="Grupo" value="{{ match.group or '' }}">
+    <button type="submit" class="btn btn-primary mt-4">Actualizar Partido</button>
+  </form>
+</div>
+{% endblock %}

@@ -1,0 +1,205 @@
+{% extends "base.html" %}
+
+{% block title %}Inicio - Asadero Rossy Pollo{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <!-- Hero Section -->
+    <div class="jumbotron p-5 rounded mb-5 text-center text-lg-start">
+        <div class="row align-items-center">
+            <div class="col-lg-9">
+                <h1 class="display-4">🍗 Bienvenidos a Asadero Rossy Pollo</h1>
+                <p class="lead fs-4">El arte del auténtico sabor a las brasas y recetas deliciosas.</p>
+                <hr class="my-4 bg-white opacity-25">
+                <p class="mb-0 text-white-50">Explora consejos de expertos, secretos del asado y las mejores guías para cocinar pollo y carnes a la parrilla de forma única.</p>
+            </div>
+            <div class="col-lg-3 text-center d-none d-lg-block">
+                <i class="fas fa-fire-alt" style="font-size: 7rem; opacity: 0.25; animation: pulse 3s infinite ease-in-out;"></i>
+            </div>
+        </div>
+    </div>
+
+    <!-- Posts -->
+    <div class="row">
+        <div class="col-md-8">
+            <h2 class="mb-4 fw-bold d-flex align-items-center">
+                <i class="far fa-newspaper text-primary me-2"></i> Últimos Artículos
+            </h2>
+            
+            {% if posts.items %}
+                {% for post in posts.items %}
+                    <div class="card mb-4 border-0">
+                        <div class="card-body p-4">
+                            <div class="d-flex align-items-center justify-content-between mb-3">
+                                {% if post.category %}
+                                    <span class="badge bg-primary">
+                                        <i class="fas fa-tag me-1"></i>{{ post.category.name }}
+                                    </span>
+                                {% else %}
+                                    <span class="badge bg-light text-muted border border-light-subtle">
+                                        <i class="fas fa-hashtag me-1"></i>General
+                                    </span>
+                                {% endif %}
+                                <span class="small text-muted">
+                                    <i class="far fa-calendar-alt me-1"></i>{{ post.created_at.strftime('%d/%m/%Y') }}
+                                </span>
+                            </div>
+                            
+                            <h3 class="card-title h4 fw-bold mb-3">
+                                <a href="{{ url_for('main.view_post', slug=post.slug) }}" class="text-decoration-none text-dark">
+                                    {{ post.title }}
+                                </a>
+                            </h3>
+                            
+                            <p class="card-text text-muted">{{ post.excerpt or post.content[:200] }}...</p>
+                            
+                            <div class="d-flex align-items-center justify-content-between mt-4 pt-3 border-top border-light-subtle">
+                                <div class="d-flex align-items-center">
+                                    <div class="avatar bg-primary text-white rounded-circle d-flex align-items-center justify-content-center me-2" style="width: 32px; height: 32px; font-weight: 700; font-size: 0.85rem;">
+                                        {{ post.author.username[0]|upper }}
+                                    </div>
+                                    <span class="small text-secondary">Por <strong>{{ post.author.username }}</strong></span>
+                                </div>
+                                <div class="d-flex align-items-center small text-muted">
+                                    <span class="me-3"><i class="far fa-eye me-1"></i>{{ post.views }} vistas</span>
+                                    <a href="{{ url_for('main.view_post', slug=post.slug) }}" class="text-decoration-none fw-bold text-primary">
+                                        Leer más <i class="fas fa-arrow-right ms-1"></i>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+
+                <!-- Paginación -->
+                {% if posts.pages > 1 %}
+                    <nav aria-label="Page navigation" class="mt-4">
+                        <ul class="pagination justify-content-center">
+                            {% if posts.has_prev %}
+                                <li class="page-item">
+                                    <a class="page-link" href="{{ url_for('main.index', page=posts.prev_num) }}">
+                                        <i class="fas fa-chevron-left me-1"></i> Anterior
+                                    </a>
+                                </li>
+                            {% endif %}
+                            
+                            {% for page_num in posts.iter_pages() %}
+                                {% if page_num %}
+                                    <li class="page-item {% if page_num == posts.page %}active{% endif %}">
+                                        <a class="page-link" href="{{ url_for('main.index', page=page_num) }}">
+                                            {{ page_num }}
+                                        </a>
+                                    </li>
+                                {% endif %}
+                            {% endfor %}
+                            
+                            {% if posts.has_next %}
+                                <li class="page-item">
+                                    <a class="page-link" href="{{ url_for('main.index', page=posts.next_num) }}">
+                                        Siguiente <i class="fas fa-chevron-right ms-1"></i>
+                                    </a>
+                                </li>
+                            {% endif %}
+                        </ul>
+                    </nav>
+                {% endif %}
+            {% else %}
+                <div class="card p-5 text-center border-0">
+                    <div class="card-body">
+                        <i class="far fa-folder-open text-muted mb-3" style="font-size: 3rem;"></i>
+                        <h4 class="fw-bold">No hay artículos publicados todavía</h4>
+                        <p class="text-muted">¡Vuelve pronto para descubrir nuevas recetas y guías de asado!</p>
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+
+        <!-- Sidebar -->
+        <div class="col-md-4 mt-4 mt-md-0">
+            <!-- Buscar -->
+            <div class="card border-0 mb-4">
+                <div class="card-header bg-transparent py-3">
+                    <h5 class="mb-0 fw-bold"><i class="fas fa-search me-2 text-primary"></i>Buscar artículos</h5>
+                </div>
+                <div class="card-body">
+                    <form id="search-form" class="input-group">
+                        <input type="text" id="search-input" class="form-control" placeholder="Escribe para buscar..." required>
+                        <button class="btn btn-primary" type="submit">
+                            <i class="fas fa-search"></i>
+                        </button>
+                    </form>
+                    <div id="search-results" class="mt-3"></div>
+                </div>
+            </div>
+
+            <!-- Categorías -->
+            <div class="card border-0">
+                <div class="card-header bg-transparent py-3">
+                    <h5 class="mb-0 fw-bold"><i class="fas fa-folder me-2 text-primary"></i>Categorías</h5>
+                </div>
+                <div class="list-group list-group-flush">
+                    <a href="{{ url_for('main.index') }}" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center fw-medium">
+                        <span><i class="fas fa-th-large me-2 text-muted"></i>Todas las categorías</span>
+                    </a>
+                    {% if categories %}
+                        {% for cat in categories %}
+                            <a href="{{ url_for('main.view_category', slug=cat.slug) }}" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
+                                <span><i class="far fa-folder-open me-2 text-muted"></i>{{ cat.name }}</span>
+                                <span class="badge rounded-pill bg-primary opacity-75">{{ cat.posts|length }}</span>
+                            </a>
+                        {% endfor %}
+                    {% else %}
+                        <div class="p-3 text-muted text-center small">No hay categorías creadas.</div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+@keyframes pulse {
+    0%, 100% { transform: scale(1) rotate(0deg); }
+    50% { transform: scale(1.05) rotate(5deg); }
+}
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.getElementById('search-form').addEventListener('submit', function(e) {
+    e.preventDefault();
+});
+
+document.getElementById('search-input').addEventListener('input', function() {
+    const query = this.value;
+    const results = document.getElementById('search-results');
+    
+    if (query.length >= 2) {
+        fetch(`{{ url_for('main.search') }}?q=${encodeURIComponent(query)}`)
+            .then(r => r.json())
+            .then(data => {
+                results.innerHTML = '';
+                if (data.results.length > 0) {
+                    data.results.forEach(post => {
+                        results.innerHTML += `
+                            <a href="/post/${post.slug}" class="d-flex align-items-center p-2 mb-1 text-decoration-none">
+                                <i class="fas fa-file-alt text-primary me-2"></i>
+                                <span>${post.title}</span>
+                            </a>
+                        `;
+                    });
+                } else {
+                    results.innerHTML = '<div class="p-2 small text-muted"><i class="fas fa-info-circle me-1"></i>No se encontraron resultados</div>';
+                }
+            })
+            .catch(err => {
+                console.error(err);
+                results.innerHTML = '<div class="p-2 small text-danger">Error al realizar la búsqueda</div>';
+            });
+    } else {
+        results.innerHTML = '';
+    }
+});
+</script>
+{% endblock %}

@@ -1,0 +1,101 @@
+{% extends "base.html" %}
+
+{% block title %}{{ post.title }} - Asadero Rossy Pollo{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <!-- Breadcrumbs -->
+    <nav aria-label="breadcrumb" class="mb-4">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{{ url_for('main.index') }}" class="text-decoration-none">Inicio</a></li>
+            {% if post.category %}
+                <li class="breadcrumb-item"><a href="{{ url_for('main.view_category', slug=post.category.slug) }}" class="text-decoration-none">{{ post.category.name }}</a></li>
+            {% endif %}
+            <li class="breadcrumb-item active" aria-current="page">{{ post.title }}</li>
+        </ol>
+    </nav>
+
+    <div class="row">
+        <div class="col-lg-8">
+            <article class="card border-0 p-4 p-md-5 mb-4">
+                <div class="d-flex align-items-center justify-content-between mb-4">
+                    {% if post.category %}
+                        <span class="badge bg-primary">
+                            <i class="fas fa-tag me-1"></i>{{ post.category.name }}
+                        </span>
+                    {% endif %}
+                    <span class="text-muted small">
+                        <i class="far fa-eye me-1"></i>{{ post.views }} vistas
+                    </span>
+                </div>
+
+                <h1 class="fw-bold display-5 mb-3">{{ post.title }}</h1>
+                
+                <div class="d-flex align-items-center mb-4 pb-3 border-bottom border-light-subtle">
+                    <div class="avatar bg-primary text-white rounded-circle d-flex align-items-center justify-content-center me-2" style="width: 40px; height: 40px; font-weight: 700; font-size: 1rem;">
+                        {{ post.author.username[0]|upper }}
+                    </div>
+                    <div>
+                        <div class="fw-bold text-dark">{{ post.author.username }}</div>
+                        <div class="small text-muted">Publicado el {{ post.created_at.strftime('%d de %B de %Y') }}</div>
+                    </div>
+                </div>
+                
+                {% if post.excerpt %}
+                    <p class="lead text-secondary mb-4 italic" style="border-left: 3px solid var(--primary-color); padding-left: 1rem; font-style: italic;">
+                        {{ post.excerpt }}
+                    </p>
+                {% endif %}
+
+                <div class="post-content mb-5">
+                    {{ post.content | safe }}
+                </div>
+
+                {% if current_user.is_authenticated and (current_user.id == post.user_id or current_user.is_admin) %}
+                    <div class="d-flex gap-2 pt-3 border-top border-light-subtle">
+                        <a href="{{ url_for('main.edit_post', post_id=post.id) }}" class="btn btn-warning text-white">
+                            <i class="far fa-edit me-1"></i> Editar artículo
+                        </a>
+                        <button class="btn btn-outline-danger" onclick="deletePost({{ post.id }}, '{{ url_for('main.dashboard') }}')">
+                            <i class="far fa-trash-can me-1"></i> Eliminar artículo
+                        </button>
+                    </div>
+                {% endif %}
+            </article>
+        </div>
+
+        <!-- Sidebar -->
+        <div class="col-lg-4">
+            <!-- Info del autor -->
+            <div class="card border-0 mb-4">
+                <div class="card-header bg-transparent py-3">
+                    <h5 class="mb-0 fw-bold"><i class="far fa-user me-2 text-primary"></i>Sobre el Autor</h5>
+                </div>
+                <div class="card-body text-center py-4">
+                    <div class="avatar bg-primary text-white rounded-circle d-flex align-items-center justify-content-center mx-auto mb-3" style="width: 64px; height: 64px; font-weight: 700; font-size: 1.5rem;">
+                        {{ post.author.username[0]|upper }}
+                    </div>
+                    <h5 class="fw-bold mb-1">{{ post.author.username }}</h5>
+                    <p class="text-muted small mb-0">Miembro desde {{ post.author.created_at.strftime('%m/%Y') }}</p>
+                </div>
+            </div>
+
+            <!-- Información de categoría -->
+            {% if post.category %}
+                <div class="card border-0">
+                    <div class="card-header bg-transparent py-3">
+                        <h5 class="mb-0 fw-bold"><i class="far fa-folder-open me-2 text-primary"></i>Categoría</h5>
+                    </div>
+                    <div class="card-body">
+                        <h5 class="fw-bold mb-2">{{ post.category.name }}</h5>
+                        <p class="text-secondary small mb-3">{{ post.category.description or 'Colección de artículos y guías selectas.' }}</p>
+                        <a href="{{ url_for('main.view_category', slug=post.category.slug) }}" class="btn btn-outline-primary btn-sm w-100">
+                            <i class="fas fa-list me-1"></i> Ver más en {{ post.category.name }}
+                        </a>
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,134 @@
+{% extends "base.html" %}
+
+{% block title %}Editar Post - Asadero Rossy Pollo{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <div class="row justify-content-center">
+        <div class="col-md-9 col-lg-8">
+            <div class="card border-0 shadow-lg">
+                <div class="card-header bg-transparent py-4 border-bottom border-light-subtle">
+                    <h3 class="mb-0 fw-bold text-dark"><i class="far fa-edit text-warning me-2"></i>Editar Artículo</h3>
+                </div>
+                <div class="card-body p-4 p-md-5">
+                    <form method="POST" id="edit-form" action="{{ url_for('main.edit_post', post_id=post.id) }}">
+                        <div class="mb-3">
+                            <label for="title" class="form-label">Título del Post</label>
+                            <input type="text" class="form-control" id="title" name="title" value="{{ post.title }}" required>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="slug" class="form-label">Slug (URL amigable)</label>
+                            <input type="text" class="form-control" id="slug" name="slug" value="{{ post.slug }}" required>
+                            <small class="text-muted small d-block mt-1">Modificar el slug cambiará el enlace permanente del artículo.</small>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="excerpt" class="form-label">Extracto</label>
+                            <textarea class="form-control" id="excerpt" name="excerpt" rows="3">{{ post.excerpt or '' }}</textarea>
+                        </div>
+                        
+                        <div class="mb-4">
+                            <label for="content" class="form-label">Contenido del Post (Soporta HTML)</label>
+                            <textarea class="form-control" id="content" name="content" rows="12" required>{{ post.content }}</textarea>
+                        </div>
+                        
+                        <div class="row mb-4">
+                            <div class="col-md-6 mb-3 mb-md-0">
+                                <label for="category_id" class="form-label">Categoría</label>
+                                <select class="form-select" id="category_id" name="category_id">
+                                    <option value="">-- Sin categoría --</option>
+                                    {% for category in categories %}
+                                        <option value="{{ category.id }}" {% if post.category_id == category.id %}selected{% endif %}>
+                                            {{ category.name }}
+                                        </option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            
+                            <div class="col-md-6 d-flex align-items-end ps-md-4">
+                                <div class="mb-2 form-check">
+                                    <input type="checkbox" class="form-check-input" id="is_published" name="is_published" {% if post.is_published %}checked{% endif %}>
+                                    <label class="form-check-label fw-semibold text-dark" for="is_published">
+                                        Publicado
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="d-flex gap-2 pt-3 border-top border-light-subtle">
+                            <button type="submit" id="submit-btn" class="btn btn-warning text-white">
+                                <i class="fas fa-arrows-rotate me-1"></i> Actualizar Artículo
+                            </button>
+                            <a href="{{ url_for('main.dashboard') }}" class="btn btn-outline-secondary">Cancelar</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// Auto-generar slug desde el título de forma elegante (opcional para edición)
+document.getElementById('title').addEventListener('input', function() {
+    const slug = this.value
+        .toLowerCase()
+        .trim()
+        .normalize('NFD')
+        .replace(/[\u0300-\u036f]/g, '')
+        .replace(/[^\w\s-]/g, '')
+        .replace(/[\s_]+/g, '-')
+        .replace(/^-+|-+$/g, '');
+    document.getElementById('slug').value = slug;
+});
+
+// Enviar formulario mediante AJAX para evitar redirección de JSON crudo
+document.getElementById('edit-form').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    const btn = document.getElementById('submit-btn');
+    const originalText = btn.innerHTML;
+    
+    btn.disabled = true;
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i> Actualizando...';
+    
+    try {
+        const formData = new FormData(this);
+        const response = await fetch(this.action || window.location.href, {
+            method: 'POST',
+            body: formData
+        });
+        
+        const data = await response.json();
+        
+        if (response.ok) {
+            if (typeof showToast !== 'undefined') {
+                showToast('¡Artículo actualizado correctamente!', 'success');
+            } else {
+                alert('¡Artículo actualizado correctamente!');
+            }
+            setTimeout(() => {
+                window.location.href = "{{ url_for('main.dashboard') }}";
+            }, 1000);
+        } else {
+            btn.disabled = false;
+            btn.innerHTML = originalText;
+            if (typeof showToast !== 'undefined') {
+                showToast(data.error || 'Error al actualizar el post', 'error');
+            } else {
+                alert(data.error || 'Error al actualizar el post');
+            }
+        }
+    } catch (err) {
+        console.error(err);
+        btn.disabled = false;
+        btn.innerHTML = originalText;
+        if (typeof showToast !== 'undefined') {
+            showToast('Error de red al actualizar el artículo', 'error');
+        } else {
+            alert('Error de red al actualizar el artículo');
+        }
+    }
+});
+</script>
+{% endblock %}

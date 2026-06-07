@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+{% block title %}Lista de Partidos - Polla{% endblock %}
+{% block content %}
+<div class="container mx-auto py-8">
+  <h1 class="text-3xl font-bold text-center mb-6" style="color: hsl(210, 70%, 50%);">Partidos Disponibles</h1>
+  <div class="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+    {% for match in matches %}
+    <div class="p-6 bg-white rounded-lg shadow-md hover:shadow-xl transition-shadow duration-300" style="background: linear-gradient(135deg, hsl(210, 20%, 95%), hsl(210, 35%, 90%));">
+      <h2 class="text-xl font-semibold mb-2">{{ match.home_team }} vs {{ match.away_team }}</h2>
+      <p class="text-gray-600 mb-2">{{ match.match_date.strftime('%Y-%m-%d %H:%M UTC') }}</p>
+      {% if match.group %}<p class="text-gray-500 mb-2">Grupo {{ match.group }}</p>{% endif %}
+      {% if predictions[match.id] %}
+        <p class="text-green-600 font-medium">Ya has pronosticado: {{ predictions[match.id].predicted_home_score }} - {{ predictions[match.id].predicted_away_score }}</p>
+      {% else %}
+        <a href="{{ url_for('main.match_detail', match_id=match.id) }}" class="inline-block mt-2 px-4 py-2 bg-gradient-to-r from-indigo-500 to-purple-500 text-white rounded hover:opacity-90 transition-opacity">Pronosticar</a>
+      {% endif %}
+    </div>
+    {% endfor %}
+  </div>
+</div>
+{% endblock %}

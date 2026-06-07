@@ -1,0 +1,26 @@
+{% extends 'base.html' %}
+{% block title %}Crear Partido{% endblock %}
+{% block content %}
+<div class="container mt-4">
+  <h1 class="mb-4">Crear Nuevo Partido</h1>
+  <form method="post" action="{{ url_for('main.create_match') }}">
+    <div class="mb-3">
+      <label class="form-label">Equipo Local</label>
+      <input type="text" name="home_team" class="form-control" required>
+    </div>
+    <div class="mb-3">
+      <label class="form-label">Equipo Visitante</label>
+      <input type="text" name="away_team" class="form-control" required>
+    </div>
+    <div class="mb-3">
+      <label class="form-label">Fecha y Hora (UTC)</label>
+      <input type="datetime-local" name="match_date" class="form-control" required>
+    </div>
+    <div class="mb-3">
+      <label class="form-label">Grupo (opcional)</label>
+      <input type="text" name="group" class="form-control">
+    </div>
+    <button type="submit" class="btn btn-primary">Crear Partido</button>
+  </form>
+</div>
+{% endblock %}
