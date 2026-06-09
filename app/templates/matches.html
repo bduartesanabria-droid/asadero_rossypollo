@@ -1,56 +1,51 @@
 {% extends 'base.html' %}
-
 {% block title %}Partidos - Rossypollo Mundial 2026{% endblock %}
-
 {% block content %}
-<div class="container py-5">
-    <div class="d-flex align-items-center justify-content-between mb-4">
-        <div>
-            <h1 class="h2 fw-bold mb-1">Partidos Disponibles</h1>
-            <p class="text-muted mb-0">Selecciona un partido y registra tu pronóstico único.</p>
-        </div>
-        <a href="{{ url_for('main.dashboard') }}" class="btn btn-outline-secondary">Volver al Panel</a>
+<div class="container py-4">
+  <div class="d-flex flex-column flex-md-row justify-content-between align-items-start gap-3 mb-4">
+    <div>
+      <h1 class="fw-bold mb-1">Partidos Disponibles</h1>
+      <p class="text-secondary mb-0">Selecciona un partido y registra tu pronóstico exclusivo</p>
     </div>
+    <a href="{{ url_for('main.dashboard') }}" class="btn btn-outline-yellow"><i class="fas fa-arrow-left me-2"></i>Mi Panel</a>
+  </div>
 
-    <div class="row g-4">
-        {% for match in matches %}
-        <div class="col-md-6">
-            <div class="card border-0 shadow-sm h-100">
-                <div class="card-body">
-                    <div class="d-flex align-items-center justify-content-between mb-3">
-                        <div>
-                            <h3 class="h5 fw-bold mb-1">{{ match.home_team }} vs {{ match.away_team }}</h3>
-                            <p class="small text-muted mb-0">{{ match.match_date.strftime('%d %b %Y • %H:%M UTC') }}{% if match.group %} · Grupo {{ match.group }}{% endif %}</p>
-                        </div>
-                        <span class="badge bg-warning text-dark">{{ 'Bloqueado' if match.is_locked else 'Abierto' }}</span>
-                    </div>
-
-                    {% if predictions[match.id] %}
-                        <div class="alert alert-success py-3 mb-3" role="alert">
-                            <strong>Pronóstico guardado:</strong> {{ predictions[match.id].predicted_home_score }} - {{ predictions[match.id].predicted_away_score }}
-                        </div>
-                    {% else %}
-                        <p class="text-muted">Cada marcador es único. Si alguien ya eligió el mismo resultado, deberás escoger otro.</p>
-                    {% endif %}
-                </div>
-                <div class="card-footer bg-transparent border-top d-flex justify-content-between align-items-center">
-                    <span class="text-muted small">Estado: {{ 'Bloqueado' if match.is_locked else 'Disponible' }}</span>
-                    {% if predictions[match.id] %}
-                        <a class="btn btn-sm btn-outline-secondary disabled">Pronostico registrado</a>
-                    {% else %}
-                        <a href="{{ url_for('main.match_detail', match_id=match.id) }}" class="btn btn-primary btn-sm">Pronosticar</a>
-                    {% endif %}
-                </div>
-            </div>
+  <div class="row g-4">
+    {% for match in matches %}
+    <div class="col-md-6">
+      <div class="match-card h-100">
+        <div class="d-flex justify-content-between align-items-start mb-3">
+          <span class="match-status {{ 'locked' if match.is_locked else 'open' }}">{{ 'Bloqueado' if match.is_locked else 'Abierto' }}</span>
+          {% if match.group %}<span class="match-info">Grupo {{ match.group }}</span>{% endif %}
         </div>
-        {% else %}
-            <div class="col-12">
-                <div class="card border-0 shadow-sm p-5 text-center">
-                    <h3 class="fw-bold">No hay partidos disponibles</h3>
-                    <p class="text-muted mb-0">Visita el panel más tarde para ver nuevos encuentros.</p>
-                </div>
-            </div>
-        {% endfor %}
+        <div class="match-teams mb-2">
+          <div class="team">{{ match.home_team }}</div>
+          <div class="d-flex align-items-center gap-2">
+            <span class="vs-badge" style="width:36px;height:36px;font-size:0.9rem;">VS</span>
+          </div>
+          <div class="team">{{ match.away_team }}</div>
+        </div>
+        <div class="d-flex justify-content-between align-items-center mt-3">
+          <span class="match-info">{{ match.match_date.strftime('%d/%m/%Y %H:%M') }}</span>
+          {% if predictions[match.id] %}
+            <span class="badge" style="background:rgba(76,175,80,0.2);color:#4CAF50;">
+              <i class="fas fa-check me-1"></i>{{ predictions[match.id].predicted_home_score }}-{{ predictions[match.id].predicted_away_score }}
+            </span>
+          {% else %}
+            <a href="{{ url_for('main.match_detail', match_id=match.id) }}" class="btn btn-yellow btn-sm">Pronosticar</a>
+          {% endif %}
+        </div>
+      </div>
     </div>
+    {% else %}
+    <div class="col-12">
+      <div class="empty-state p-5">
+        <div class="empty-icon"><i class="fas fa-calendar-times"></i></div>
+        <h4>No hay partidos disponibles</h4>
+        <p>Vuelve pronto para ver los nuevos encuentros del Mundial</p>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
 </div>
 {% endblock %}

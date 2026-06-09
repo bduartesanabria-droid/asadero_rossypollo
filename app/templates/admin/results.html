@@ -1,98 +1,82 @@
 {% extends "base.html" %}
-
-{% block title %}Resultados del Admin - Asadero Rossy Pollo{% endblock %}
-
+{% block title %}Resultados - Admin{% endblock %}
 {% block content %}
-<div class="container my-5">
-    <div class="row gy-4">
-        <div class="col-12">
-            <div class="card border-0 shadow-sm">
-                <div class="card-header bg-transparent py-3 d-flex justify-content-between align-items-center">
-                    <h5 class="mb-0 fw-bold"><i class="fas fa-trophy me-2 text-primary"></i>Ganadores</h5>
-                    <a href="{{ url_for('main.dashboard') }}" class="btn btn-sm btn-outline-secondary">
-                        <i class="fas fa-arrow-left me-1"></i>Volver al Panel
-                    </a>
-                </div>
-                <div class="card-body p-0">
-                    {% if winners %}
-                        <div class="table-responsive">
-                            <table class="table table-hover align-middle mb-0">
-                                <thead class="table-light">
-                                    <tr>
-                                        <th class="ps-4">Usuario</th>
-                                        <th>Evento</th>
-                                        <th>Puntaje</th>
-                                        <th>Fecha</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {% for result in winners %}
-                                        <tr>
-                                            <td class="ps-4">{{ result.user.username }}</td>
-                                            <td>{{ result.event }}</td>
-                                            <td>{{ result.score }}</td>
-                                            <td><small class="text-muted">{{ result.created_at.strftime('%d/%m/%Y') }}</small></td>
-                                        </tr>
-                                    {% endfor %}
-                                </tbody>
-                            </table>
-                        </div>
-                    {% else %}
-                        <div class="p-5 text-center text-muted">
-                            <i class="fas fa-medal mb-3" style="font-size: 3rem; opacity: 0.4;"></i>
-                            <p class="mb-0">No hay ganadores definidos todavía.</p>
-                        </div>
-                    {% endif %}
-                </div>
-            </div>
-        </div>
-
-        <div class="col-12">
-            <div class="card border-0 shadow-sm">
-                <div class="card-header bg-transparent py-3">
-                    <h5 class="mb-0 fw-bold"><i class="fas fa-table me-2 text-primary"></i>Todos los Resultados</h5>
-                </div>
-                <div class="card-body p-0">
-                    {% if results %}
-                        <div class="table-responsive">
-                            <table class="table table-hover align-middle mb-0">
-                                <thead class="table-light">
-                                    <tr>
-                                        <th class="ps-4">Usuario</th>
-                                        <th>Evento</th>
-                                        <th>Puntaje</th>
-                                        <th>Ganador</th>
-                                        <th>Fecha</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {% for result in results %}
-                                        <tr>
-                                            <td class="ps-4">{{ result.user.username }}</td>
-                                            <td>{{ result.event }}</td>
-                                            <td>{{ result.score }}</td>
-                                            <td>
-                                                {% if result.is_winner %}
-                                                    <span class="badge bg-success bg-opacity-10 text-success border border-success-subtle">Sí</span>
-                                                {% else %}
-                                                    <span class="badge bg-secondary bg-opacity-10 text-muted border border-secondary-subtle">No</span>
-                                                {% endif %}
-                                            </td>
-                                            <td><small class="text-muted">{{ result.created_at.strftime('%d/%m/%Y') }}</small></td>
-                                        </tr>
-                                    {% endfor %}
-                                </tbody>
-                            </table>
-                        </div>
-                    {% else %}
-                        <div class="p-5 text-center text-muted">
-                            <i class="fas fa-table mb-3" style="font-size: 3rem; opacity: 0.4;"></i>
-                            <p class="mb-0">No hay resultados registrados aún.</p>
-                        </div>
-                    {% endif %}
-                </div>
-            </div>
-        </div>
+<div class="container py-4">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+      <h1 class="fw-bold mb-1">Resultados y Ganadores</h1>
+      <p class="text-secondary mb-0">Gestiona los resultados de la competencia</p>
     </div>
+    <a href="{{ url_for('main.admin_dashboard') }}" class="btn btn-outline-yellow"><i class="fas fa-arrow-left me-2"></i>Admin</a>
+  </div>
+
+  <div class="row g-4">
+    <div class="col-12">
+      <div class="card">
+        <div class="card-header">
+          <h5 class="mb-0 fw-bold"><i class="fas fa-trophy me-2" style="color:var(--yellow);"></i>Ganadores</h5>
+        </div>
+        <div class="card-body p-0">
+          {% if winners %}
+          <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+              <thead><tr><th>Usuario</th><th>Evento</th><th>Puntaje</th><th>Fecha</th></tr></thead>
+              <tbody>
+                {% for result in winners %}
+                <tr>
+                  <td><strong>{{ result.user.username }}</strong></td>
+                  <td>{{ result.event }}</td>
+                  <td><span class="badge badge-yellow">{{ result.score }}</span></td>
+                  <td><small class="text-secondary">{{ result.created_at.strftime('%d/%m/%Y') }}</small></td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+          {% else %}
+          <div class="empty-state">
+            <div class="empty-icon"><i class="fas fa-medal"></i></div>
+            <h4>Sin ganadores aún</h4>
+            <p>Los ganadores aparecerán aquí cuando la competencia avance</p>
+          </div>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+
+    <div class="col-12">
+      <div class="card">
+        <div class="card-header">
+          <h5 class="mb-0 fw-bold"><i class="fas fa-table me-2" style="color:var(--yellow);"></i>Todos los Resultados</h5>
+        </div>
+        <div class="card-body p-0">
+          {% if results %}
+          <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+              <thead><tr><th>Usuario</th><th>Evento</th><th>Puntaje</th><th>Ganador</th><th>Fecha</th></tr></thead>
+              <tbody>
+                {% for result in results %}
+                <tr>
+                  <td><strong>{{ result.user.username }}</strong></td>
+                  <td>{{ result.event }}</td>
+                  <td><span class="badge badge-yellow">{{ result.score }}</span></td>
+                  <td>{% if result.is_winner %}<span class="badge" style="background:#4CAF50;">Sí</span>{% else %}<span class="badge" style="background:var(--text-muted);">No</span>{% endif %}</td>
+                  <td><small class="text-secondary">{{ result.created_at.strftime('%d/%m/%Y') }}</small></td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+          {% else %}
+          <div class="empty-state">
+            <div class="empty-icon"><i class="fas fa-table"></i></div>
+            <h4>Sin resultados</h4>
+            <p>No hay resultados registrados aún</p>
+          </div>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </div>
 </div>
 {% endblock %}

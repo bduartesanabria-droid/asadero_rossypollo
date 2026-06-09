@@ -1,112 +1,105 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="es" data-theme="dark">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}Asadero Rossy Pollo{% endblock %}</title>
-    <!-- Bootstrap 5 -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <!-- Font Awesome -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- Custom CSS -->
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
-    {% block extra_css %}{% endblock %}
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% block title %}Asadero Rossy Pollo - Mundial 2026{% endblock %}</title>
+  <meta name="description" content="Participa en el Marcador Rossypollo Mundial 2026. Registra tus pronósticos, compite por premios y descuentos exclusivos.">
+  <meta name="theme-color" content="#0A1F44">
+  <link rel="manifest" href="{{ url_for('static', filename='manifest.json') }}">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+  {% block extra_css %}{% endblock %}
 </head>
 <body>
-    <!-- Navbar -->
-    <nav class="navbar navbar-expand-lg navbar-dark">
-        <div class="container">
-            <a class="navbar-brand fw-bold" href="{{ url_for('main.index') }}">
-                🍗 Asadero Rossy Pollo
-            </a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav ms-auto align-items-center">
-                    <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for('main.index') }}">Inicio</a>
-                    </li>
-                    {% if current_user.is_authenticated %}
-                        <li class="nav-item">
-                            <a class="nav-link" href="{{ url_for('main.dashboard') }}">Mi Panel</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="{{ url_for('main.list_matches') }}">Partidos</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="{{ url_for('main.leaderboard') }}">Ranking</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="{{ url_for('main.results') }}">Resultados</a>
-                        </li>
-                        {% if current_user.is_admin %}
-                            <li class="nav-item">
-                                <a class="nav-link" href="{{ url_for('main.admin_matches') }}"><i class="fas fa-plus me-1"></i>Admin</a>
-                            </li>
-                        {% endif %}
-                        <li class="nav-item">
-                            <a class="nav-link" href="{{ url_for('auth.profile') }}">Perfil</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-danger" href="{{ url_for('auth.logout') }}"><i class="fas fa-sign-out-alt me-1"></i>Salir</a>
-                        </li>
-                    {% else %}
-                        <li class="nav-item">
-                            <a class="nav-link" href="{{ url_for('auth.login') }}">Iniciar Sesión</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="{{ url_for('auth.register') }}">Registrarse</a>
-                        </li>
-                    {% endif %}
-                    <li class="nav-item ms-lg-2">
-                        <button id="theme-toggle" class="theme-toggle-btn" aria-label="Cambiar tema">
-                            <i class="fas fa-moon"></i>
-                        </button>
-                    </li>
-                </ul>
-            </div>
-        </div>
-    </nav>
-
-    <!-- Mensajes Flash -->
-    <div class="container mt-4">
-        {% with messages = get_flashed_messages(with_categories=true) %}
-            {% if messages %}
-                {% for category, message in messages %}
-                    <div class="alert alert-{{ 'danger' if category == 'error' else category }} alert-dismissible fade show" role="alert">
-                        {% if category == 'error' %}
-                            <i class="fas fa-exclamation-circle me-2"></i>
-                        {% elif category == 'success' %}
-                            <i class="fas fa-check-circle me-2"></i>
-                        <!-- default -->
-                        {% else %}
-                            <i class="fas fa-info-circle me-2"></i>
-                        {% endif %}
-                        {{ message }}
-                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                    </div>
-                {% endfor %}
+  <nav class="navbar navbar-expand-lg">
+    <div class="container">
+      <a class="navbar-brand" href="{{ url_for('main.index') }}">
+        <span class="brand-icon">R</span>
+        Rossypollo Mundial
+      </a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav ms-auto align-items-center gap-1">
+          <li class="nav-item"><a class="nav-link" href="{{ url_for('main.index') }}">Inicio</a></li>
+          {% if current_user.is_authenticated %}
+            <li class="nav-item"><a class="nav-link" href="{{ url_for('main.dashboard') }}">Mi Panel</a></li>
+            <li class="nav-item"><a class="nav-link" href="{{ url_for('main.list_matches') }}">Partidos</a></li>
+            <li class="nav-item"><a class="nav-link" href="{{ url_for('main.leaderboard') }}">Ranking</a></li>
+            {% if current_user.is_admin %}
+              <li class="nav-item"><a class="nav-link" href="{{ url_for('main.admin_dashboard') }}"><i class="fas fa-cog me-1"></i>Admin</a></li>
+              <li class="nav-item"><a class="nav-link" href="{{ url_for('main.admin_users') }}"><i class="fas fa-users me-1"></i>Usuarios</a></li>
             {% endif %}
-        {% endwith %}
+            <li class="nav-item"><a class="nav-link" href="{{ url_for('auth.profile') }}">Perfil</a></li>
+            <li class="nav-item"><a class="nav-link text-danger" href="{{ url_for('auth.logout') }}"><i class="fas fa-sign-out-alt me-1"></i>Salir</a></li>
+          {% else %}
+            <li class="nav-item"><a class="nav-link" href="{{ url_for('auth.login') }}">Iniciar Sesión</a></li>
+            <li class="nav-item"><a class="nav-link" href="{{ url_for('auth.register') }}">Registrarse</a></li>
+          {% endif %}
+          <li class="nav-item ms-2">
+            <button id="theme-toggle" class="theme-toggle-btn" aria-label="Cambiar tema">
+              <i class="fas fa-sun"></i> <span class="theme-label d-none d-md-inline">Claro</span>
+            </button>
+          </li>
+        </ul>
+      </div>
     </div>
+  </nav>
 
-    <!-- Contenido principal -->
-    <main class="flex-grow-1">
-        {% block content %}{% endblock %}
-    </main>
+  {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+      <div class="container mt-3">
+        {% for category, message in messages %}
+          <div class="alert alert-{{ 'danger' if category == 'error' else category }} alert-dismissible fade show" role="alert">
+            {% if category == 'error' %}<i class="fas fa-exclamation-circle me-2"></i>
+            {% elif category == 'success' %}<i class="fas fa-check-circle me-2"></i>
+            {% else %}<i class="fas fa-info-circle me-2"></i>{% endif %}
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+          </div>
+        {% endfor %}
+      </div>
+    {% endif %}
+  {% endwith %}
 
-    <!-- Footer -->
-    <footer class="text-center py-4 mt-5">
-        <div class="container">
-            <p class="mb-1">&copy; 2024 Asadero Rossy Pollo. Todos los derechos reservados.</p>
-            <p class="small text-muted mb-0">Hecho con <i class="fas fa-heart text-danger"></i> usando Flask & Bootstrap 5</p>
+  <main class="flex-grow-1 page-enter">
+    {% block content %}{% endblock %}
+  </main>
+
+  <footer class="footer">
+    <div class="container">
+      <div class="row g-4">
+        <div class="col-md-4">
+          <h5><span class="brand-icon" style="display:inline-flex;width:32px;height:32px;font-size:1rem;margin-right:8px;">R</span> Rossypollo</h5>
+          <p class="text-secondary" style="font-size:0.9rem;">Vive la pasión del Mundial con Rossypollo. Registra tus pronósticos y gana premios exclusivos.</p>
         </div>
-    </footer>
+        <div class="col-md-4">
+          <h5>Enlaces</h5>
+          <ul class="list-unstyled">
+            <li class="mb-2"><a href="{{ url_for('main.index') }}">Inicio</a></li>
+            <li class="mb-2"><a href="{{ url_for('main.list_matches') }}">Partidos</a></li>
+            <li class="mb-2"><a href="{{ url_for('main.leaderboard') }}">Ranking</a></li>
+          </ul>
+        </div>
+        <div class="col-md-4">
+          <h5>Contacto</h5>
+          <ul class="list-unstyled">
+            <li class="mb-2"><a href="#"><i class="fab fa-facebook me-2"></i>Facebook</a></li>
+            <li class="mb-2"><a href="#"><i class="fab fa-instagram me-2"></i>Instagram</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <p>&copy; 2026 Asadero Rossy Pollo. Todos los derechos reservados.</p>
+      </div>
+    </div>
+  </footer>
 
-    <!-- Bootstrap JS Bundle -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
-    {% block extra_js %}{% endblock %}
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+  {% block extra_js %}{% endblock %}
 </body>
 </html>

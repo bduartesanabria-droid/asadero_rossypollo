@@ -93,6 +93,16 @@ python run.py
 
 La aplicación estará disponible en: **http://localhost:5000**
 
+#### 6. Ejecutar tests
+```bash
+pytest
+```
+
+Si deseas ejecutar una prueba específica:
+```bash
+pytest tests/test_app.py
+```
+
 ---
 
 ### Opción 2: Instalación con Docker
@@ -106,25 +116,60 @@ La aplicación estará disponible en: **http://localhost:5000**
 cp .env.example .env
 ```
 
-#### 2. Ejecutar con docker-compose
-```bash
-docker-compose up -d
+*En Windows PowerShell:*
+```powershell
+Copy-Item .env.example .env
 ```
 
-#### 3. Acceder a la aplicación
+#### 2. Personalizar `.env`
+Asegúrate de ajustar:
+- `SECRET_KEY`
+- `DATABASE_URL`
+- `MYSQL_DATABASE`
+- `MYSQL_USER`
+- `MYSQL_PASSWORD`
+- `MYSQL_ROOT_PASSWORD`
+- `ADMIN_USERNAME`, `ADMIN_EMAIL`, `ADMIN_PASSWORD`
+
+#### 3. Levantar los contenedores
+```bash
+docker-compose up -d --build
+```
+
+#### 4. Verificar que el contenedor esté listo
+```bash
+docker-compose logs -f app
+```
+
+#### 5. Acceder a la aplicación
 ```
 http://localhost:5000
 ```
 
+#### 6. Migraciones y mantenimiento
+El `entrypoint.sh` ejecuta `flask db upgrade` automáticamente cuando `FLASK_ENV=production`.
+Si necesitas forzar una migración manualmente:
+```bash
+docker-compose exec app flask db upgrade
+```
+
+Para resetear el volumen de la base de datos y volver a iniciar desde cero:
+```bash
+docker-compose down -v
+```
+
 #### Comandos útiles
 ```bash
-# Ver logs
+# Ver logs de la app
 docker-compose logs -f app
 
-# Detener
+# Ver logs de MySQL
+docker-compose logs -f db
+
+# Detener la aplicación
 docker-compose down
 
-# Reconstruir
+# Reconstruir imágenes
 docker-compose build --no-cache
 ```
 
@@ -221,9 +266,16 @@ with app.app_context():
 - `/auth/logout` - Cerrar sesión
 
 ### Administrador
+- `/admin` - Panel principal del administrador
+- `/admin/matches` - Gestionar partidos
+- `/admin/match/new` - Crear partido
+- `/admin/match/<id>/edit` - Editar partido y resultados
+- `/admin/prizes` - Gestionar premios
+- `/admin/prize/new` - Crear premio
+- `/admin/prize/<id>/edit` - Editar premio
+- `/admin/results` - Ver ganadores y todos los resultados
 - `/admin/post/new` - Crear nuevo post
 - `/admin/post/<id>/edit` - Editar post
-- `/admin/results` - Ver ganadores y todos los resultados
 
 ### API
 - `/api/search?q=<query>` - Buscar posts

@@ -1,21 +1,54 @@
 {% extends 'base.html' %}
 {% block title %}Editar Partido - Admin{% endblock %}
 {% block content %}
-<div class="container mx-auto py-8">
-  <h1 class="text-3xl font-bold mb-6">Editar Partido</h1>
-  <form method="POST" class="grid gap-4">
-    <div class="grid grid-cols-2 gap-4">
-      <input type="text" name="home_team" class="form-control" placeholder="Equipo Local" value="{{ match.home_team }}" required {% if locked %}disabled{% endif %}>
-      <input type="text" name="away_team" class="form-control" placeholder="Equipo Visitante" value="{{ match.away_team }}" required {% if locked %}disabled{% endif %}>
+<div class="container py-4">
+  <div class="row justify-content-center">
+    <div class="col-md-6">
+      <div class="card p-4">
+        <div class="card-header bg-transparent border-bottom mb-3">
+          <h4 class="fw-bold mb-0"><i class="fas fa-edit me-2" style="color:var(--yellow);"></i>{{ 'Actualizar Resultado' if locked else 'Editar Partido' }}</h4>
+        </div>
+        <div class="card-body">
+          {% if locked %}
+            <div class="alert alert-info"><i class="fas fa-info-circle me-2"></i>Partido bloqueado. Solo puedes actualizar el resultado.</div>
+          {% endif %}
+          <form method="POST">
+            <div class="row g-3 mb-3">
+              <div class="col-6">
+                <label class="form-label">Local</label>
+                <input type="text" name="home_team" class="form-control" value="{{ match.home_team }}" {% if locked %}disabled{% endif %}>
+              </div>
+              <div class="col-6">
+                <label class="form-label">Visitante</label>
+                <input type="text" name="away_team" class="form-control" value="{{ match.away_team }}" {% if locked %}disabled{% endif %}>
+              </div>
+            </div>
+            <div class="row g-3 mb-3">
+              <div class="col-6">
+                <label class="form-label">Goles Local</label>
+                <input type="number" name="home_score" class="form-control" value="{{ match.home_score or '' }}" min="0">
+              </div>
+              <div class="col-6">
+                <label class="form-label">Goles Visitante</label>
+                <input type="number" name="away_score" class="form-control" value="{{ match.away_score or '' }}" min="0">
+              </div>
+            </div>
+            <div class="mb-3">
+              <label class="form-label">Fecha y Hora</label>
+              <input type="datetime-local" name="match_date" class="form-control" value="{{ match.match_date.isoformat()[:16] }}" {% if locked %}disabled{% endif %}>
+            </div>
+            <div class="mb-3">
+              <label class="form-label">Grupo</label>
+              <input type="text" name="group" class="form-control" value="{{ match.group or '' }}" {% if locked %}disabled{% endif %}>
+            </div>
+            <div class="d-flex gap-2">
+              <button type="submit" class="btn btn-yellow"><i class="fas fa-save me-2"></i>{{ 'Guardar Resultado' if locked else 'Actualizar' }}</button>
+              <a href="{{ url_for('main.admin_matches') }}" class="btn btn-outline-yellow">Cancelar</a>
+            </div>
+          </form>
+        </div>
+      </div>
     </div>
-    <input type="datetime-local" name="match_date" class="form-control" value="{{ match.match_date.isoformat()|replace('Z','') }}" required {% if locked %}disabled{% endif %}>
-    <input type="number" name="home_score" class="form-control" placeholder="Goles Local" value="{{ match.home_score or '' }}">
-    <input type="number" name="away_score" class="form-control" placeholder="Goles Visitante" value="{{ match.away_score or '' }}">
-    <input type="text" name="group" class="form-control" placeholder="Grupo" value="{{ match.group or '' }}" {% if locked %}disabled{% endif %}>
-    {% if locked %}
-      <div class="alert alert-info">El partido está bloqueado. Solo se pueden actualizar los goles y el resultado final.</div>
-    {% endif %}
-    <button type="submit" class="btn btn-primary mt-4">{{ 'Actualizar Resultado' if locked else 'Actualizar Partido' }}</button>
-  </form>
+  </div>
 </div>
 {% endblock %}

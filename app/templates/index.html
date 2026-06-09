@@ -1,127 +1,227 @@
 {% extends "base.html" %}
-
-{% block title %}Asadero Rossy Pollo - Mundial 2026{% endblock %}
-
+{% block title %}Rossypollo Mundial 2026 - Pronósticos y Premios{% endblock %}
 {% block content %}
-<div class="container py-5">
-    <section class="worldcup-hero mb-5">
-        <div class="row align-items-center gy-4">
-            <div class="col-lg-7">
-                <span class="worldcup-champ">Rossypollo Mundial 2026</span>
-                <h1 class="display-4 fw-bold">Vive la pasión del Mundial con <span>Rossypollo</span></h1>
-                <p class="lead text-white-75 mb-4">Regístrate, elige tus marcadores exclusivos y compite por premios y descuentos en cada fase del torneo.</p>
-                <div class="d-flex flex-column flex-sm-row gap-3 mb-4">
-                    <a href="{{ url_for('auth.register') }}" class="btn btn-light btn-lg">Participar Ahora</a>
-                    <a href="{{ url_for('main.list_matches') }}" class="btn btn-outline-light btn-lg">Ver Partidos</a>
-                </div>
-                <div class="row row-cols-1 row-cols-md-3 g-3 worldcup-kpis">
-                    <div class="col">
-                        <div class="kpi-card">
-                            <span class="kpi-label">Ranking</span>
-                            <strong>{{ leaderboard|length }} líderes</strong>
-                        </div>
-                    </div>
-                    <div class="col">
-                        <div class="kpi-card">
-                            <span class="kpi-label">Partidos</span>
-                            <strong>{{ upcoming_matches|length }} disponibles</strong>
-                        </div>
-                    </div>
-                    <div class="col">
-                        <div class="kpi-card">
-                            <span class="kpi-label">Premios</span>
-                            <strong>5 fases</strong>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="col-lg-5">
-                <div class="mascot-card p-4">
-                    <div class="mascot-top">
-                        <div class="mascot-ear"></div>
-                        <div class="mascot-head">
-                            <div class="mascot-face">R</div>
-                        </div>
-                        <div class="mascot-ear right"></div>
-                    </div>
-                    <div class="mascot-body"></div>
-                    <div class="mascot-ball"></div>
-                </div>
-            </div>
-        </div>
-    </section>
 
-    <div class="row g-4 mb-5">
-        <div class="col-lg-6">
-            <div class="card border-0 shadow-sm">
-                <div class="card-header bg-transparent py-4">
-                    <h3 class="fw-bold mb-1">Ranking en Vivo</h3>
-                    <p class="text-muted small mb-0">Los mejores pronosticadores del torneo.</p>
-                </div>
-                <div class="card-body p-0">
-                    {% if leaderboard %}
-                        <div class="list-group list-group-flush">
-                            {% for user in leaderboard %}
-                                <div class="list-group-item d-flex justify-content-between align-items-center py-3">
-                                    <div>
-                                        <strong class="d-block">{{ loop.index }}. {{ user.username }}</strong>
-                                        <small class="text-muted">{{ user.total_points }} puntos</small>
-                                    </div>
-                                    <span class="badge bg-primary rounded-pill">{{ user.total_points }}</span>
-                                </div>
-                            {% endfor %}
-                        </div>
-                    {% else %}
-                        <div class="p-4 text-center text-muted">Todavía no hay resultados registrados.</div>
-                    {% endif %}
-                </div>
-            </div>
+<!-- HERO SECTION -->
+<section class="hero-section">
+  <div class="hero-stadium-lights"></div>
+  <div class="container">
+    <div class="row align-items-center gy-5">
+      <div class="col-lg-7">
+        <span class="badge badge-yellow mb-3 animate-fade-up">Mundial 2026</span>
+        <h1 class="hero-title animate-fade-up delay-1">
+          Vive la pasión del Mundial<br>con <span class="highlight">Rossypollo</span>
+        </h1>
+        <p class="hero-subtitle animate-fade-up delay-2">
+          Regístrate, elige tus marcadores exclusivos y compite por premios y descuentos en cada fase del torneo. Cada marcador es único.
+        </p>
+        <div class="d-flex flex-column flex-sm-row gap-3 animate-fade-up delay-3">
+          {% if current_user.is_authenticated %}
+            <a href="{{ url_for('main.list_matches') }}" class="btn btn-yellow btn-lg btn-glow" data-confetti="true">
+              <i class="fas fa-futbol me-2"></i>Pronosticar Ahora
+            </a>
+          {% else %}
+            <a href="{{ url_for('auth.register') }}" class="btn btn-yellow btn-lg btn-glow" data-confetti="true">
+              <i class="fas fa-user-plus me-2"></i>Participar Ahora
+            </a>
+            <a href="{{ url_for('auth.login') }}" class="btn btn-outline-yellow btn-lg">
+              <i class="fas fa-sign-in-alt me-2"></i>Iniciar Sesión
+            </a>
+          {% endif %}
         </div>
-        <div class="col-lg-6">
-            <div class="card border-0 shadow-sm">
-                <div class="card-header bg-transparent py-4">
-                    <h3 class="fw-bold mb-1">Próximos Partidos</h3>
-                    <p class="text-muted small mb-0">No te quedes sin elegir tu marcador.</p>
-                </div>
-                <div class="card-body p-0">
-                    {% if upcoming_matches %}
-                        <div class="list-group list-group-flush">
-                            {% for match in upcoming_matches %}
-                                <a href="{{ url_for('main.match_detail', match_id=match.id) }}" class="list-group-item list-group-item-action py-3">
-                                    <div class="d-flex justify-content-between align-items-center">
-                                        <div>
-                                            <h5 class="mb-1 fw-bold">{{ match.home_team }} vs {{ match.away_team }}</h5>
-                                            <small class="text-white-75">{{ match.match_date.strftime('%d %b %Y - %H:%M UTC') }}{% if match.group %} · Grupo {{ match.group }}{% endif %}</small>
-                                        </div>
-                                        <span class="badge bg-warning text-dark">Pronosticar</span>
-                                    </div>
-                                </a>
-                            {% endfor %}
-                        </div>
-                    {% else %}
-                        <div class="p-4 text-center text-muted">No hay partidos programados.</div>
-                    {% endif %}
-                </div>
+        <div class="row g-3 mt-4 animate-fade-up delay-4">
+          <div class="col-4">
+            <div class="stat-card p-3">
+              <div class="stat-number">{{ leaderboard|length }}</div>
+              <div class="stat-label">Ranking</div>
             </div>
+          </div>
+          <div class="col-4">
+            <div class="stat-card p-3">
+              <div class="stat-number">{{ upcoming_matches|length }}</div>
+              <div class="stat-label">Partidos</div>
+            </div>
+          </div>
+          <div class="col-4">
+            <div class="stat-card p-3">
+              <div class="stat-number">{{ prizes|length }}</div>
+              <div class="stat-label">Premios</div>
+            </div>
+          </div>
         </div>
+      </div>
+      <div class="col-lg-5">
+        <div class="mascot-wrapper animate-slide-right">
+          <div class="mascot-3d">
+            <div class="mascot-head-chicken">
+              <div class="mascot-comb"></div>
+              <div class="mascot-eye left"></div>
+              <div class="mascot-eye right"></div>
+              <div class="mascot-beak"></div>
+              <div class="mascot-beak-lower"></div>
+              <div class="mascot-wattle"></div>
+            </div>
+            <div class="mascot-body-chicken">
+              <div class="mascot-wings left"></div>
+              <div class="mascot-wings right"></div>
+              <div class="mascot-shirt">R</div>
+            </div>
+            <div class="mascot-feet">
+              <div class="mascot-foot"></div>
+              <div class="mascot-foot"></div>
+            </div>
+            <div class="mascot-ball-area">
+              <div class="mascot-soccer-ball"></div>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
+  </div>
+</section>
 
-    <div class="row g-4">
-        {% if prizes %}
-            {% for prize in prizes %}
-                <div class="col-md-4">
-                    <div class="promo-card p-4 h-100">
-                        <span class="promo-tag">{{ prize.phase }}</span>
-                        <h3>{{ prize.name }}</h3>
-                        <p class="mb-0 text-muted">{{ prize.description }}</p>
-                    </div>
-                </div>
+<!-- HOW TO PARTICIPATE -->
+<section class="steps-section">
+  <div class="container">
+    <div class="section-title">
+      <div class="section-divider"></div>
+      <h2>Cómo <span class="highlight">Participar</span></h2>
+      <p>Cuatro pasos simples para unirte a la competencia</p>
+    </div>
+    <div class="row g-4 justify-content-center">
+      <div class="col-md-3">
+        <div class="step-card animate-on-scroll">
+          <div class="step-number">1</div>
+          <h4>Regístrate</h4>
+          <p>Crea tu cuenta gratis en Rossypollo</p>
+        </div>
+      </div>
+      <div class="col-md-3">
+        <div class="step-card animate-on-scroll delay-1">
+          <div class="step-number">2</div>
+          <h4>Elige Marcador</h4>
+          <p>Selecciona tu resultado único para cada partido</p>
+        </div>
+      </div>
+      <div class="col-md-3">
+        <div class="step-card animate-on-scroll delay-2">
+          <div class="step-number">3</div>
+          <h4>Acumula Puntos</h4>
+          <p>Gana 3 pts por resultado exacto, 1 por ganador correcto</p>
+        </div>
+      </div>
+      <div class="col-md-3">
+        <div class="step-card animate-on-scroll delay-3">
+          <div class="step-number">4</div>
+          <h4>Gana Premios</h4>
+          <p>Canjea descuentos y combos exclusivos por fase</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- RANKING & MATCHES -->
+<div class="container">
+  <div class="row g-4 mb-5">
+    <div class="col-lg-6">
+      <div class="section-title text-start mb-4">
+        <div class="section-divider" style="margin:0 0 1rem 0;"></div>
+        <h2 style="text-align:left;">Ranking <span class="highlight">en Vivo</span></h2>
+      </div>
+      {% if leaderboard %}
+        <table class="ranking-table">
+          <thead>
+            <tr><th>#</th><th>Participante</th><th style="text-align:right;">Puntos</th></tr>
+          </thead>
+          <tbody>
+            {% for user in leaderboard %}
+            <tr>
+              <td>
+                {% if loop.index == 1 %}<span class="rank-badge rank-1">1</span>
+                {% elif loop.index == 2 %}<span class="rank-badge rank-2">2</span>
+                {% elif loop.index == 3 %}<span class="rank-badge rank-3">3</span>
+                {% else %}<span class="rank-badge" style="background:var(--bg-card);color:var(--text-secondary);">{{ loop.index }}</span>
+                {% endif %}
+              </td>
+              <td><strong>{{ user.username }}</strong></td>
+              <td style="text-align:right;font-weight:800;color:var(--yellow);">{{ user.total_points }}</td>
+            </tr>
             {% endfor %}
-        {% else %}
-            <div class="col-12">
-                <div class="alert alert-secondary">No hay premios configurados por el administrador.</div>
-            </div>
-        {% endif %}
+          </tbody>
+        </table>
+        <div class="mt-3 text-center">
+          <a href="{{ url_for('main.leaderboard') }}" class="btn btn-outline-yellow btn-sm">Ver Ranking Completo</a>
+        </div>
+      {% else %}
+        <div class="empty-state">
+          <div class="empty-icon"><i class="fas fa-trophy"></i></div>
+          <h4>Sin participantes aún</h4>
+          <p>Sé el primero en registrarte y participar</p>
+        </div>
+      {% endif %}
     </div>
+    <div class="col-lg-6">
+      <div class="section-title text-start mb-4">
+        <div class="section-divider" style="margin:0 0 1rem 0;"></div>
+        <h2 style="text-align:left;">Próximos <span class="highlight">Partidos</span></h2>
+      </div>
+      {% if upcoming_matches %}
+        {% for match in upcoming_matches %}
+        <a href="{{ url_for('main.match_detail', match_id=match.id) }}" class="text-decoration-none" style="display:block;">
+          <div class="match-card mb-3">
+            <div class="match-teams">
+              <div class="team"><i class="fas fa-shield-alt me-2" style="color:var(--yellow);"></i>{{ match.home_team }}</div>
+              <div class="d-flex align-items-center gap-3">
+                <span class="match-status {{ 'locked' if match.is_locked else 'open' }}">{{ 'Bloqueado' if match.is_locked else 'Abierto' }}</span>
+              </div>
+              <div class="team">{{ match.away_team }}<i class="fas fa-shield-alt ms-2" style="color:var(--yellow);"></i></div>
+            </div>
+            <div class="d-flex justify-content-between align-items-center mt-2">
+              <span class="match-info">{{ match.match_date.strftime('%d/%m/%Y %H:%M') }}</span>
+              {% if match.group %}<span class="match-info">Grupo {{ match.group }}</span>{% endif %}
+            </div>
+          </div>
+        </a>
+        {% endfor %}
+      {% else %}
+        <div class="empty-state">
+          <div class="empty-icon"><i class="fas fa-calendar"></i></div>
+          <h4>No hay partidos</h4>
+          <p>Pronto se anunciarán los encuentros del Mundial</p>
+        </div>
+      {% endif %}
+    </div>
+  </div>
 </div>
+
+<!-- PRIZES -->
+<section class="steps-section">
+  <div class="container">
+    <div class="section-title">
+      <div class="section-divider"></div>
+      <h2>Tabla de <span class="highlight">Premios</span></h2>
+      <p>Recompensas por cada fase del Mundial 2026</p>
+    </div>
+    <div class="prize-timeline">
+      {% if prizes %}
+        {% for prize in prizes %}
+        <div class="prize-card {% if loop.last %}final{% endif %}">
+          <div class="prize-phase">{{ prize.phase }}</div>
+          <div class="prize-icon"><i class="fas fa-{% if loop.index == 1 %}drumstick-bite{% elif loop.index == 2 %}percent{% elif loop.index == 3 %}percent{% elif loop.index == 4 %}utensils{% else %}crown{% endif %}"></i></div>
+          <div class="prize-name">{{ prize.name }}</div>
+          <div class="prize-desc">{{ prize.description }}</div>
+        </div>
+        {% endfor %}
+      {% else %}
+        <div class="empty-state">
+          <div class="empty-icon"><i class="fas fa-gift"></i></div>
+          <h4>Premios próximamente</h4>
+          <p>El administrador configurará los premios pronto</p>
+        </div>
+      {% endif %}
+    </div>
+  </div>
+</section>
+
 {% endblock %}

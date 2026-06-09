@@ -1,140 +1,190 @@
-// Funciones de JavaScript de Asadero Rossy Pollo
-
-document.addEventListener('DOMContentLoaded', function() {
-    // 1. INICIALIZAR MODO OSCURO / CLARO
-    const savedTheme = localStorage.getItem('theme') || 'light';
-    document.documentElement.setAttribute('data-theme', savedTheme);
-    updateThemeToggleIcon(savedTheme);
-
-    // Configurar listener para el botón de alternancia si existe
-    const themeBtn = document.getElementById('theme-toggle');
-    if (themeBtn) {
-        themeBtn.addEventListener('click', toggleTheme);
-    }
-
-    // 2. INICIALIZAR TOOLTIPS
-    const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
-    if (typeof bootstrap !== 'undefined' && bootstrap.Tooltip) {
-        tooltipTriggerList.map(function (tooltipTriggerEl) {
-            return new bootstrap.Tooltip(tooltipTriggerEl);
-        });
-    }
-
-    // 3. AUTO-CERRAR ALERTAS DE BOOTSTRAP SI EXISTEN
-    const alerts = document.querySelectorAll('.alert');
-    alerts.forEach(alert => {
-        setTimeout(() => {
-            if (typeof bootstrap !== 'undefined' && bootstrap.Alert) {
-                const bsAlert = new bootstrap.Alert(alert);
-                bsAlert.close();
-            } else {
-                alert.style.display = 'none';
-            }
-        }, 5000);
-    });
+document.addEventListener('DOMContentLoaded', function () {
+  initTheme();
+  initTooltips();
+  initAutoCloseAlerts();
+  initScrollAnimations();
+  initConfetti();
 });
 
-// ALTERNAR TEMA (CLARO/OSCURO)
-function toggleTheme() {
-    const currentTheme = document.documentElement.getAttribute('data-theme');
-    const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
-    
-    document.documentElement.setAttribute('data-theme', newTheme);
-    localStorage.setItem('theme', newTheme);
-    updateThemeToggleIcon(newTheme);
+function initTheme() {
+  const saved = localStorage.getItem('theme') || 'dark';
+  document.documentElement.setAttribute('data-theme', saved);
+  updateThemeIcon(saved);
+
+  const btn = document.getElementById('theme-toggle');
+  if (btn) {
+    btn.addEventListener('click', function () {
+      const current = document.documentElement.getAttribute('data-theme');
+      const next = current === 'dark' ? 'light' : 'dark';
+      document.documentElement.setAttribute('data-theme', next);
+      localStorage.setItem('theme', next);
+      updateThemeIcon(next);
+    });
+  }
 }
 
-// ACTUALIZAR ICONO DE MODO OSCURO
-function updateThemeToggleIcon(theme) {
-    const icon = document.querySelector('#theme-toggle i');
-    if (icon) {
-        if (theme === 'dark') {
-            icon.className = 'fas fa-sun';
-            icon.style.color = '#e28f32';
-        } else {
-            icon.className = 'fas fa-moon';
-            icon.style.color = '#6b5c51';
-        }
-    }
+function updateThemeIcon(theme) {
+  const btn = document.getElementById('theme-toggle');
+  if (!btn) return;
+  const icon = btn.querySelector('i');
+  if (icon) {
+    icon.className = theme === 'dark' ? 'fas fa-sun' : 'fas fa-moon';
+  }
+  const label = btn.querySelector('.theme-label');
+  if (label) {
+    label.textContent = theme === 'dark' ? 'Claro' : 'Oscuro';
+  }
 }
 
-// MOSTRAR TOAST PERSONALIZADO PREMIUM
-function showToast(message, type = 'info') {
-    // Buscar o crear contenedor de toasts
-    let container = document.querySelector('.toast-container');
-    if (!container) {
-        container = document.createElement('div');
-        container.className = 'toast-container';
-        document.body.appendChild(container);
-    }
-
-    const toast = document.createElement('div');
-    toast.className = `custom-toast ${type}`;
-    
-    let iconClass = 'info-circle';
-    if (type === 'success') iconClass = 'check-circle';
-    if (type === 'error') iconClass = 'exclamation-circle';
-
-    toast.innerHTML = `
-        <div class="d-flex align-items-center">
-            <i class="fas fa-${iconClass} me-2"></i>
-            <span>${message}</span>
-        </div>
-        <button type="button" class="btn-close ms-3 bg-transparent border-0" style="color: inherit;" onclick="this.parentElement.remove()">
-            <i class="fas fa-times"></i>
-        </button>
-    `;
-
-    container.appendChild(toast);
-
-    // Auto-eliminar después de 4 segundos
-    setTimeout(() => {
-        toast.style.animation = 'slideOut 0.3s forwards';
-        setTimeout(() => toast.remove(), 300);
-    }, 4000);
+function initTooltips() {
+  if (typeof bootstrap !== 'undefined' && bootstrap.Tooltip) {
+    document.querySelectorAll('[data-bs-toggle="tooltip"]').forEach(function (el) {
+      new bootstrap.Tooltip(el);
+    });
+  }
 }
 
-// LLAMADAS AJAX GENÉRICAS
-async function apiRequest(url, options = {}) {
-    try {
-        const response = await fetch(url, options);
-        const data = await response.json();
-        if (!response.ok) {
-            throw new Error(data.error || 'Ocurrió un error inesperado');
-        }
-        return data;
-    } catch (error) {
-        showToast(error.message, 'error');
-        throw error;
-    }
+function initAutoCloseAlerts() {
+  document.querySelectorAll('.alert').forEach(function (alert) {
+    setTimeout(function () {
+      if (typeof bootstrap !== 'undefined' && bootstrap.Alert) {
+        new bootstrap.Alert(alert).close();
+      } else {
+        alert.style.display = 'none';
+      }
+    }, 5000);
+  });
 }
 
-// CONFIRMACIÓN Y ELIMINACIÓN DE POST POR AJAX
-async function deletePost(postId, redirectUrl = '/dashboard') {
-    // Usar SweetAlert2 si está disponible, de lo contrario un confirm estilizado
-    const confirmDelete = confirm('¿Estás seguro de que deseas eliminar este artículo de forma permanente?');
-    if (!confirmDelete) return;
+function initScrollAnimations() {
+  const observer = new IntersectionObserver(function (entries) {
+    entries.forEach(function (entry) {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('animate-fade-up');
+        observer.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.1 });
 
-    try {
-        const response = await fetch(`/admin/post/${postId}/delete`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            }
-        });
-        
-        const data = await response.json();
-        
-        if (response.ok) {
-            showToast('Post eliminado con éxito', 'success');
-            setTimeout(() => {
-                window.location.href = redirectUrl;
-            }, 1000);
-        } else {
-            showToast(data.error || 'Error al eliminar el post', 'error');
-        }
-    } catch (error) {
-        console.error('Error:', error);
-        showToast('Error de conexión al eliminar el post', 'error');
+  document.querySelectorAll('.animate-on-scroll').forEach(function (el) {
+    observer.observe(el);
+  });
+}
+
+function initConfetti() {
+  const triggers = document.querySelectorAll('[data-confetti]');
+  triggers.forEach(function (el) {
+    el.addEventListener('click', function (e) {
+      e.preventDefault();
+      fireConfetti();
+      var href = el.getAttribute('href');
+      if (href) {
+        setTimeout(function () { window.location.href = href; }, 800);
+      }
+    });
+  });
+}
+
+function fireConfetti() {
+  var container = document.querySelector('.confetti-container');
+  if (!container) {
+    container = document.createElement('div');
+    container.className = 'confetti-container';
+    document.body.appendChild(container);
+  }
+
+  var colors = ['#FFD700', '#D32F2F', '#0A1F44', '#FFFFFF', '#FF9800', '#4CAF50', '#E91E63'];
+  var shapes = ['circle', 'square', 'triangle'];
+
+  for (var i = 0; i < 80; i++) {
+    var piece = document.createElement('div');
+    piece.className = 'confetti-piece';
+    var color = colors[Math.floor(Math.random() * colors.length)];
+    var shape = shapes[Math.floor(Math.random() * shapes.length)];
+    var size = Math.random() * 8 + 4;
+    var left = Math.random() * 100;
+    var delay = Math.random() * 2;
+    var duration = Math.random() * 2 + 2;
+
+    piece.style.left = left + '%';
+    piece.style.width = size + 'px';
+    piece.style.height = size + 'px';
+    piece.style.background = color;
+    piece.style.animationDuration = duration + 's';
+    piece.style.animationDelay = delay + 's';
+
+    if (shape === 'circle') piece.style.borderRadius = '50%';
+    if (shape === 'triangle') {
+      piece.style.width = '0';
+      piece.style.height = '0';
+      piece.style.background = 'transparent';
+      piece.style.borderLeft = size / 2 + 'px solid transparent';
+      piece.style.borderRight = size / 2 + 'px solid transparent';
+      piece.style.borderBottom = size + 'px solid ' + color;
     }
+
+    container.appendChild(piece);
+  }
+
+  setTimeout(function () {
+    container.innerHTML = '';
+  }, 5000);
+}
+
+function showToast(message, type) {
+  type = type || 'info';
+  var container = document.querySelector('.toast-container');
+  if (!container) {
+    container = document.createElement('div');
+    container.className = 'toast-container';
+    document.body.appendChild(container);
+  }
+
+  var toast = document.createElement('div');
+  toast.className = 'custom-toast ' + type;
+
+  var iconMap = { success: 'check-circle', error: 'exclamation-circle', info: 'info-circle' };
+  var icon = iconMap[type] || 'info-circle';
+
+  toast.innerHTML =
+    '<div class="d-flex align-items-center gap-2">' +
+    '<i class="fas fa-' + icon + '"></i>' +
+    '<span>' + message + '</span>' +
+    '</div>' +
+    '<button type="button" class="btn-close btn-close-white" onclick="this.parentElement.remove()"></button>';
+
+  container.appendChild(toast);
+
+  setTimeout(function () {
+    toast.style.animation = 'toastOut 0.3s forwards';
+    setTimeout(function () { toast.remove(); }, 300);
+  }, 4000);
+}
+
+async function apiRequest(url, options) {
+  options = options || {};
+  try {
+    var response = await fetch(url, options);
+    var data = await response.json();
+    if (!response.ok) throw new Error(data.error || 'Error inesperado');
+    return data;
+  } catch (error) {
+    showToast(error.message, 'error');
+    throw error;
+  }
+}
+
+function togglePassword(fieldId) {
+  var field = document.getElementById(fieldId);
+  if (field) {
+    field.type = field.type === 'password' ? 'text' : 'password';
+  }
+}
+
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('/service-worker.js').then(function () {
+    // console.log('SW registered');
+  }).catch(function () {
+    // console.log('SW failed');
+  });
 }

@@ -1,48 +1,43 @@
 {% extends "base.html" %}
-
-{% block title %}Perfil - Asadero Rossy Pollo{% endblock %}
-
+{% block title %}Perfil - Rossypollo Mundial 2026{% endblock %}
 {% block content %}
-<div class="container my-5">
-    <div class="row justify-content-center">
-        <div class="col-md-8 col-lg-6">
-            <div class="card border-0 shadow-lg text-center py-4">
-                <div class="card-body p-4 p-md-5">
-                    <div class="avatar bg-primary text-white rounded-circle d-flex align-items-center justify-content-center mx-auto mb-4" style="width: 90px; height: 90px; font-weight: 700; font-size: 2.2rem; box-shadow: 0 4px 12px rgba(212, 92, 63, 0.2);">
-                        {{ current_user.username[0]|upper }}
-                    </div>
-                    
-                    <h2 class="fw-bold mb-2">{{ current_user.username }}</h2>
-                    <p class="text-secondary mb-4"><i class="far fa-envelope me-2"></i>{{ current_user.email }}</p>
-                    
-                    <div class="d-flex justify-content-center gap-2 mb-4">
-                        {% if current_user.is_admin %}
-                            <span class="badge bg-primary">
-                                <i class="fas fa-shield-halved me-1"></i>Administrador
-                            </span>
-                        {% else %}
-                            <span class="badge bg-secondary bg-opacity-10 text-muted border border-secondary-subtle">
-                                <i class="far fa-user me-1"></i>Autor/Lector
-                            </span>
-                        {% endif %}
-                        <span class="badge bg-light text-muted border border-light-subtle">
-                            <i class="far fa-calendar me-1"></i>Desde {{ current_user.created_at.strftime('%d/%m/%Y') }}
-                        </span>
-                    </div>
-                    
-                    <hr class="my-4 border-light-subtle">
-                    
-                    <div class="d-flex justify-content-center gap-2">
-                        <a href="{{ url_for('auth.edit_profile') }}" class="btn btn-primary">
-                            <i class="far fa-edit me-1"></i> Editar Perfil
-                        </a>
-                        <a href="{{ url_for('main.dashboard') }}" class="btn btn-outline-secondary">
-                            <i class="far fa-file-lines me-1"></i> Mis Artículos
-                        </a>
-                    </div>
-                </div>
+<div class="container py-5">
+  <div class="row justify-content-center">
+    <div class="col-md-6">
+      <div class="card text-center p-4">
+        <div class="card-body p-md-4">
+          <div class="d-flex justify-content-center mb-4">
+            <div class="mascot-3d" style="width:120px;height:160px;">
+              <div class="mascot-head-chicken" style="width:60px;height:60px;top:5px;">
+                <div class="mascot-comb" style="width:25px;height:14px;top:-10px;"></div>
+                <div class="mascot-eye left" style="width:8px;height:10px;top:22px;left:16px;"></div>
+                <div class="mascot-eye right" style="width:8px;height:10px;top:22px;right:16px;"></div>
+                <div class="mascot-beak" style="border-left-width:6px;border-right-width:6px;border-top-width:10px;bottom:14px;"></div>
+              </div>
+              <div class="mascot-body-chicken" style="width:65px;height:80px;bottom:25px;">
+                <div class="mascot-shirt" style="width:75px;height:40px;font-size:1.1rem;">R</div>
+              </div>
             </div>
+          </div>
+          <h2 class="fw-bold mb-1">{{ current_user.username }}</h2>
+          <p class="text-secondary mb-3"><i class="far fa-envelope me-2"></i>{{ current_user.email }}</p>
+
+          <div class="d-flex justify-content-center gap-2 mb-3">
+            {% if current_user.is_admin %}
+              <span class="badge badge-yellow"><i class="fas fa-shield-alt me-1"></i>Administrador</span>
+            {% endif %}
+            <span class="badge" style="background:var(--bg-card);color:var(--text-secondary);border:1px solid var(--border-color);">
+              <i class="far fa-calendar me-1"></i>{{ current_user.created_at.strftime('%d/%m/%Y') }}
+            </span>
+          </div>
+
+          <div class="d-flex justify-content-center gap-2 mt-4">
+            <a href="{{ url_for('auth.edit_profile') }}" class="btn btn-yellow"><i class="far fa-edit me-1"></i>Editar Perfil</a>
+            <a href="{{ url_for('main.dashboard') }}" class="btn btn-outline-yellow"><i class="fas fa-chart-simple me-1"></i>Mi Panel</a>
+          </div>
         </div>
+      </div>
     </div>
+  </div>
 </div>
 {% endblock %}

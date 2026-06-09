@@ -13,7 +13,8 @@ class User(UserMixin, db.Model):
     password_hash = db.Column(db.String(255), nullable=False)
     role = db.Column(db.String(20), default='user', nullable=False)
     is_admin = db.Column(db.Boolean, default=False)
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    is_active_col = db.Column('is_active', db.Boolean, default=True)
+    created_at = db.Column(db.DateTime, default=datetime.now)
     
     # Relaciones
     posts = db.relationship('Post', backref='author', lazy=True, cascade='all, delete-orphan')
@@ -28,6 +29,14 @@ class User(UserMixin, db.Model):
         """Verifica la contraseña"""
         return check_password_hash(self.password_hash, password)
     
+    @property
+    def is_active(self):
+        return self.is_active_col
+
+    @is_active.setter
+    def is_active(self, value):
+        self.is_active_col = value
+
     def __repr__(self):
         return f'<User {self.username}>'
 
@@ -45,8 +54,8 @@ class Post(db.Model):
     category_id = db.Column(db.Integer, db.ForeignKey('category.id'), nullable=True)
     
     # Metadatos
-    created_at = db.Column(db.DateTime, default=datetime.utcnow, index=True)
-    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    created_at = db.Column(db.DateTime, default=datetime.now, index=True)
+    updated_at = db.Column(db.DateTime, default=datetime.now, onupdate=datetime.now)
     is_published = db.Column(db.Boolean, default=False)
     views = db.Column(db.Integer, default=0)
     
@@ -63,7 +72,7 @@ class Result(db.Model):
     event = db.Column(db.String(150), nullable=False)
     score = db.Column(db.Integer, nullable=False, default=0)
     is_winner = db.Column(db.Boolean, default=False)
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    created_at = db.Column(db.DateTime, default=datetime.now)
 
     def __repr__(self):
         return f'<Result {self.event} - {self.user.username}>'
@@ -83,7 +92,7 @@ class Match(db.Model):
     @property
     def is_locked(self):
         from datetime import datetime
-        return datetime.utcnow() >= self.match_date
+        return datetime.now() >= self.match_date
 
     @property
     def result(self):
@@ -137,7 +146,7 @@ class Ranking(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     points = db.Column(db.Integer, default=0, nullable=False)
-    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    updated_at = db.Column(db.DateTime, default=datetime.now, onupdate=datetime.now)
 
     def __repr__(self):
         return f'<Ranking user={self.user.username} points={self.points}>'
@@ -149,7 +158,7 @@ class Prize(db.Model):
     description = db.Column(db.Text, nullable=False)
     image_url = db.Column(db.String(500), nullable=True)
     phase = db.Column(db.String(80), nullable=False)
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    created_at = db.Column(db.DateTime, default=datetime.now)
 
     def __repr__(self):
         return f'<Prize {self.name} ({self.phase})>'
@@ -160,7 +169,7 @@ class Category(db.Model):
     name = db.Column(db.String(100), nullable=False, unique=True)
     slug = db.Column(db.String(100), nullable=False, unique=True)
     description = db.Column(db.Text)
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    created_at = db.Column(db.DateTime, default=datetime.now)
     
     def __repr__(self):
         return f'<Category {self.name}>'

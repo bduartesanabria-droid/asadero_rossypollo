@@ -1,12 +1,17 @@
+import os
 from datetime import datetime
 
-from flask import Blueprint, render_template, request, jsonify, flash, redirect, url_for
+from flask import Blueprint, render_template, request, jsonify, flash, redirect, url_for, send_from_directory
 from flask_login import login_required, current_user
 from sqlalchemy import func
 
-from app.models import db, Post, Category, Match, Prediction, User, Result, Prize
+from app.models import db, Post, Category, Match, Prediction, User, Result, Prize, Ranking
 
 main_bp = Blueprint('main', __name__)
+
+@main_bp.route('/service-worker.js')
+def service_worker():
+    return send_from_directory(os.path.join(main_bp.root_path, 'static'), 'service-worker.js', mimetype='application/javascript')
 
 @main_bp.route('/matches')
 @login_required
@@ -91,9 +96,9 @@ def seed_matches_admin():
         return jsonify({'error': 'Acceso denegado'}), 403
     from datetime import datetime, timedelta
     seed_data = [
-        {'home_team': 'Brasil', 'away_team': 'Argentina', 'match_date': datetime.utcnow() + timedelta(days=1), 'group': 'A'},
-        {'home_team': 'España', 'away_team': 'Portugal', 'match_date': datetime.utcnow() + timedelta(days=2), 'group': 'B'},
-        {'home_team': 'Alemania', 'away_team': 'Francia', 'match_date': datetime.utcnow() + timedelta(days=3), 'group': 'C'},
+        {'home_team': 'Brasil', 'away_team': 'Argentina', 'match_date': datetime.now() + timedelta(days=1), 'group': 'A'},
+        {'home_team': 'España', 'away_team': 'Portugal', 'match_date': datetime.now() + timedelta(days=2), 'group': 'B'},
+        {'home_team': 'Alemania', 'away_team': 'Francia', 'match_date': datetime.now() + timedelta(days=3), 'group': 'C'},
     ]
     for data in seed_data:
         exists = Match.query.filter_by(home_team=data['home_team'], away_team=data['away_team'], match_date=data['match_date']).first()
@@ -105,6 +110,46 @@ def seed_matches_admin():
     return redirect(url_for('main.admin_matches'))
 
 # Admin match management routes
+@main_bp.route('/admin')
+@login_required
+def admin_dashboard():
+    """Panel principal de administración"""
+    if not current_user.is_admin:
+        return jsonify({'error': 'Acceso denegado'}), 403
+
+    total_predictions = Prediction.query.count()
+    total_points = db.session.query(func.coalesce(func.sum(Prediction.points_earned), 0)).scalar()
+    stats = {
+        'users': User.query.count(),
+        'matches': Match.query.count(),
+        'prizes': Prize.query.count(),
+        'results': Result.query.count(),
+        'predictions': total_predictions,
+        'total_points': total_points,
+    }
+    return render_template('admin/dashboard.html', stats=stats)
+
+@main_bp.route('/admin/users')
+@login_required
+def admin_users():
+    """Lista de usuarios para administradores"""
+    if not current_user.is_admin:
+        return jsonify({'error': 'Acceso denegado'}), 403
+    users = User.query.order_by(User.created_at.desc()).all()
+    return render_template('admin/users.html', users=users)
+
+@main_bp.route('/admin/user/<int:user_id>/toggle_block', methods=['POST'])
+@login_required
+def toggle_block_user(user_id):
+    """Bloquear/desbloquear usuario"""
+    if not current_user.is_admin:
+        return jsonify({'error': 'Acceso denegado'}), 403
+    user = User.query.get_or_404(user_id)
+    user.is_active_col = not user.is_active_col
+    db.session.commit()
+    flash(f'Usuario {"bloqueado" if not user.is_active_col else "desbloqueado"} exitosamente', 'success')
+    return redirect(url_for('main.admin_users'))
+
 @main_bp.route('/admin/matches')
 @login_required
 def admin_matches():
@@ -194,7 +239,7 @@ def update_rankings_admin():
 @main_bp.route('/')
 def index():
     """Página principal con hero, próximos partidos y ranking"""
-    upcoming_matches = Match.query.filter(Match.match_date >= datetime.utcnow())
+    upcoming_matches = Match.query.filter(Match.match_date >= datetime.now())
     upcoming_matches = upcoming_matches.order_by(Match.match_date.asc()).limit(6).all()
 
     leaderboard = db.session.query(
@@ -335,7 +380,7 @@ def dashboard():
     total_forecasts = len(predictions)
     accuracy = int(((exact_hits + winner_hits) / total_forecasts) * 100) if total_forecasts else 0
 
-    upcoming_matches = Match.query.filter(Match.match_date >= datetime.utcnow())
+    upcoming_matches = Match.query.filter(Match.match_date >= datetime.now())
     upcoming_matches = upcoming_matches.order_by(Match.match_date.asc()).limit(4).all()
 
     return render_template(

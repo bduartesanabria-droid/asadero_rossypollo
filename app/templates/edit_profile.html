@@ -1,44 +1,38 @@
 {% extends "base.html" %}
-
-{% block title %}Editar Perfil - Asadero Rossy Pollo{% endblock %}
-
+{% block title %}Editar Perfil - Rossypollo Mundial 2026{% endblock %}
 {% block content %}
-<div class="container my-5">
-    <div class="row justify-content-center">
-        <div class="col-md-8 col-lg-6">
-            <div class="card border-0 shadow-lg">
-                <div class="card-header bg-transparent py-4 border-bottom border-light-subtle">
-                    <h3 class="mb-0 fw-bold"><i class="far fa-edit text-primary me-2"></i>Editar Perfil</h3>
-                </div>
-                <div class="card-body p-4 p-md-5">
-                    <form method="POST">
-                        <div class="mb-3">
-                            <label for="username" class="form-label">Nombre de Usuario</label>
-                            <div class="input-group">
-                                <span class="input-group-text bg-transparent border-end-0 border-color"><i class="far fa-user text-muted"></i></span>
-                                <input type="text" class="form-control border-start-0" id="username" value="{{ current_user.username }}" disabled>
-                            </div>
-                            <small class="text-muted small d-block mt-1">El nombre de usuario no se puede cambiar.</small>
-                        </div>
-                        
-                        <div class="mb-4">
-                            <label for="email" class="form-label">Correo Electrónico</label>
-                            <div class="input-group">
-                                <span class="input-group-text bg-transparent border-end-0 border-color"><i class="far fa-envelope text-muted"></i></span>
-                                <input type="email" class="form-control border-start-0" id="email" name="email" value="{{ current_user.email }}" required>
-                            </div>
-                        </div>
-                        
-                        <div class="d-flex gap-2 pt-3 border-top border-light-subtle">
-                            <button type="submit" class="btn btn-primary">
-                                <i class="fas fa-floppy-disk me-1"></i> Guardar Cambios
-                            </button>
-                            <a href="{{ url_for('auth.profile') }}" class="btn btn-outline-secondary">Cancelar</a>
-                        </div>
-                    </form>
-                </div>
-            </div>
+<div class="container py-5">
+  <div class="row justify-content-center">
+    <div class="col-md-6">
+      <div class="card p-4">
+        <div class="card-header bg-transparent border-bottom mb-3">
+          <h4 class="fw-bold mb-0"><i class="far fa-edit me-2" style="color:var(--yellow);"></i>Editar Perfil</h4>
         </div>
+        <div class="card-body">
+          <form method="POST">
+            <div class="mb-3">
+              <label class="form-label">Nombre de Usuario</label>
+              <div class="input-group">
+                <span class="input-group-text"><i class="far fa-user"></i></span>
+                <input type="text" class="form-control" value="{{ current_user.username }}" disabled>
+              </div>
+              <small class="text-secondary small d-block mt-1">El nombre de usuario no se puede cambiar</small>
+            </div>
+            <div class="mb-4">
+              <label class="form-label">Correo Electrónico</label>
+              <div class="input-group">
+                <span class="input-group-text"><i class="far fa-envelope"></i></span>
+                <input type="email" class="form-control" name="email" value="{{ current_user.email }}" required>
+              </div>
+            </div>
+            <div class="d-flex gap-2">
+              <button type="submit" class="btn btn-yellow"><i class="fas fa-floppy-disk me-1"></i>Guardar</button>
+              <a href="{{ url_for('auth.profile') }}" class="btn btn-outline-yellow">Cancelar</a>
+            </div>
+          </form>
+        </div>
+      </div>
     </div>
+  </div>
 </div>
 {% endblock %}

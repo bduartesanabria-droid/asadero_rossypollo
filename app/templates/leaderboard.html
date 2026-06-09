@@ -1,64 +1,67 @@
 {% extends 'base.html' %}
-
 {% block title %}Ranking - Rossypollo Mundial 2026{% endblock %}
-
 {% block content %}
-<div class="container py-5">
-    <div class="row align-items-center mb-4">
-        <div class="col-md-8">
-            <h1 class="h2 fw-bold mb-1">Ranking General</h1>
-            <p class="text-muted">Los usuarios con mejor puntaje en la competición.</p>
-        </div>
-        <div class="col-md-4 text-md-end">
-            <a href="{{ url_for('main.dashboard') }}" class="btn btn-outline-secondary">Volver al Panel</a>
-        </div>
+<div class="container py-4">
+  <div class="section-title">
+    <div class="section-divider"></div>
+    <h2>Ranking <span class="highlight">General</span></h2>
+    <p>Los mejores pronosticadores del Mundial</p>
+  </div>
+
+  {% if users_points %}
+  <div class="top-three">
+    {% for user in users_points[:3] %}
+    <div class="rank-card {% if loop.index == 1 %}gold{% elif loop.index == 2 %}silver{% else %}bronze{% endif %} animate-fade-up delay-{{ loop.index }}">
+      {% if loop.index == 1 %}<div class="rank-crown"><i class="fas fa-crown"></i></div>{% endif %}
+      <div class="rank-avatar">{{ user.username[0]|upper }}</div>
+      <h4 class="fw-bold mb-1">{{ user.username }}</h4>
+      <div style="font-family:'Black Ops One',cursive;font-size:2rem;color:var(--yellow);">{{ user.total_points }}</div>
+      <small class="text-secondary">puntos</small>
     </div>
+    {% endfor %}
+  </div>
 
-    {% if users_points %}
-        <div class="row g-4">
-            {% for user in users_points[:3] %}
-                <div class="col-md-4">
-                    <div class="card border-0 shadow-sm text-center p-4">
-                        <div class="mb-3">
-                            <span class="fs-1 fw-bold">{{ loop.index }}</span>
-                        </div>
-                        <h3 class="h5 fw-bold mb-1">{{ user.username }}</h3>
-                        <p class="text-muted mb-3">{{ user.total_points }} puntos</p>
-                        <span class="badge bg-primary">Top {{ loop.index }}</span>
-                    </div>
-                </div>
-            {% endfor %}
-        </div>
-
-        <div class="card border-0 shadow-sm mt-4">
-            <div class="card-body p-0">
-                <div class="table-responsive">
-                    <table class="table table-hover align-middle mb-0">
-                        <thead class="table-light">
-                            <tr>
-                                <th>#</th>
-                                <th>Nombre</th>
-                                <th class="text-end">Puntos</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {% for user in users_points %}
-                                <tr>
-                                    <td>{{ loop.index }}</td>
-                                    <td>{{ user.username }}</td>
-                                    <td class="text-end"><strong>{{ user.total_points }}</strong></td>
-                                </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
+  <div class="card">
+    <div class="card-body p-0">
+      <table class="ranking-table">
+        <thead>
+          <tr><th>#</th><th>Participante</th><th>Aciertos</th><th style="text-align:right;">Puntos</th></tr>
+        </thead>
+        <tbody>
+          {% for user in users_points %}
+          <tr>
+            <td>
+              {% if loop.index == 1 %}<span class="rank-badge rank-1">1</span>
+              {% elif loop.index == 2 %}<span class="rank-badge rank-2">2</span>
+              {% elif loop.index == 3 %}<span class="rank-badge rank-3">3</span>
+              {% else %}<span class="rank-badge" style="background:var(--bg-card);color:var(--text-secondary);">{{ loop.index }}</span>
+              {% endif %}
+            </td>
+            <td>
+              <div class="d-flex align-items-center gap-2">
+                <div style="width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,var(--blue-light),var(--blue));display:flex;align-items:center;justify-content:center;font-weight:700;font-size:0.8rem;color:var(--yellow);">{{ user.username[0]|upper }}</div>
+                <strong>{{ user.username }}</strong>
+              </div>
+            </td>
+            <td><span class="badge" style="background:rgba(76,175,80,0.15);color:#81C784;">{{ user.total_points }}</span></td>
+            <td style="text-align:right;"><strong style="font-size:1.2rem;color:var(--yellow);">{{ user.total_points }}</strong></td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+  {% else %}
+  <div class="empty-state">
+    <div class="empty-icon"><i class="fas fa-trophy"></i></div>
+    <h4>Aún no hay ranking</h4>
+    <p>Registra pronósticos para aparecer en el tablero</p>
+    {% if current_user.is_authenticated %}
+      <a href="{{ url_for('main.list_matches') }}" class="btn btn-yellow">Ver Partidos</a>
     {% else %}
-        <div class="card border-0 shadow-sm p-5 text-center">
-            <h3 class="fw-bold mb-3">Aún no hay ranking disponible</h3>
-            <p class="text-muted mb-0">Registra pronósticos para aparecer en el tablero.</p>
-        </div>
+      <a href="{{ url_for('auth.register') }}" class="btn btn-yellow">Registrarse</a>
     {% endif %}
+  </div>
+  {% endif %}
 </div>
 {% endblock %}
