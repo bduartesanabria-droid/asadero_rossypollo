@@ -8,10 +8,16 @@ services:
     container_name: asadero_rossypollo_app
     ports:
       - "5000:5000"
+    env_file:
+      - .env
     environment:
       FLASK_ENV: ${FLASK_ENV:-development}
       FLASK_APP: run.py
-      SECRET_KEY: ${SECRET_KEY:-dev-secret-key-change-in-production}
+      SECRET_KEY: ${SECRET_KEY}
+      DATABASE_URL: ${DATABASE_URL:-sqlite:///asadero.db}
+      ADMIN_USERNAME: ${ADMIN_USERNAME}
+      ADMIN_EMAIL: ${ADMIN_EMAIL}
+      ADMIN_PASSWORD: ${ADMIN_PASSWORD}
     volumes:
       - .:/app
       - /app/__pycache__
