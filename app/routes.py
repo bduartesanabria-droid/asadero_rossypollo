@@ -45,7 +45,6 @@ def match_detail(match_id):
 @main_bp.route('/leaderboard')
 def leaderboard():
     """Display leaderboard based on total points"""
-    # Sum points per user
     from sqlalchemy import func
     users_points = db.session.query(User.username, func.coalesce(func.sum(Prediction.points_earned), 0).label('total_points'))\
         .outerjoin(Prediction, Prediction.user_id == User.id)\
@@ -75,7 +74,6 @@ def seed_matches_admin():
     if not current_user.is_admin:
         return jsonify({'error': 'Acceso denegado'}), 403
     from datetime import datetime, timedelta
-    # Example seed data - Mundial 2026 group stage (simplified)
     seed_data = [
         {'home_team': 'Brasil', 'away_team': 'Argentina', 'match_date': datetime.utcnow() + timedelta(days=1), 'group': 'A'},
         {'home_team': 'España', 'away_team': 'Portugal', 'match_date': datetime.utcnow() + timedelta(days=2), 'group': 'B'},
@@ -150,8 +148,6 @@ def edit_match(match_id):
     return render_template('admin/edit_match.html', match=match)
 
 
-
-
 @main_bp.route('/')
 def index():
     """Página principal - lista de posts"""
@@ -160,19 +156,19 @@ def index():
         Post.created_at.desc()
     ).paginate(page=page, per_page=10)
     categories = Category.query.all()
-    
+
     return render_template('index.html', posts=posts, categories=categories)
 
 @main_bp.route('/post/<slug>')
 def view_post(slug):
     """Ver un post completo"""
     post = Post.query.filter_by(slug=slug).first_or_404()
-    
+
     # Incrementar contador de vistas
     if post.is_published:
         post.views += 1
         db.session.commit()
-    
+
     return render_template('post.html', post=post)
 
 @main_bp.route('/category/<slug>')
@@ -180,12 +176,12 @@ def view_category(slug):
     """Ver posts de una categoría"""
     category = Category.query.filter_by(slug=slug).first_or_404()
     page = request.args.get('page', 1, type=int)
-    
+
     posts = Post.query.filter_by(
         category_id=category.id,
         is_published=True
     ).order_by(Post.created_at.desc()).paginate(page=page, per_page=10)
-    
+
     return render_template('category.html', category=category, posts=posts)
 
 @main_bp.route('/dashboard')
@@ -196,15 +192,15 @@ def dashboard():
     posts = Post.query.filter_by(user_id=current_user.id).order_by(
         Post.created_at.desc()
     ).paginate(page=page, per_page=10)
-    
+
     return render_template('dashboard.html', posts=posts)
 
 @main_bp.route('/results')
 @login_required
 def results():
     """Ver los resultados personales del usuario"""
-    results = Result.query.filter_by(user_id=current_user.id).order_by(Result.created_at.desc()).all()
-    return render_template('results.html', results=results)
+    user_results = Result.query.filter_by(user_id=current_user.id).order_by(Result.created_at.desc()).all()
+    return render_template('results.html', results=user_results)
 
 @main_bp.route('/admin/results')
 @login_required
@@ -214,8 +210,8 @@ def admin_results():
         return jsonify({'error': 'Acceso denegado'}), 403
 
     winners = Result.query.filter_by(is_winner=True).order_by(Result.created_at.desc()).all()
-    results = Result.query.order_by(Result.created_at.desc()).all()
-    return render_template('admin/results.html', winners=winners, results=results)
+    all_results = Result.query.order_by(Result.created_at.desc()).all()
+    return render_template('admin/results.html', winners=winners, results=all_results)
 
 @main_bp.route('/admin/post/new', methods=['GET', 'POST'])
 @login_required
@@ -223,7 +219,7 @@ def create_post():
     """Crear un nuevo post (solo admins o autores)"""
     if not current_user.is_admin:
         return jsonify({'error': 'Acceso denegado'}), 403
-    
+
     if request.method == 'POST':
         try:
             post = Post(
@@ -237,12 +233,12 @@ def create_post():
             )
             db.session.add(post)
             db.session.commit()
-            
+
             return jsonify({'message': 'Post creado exitosamente', 'id': post.id}), 201
         except Exception as e:
             db.session.rollback()
             return jsonify({'error': str(e)}), 400
-    
+
     categories = Category.query.all()
     return render_template('admin/create_post.html', categories=categories)
 
@@ -251,11 +247,11 @@ def create_post():
 def edit_post(post_id):
     """Editar un post"""
     post = Post.query.get_or_404(post_id)
-    
+
     # Verificar que sea el autor o admin
     if post.user_id != current_user.id and not current_user.is_admin:
         return jsonify({'error': 'Acceso denegado'}), 403
-    
+
     if request.method == 'POST':
         try:
             post.title = request.form.get('title')
@@ -264,13 +260,13 @@ def edit_post(post_id):
             post.excerpt = request.form.get('excerpt')
             post.category_id = request.form.get('category_id')
             post.is_published = request.form.get('is_published') == 'on'
-            
+
             db.session.commit()
             return jsonify({'message': 'Post actualizado exitosamente'}), 200
         except Exception as e:
             db.session.rollback()
             return jsonify({'error': str(e)}), 400
-    
+
     categories = Category.query.all()
     return render_template('admin/edit_post.html', post=post, categories=categories)
 
@@ -279,11 +275,11 @@ def edit_post(post_id):
 def delete_post(post_id):
     """Eliminar un post"""
     post = Post.query.get_or_404(post_id)
-    
+
     # Verificar que sea el autor o admin
     if post.user_id != current_user.id and not current_user.is_admin:
         return jsonify({'error': 'Acceso denegado'}), 403
-    
+
     try:
         db.session.delete(post)
         db.session.commit()
@@ -296,18 +292,18 @@ def delete_post(post_id):
 def search():
     """API de búsqueda"""
     query = request.args.get('q', '')
-    
+
     if len(query) < 2:
         return jsonify({'results': []})
-    
-    results = Post.query.filter(
+
+    search_results = Post.query.filter(
         Post.is_published == True,
         Post.title.ilike(f'%{query}%')
     ).limit(10).all()
-    
+
     return jsonify({
         'results': [
             {'id': post.id, 'title': post.title, 'slug': post.slug}
-            for post in results
+            for post in search_results
         ]
     })
