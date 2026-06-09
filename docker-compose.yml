@@ -19,13 +19,11 @@ services:
       ADMIN_EMAIL: ${ADMIN_EMAIL}
       ADMIN_PASSWORD: ${ADMIN_PASSWORD}
     volumes:
-      # Solo persistir la base de datos SQLite, NO el código fuente
       - instance_data:/app/instance
     # Entrypoint manejará migraciones y luego ejecutará el servidor (gunicorn)
     depends_on:
       db:
         condition: service_healthy
-    restart: unless-stopped
     restart: unless-stopped
     networks:
       - asadero_network

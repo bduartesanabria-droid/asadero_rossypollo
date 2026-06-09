@@ -1,6 +1,7 @@
 from flask import Flask
 import os
 from flask_login import LoginManager
+from sqlalchemy.exc import SQLAlchemyError
 from app.config import config
 from app.models import db, User
 
@@ -43,12 +44,19 @@ def create_app(config_name='development'):
         admin_email = os.getenv('ADMIN_EMAIL')
         admin_password = os.getenv('ADMIN_PASSWORD')
         if admin_username and admin_email and admin_password:
-            existing_admin = User.query.filter_by(username=admin_username).first()
+            try:
+                existing_admin = User.query.filter_by(username=admin_username).first()
+            except SQLAlchemyError:
+                existing_admin = None
+
             if not existing_admin:
-                admin_user = User(username=admin_username, email=admin_email, is_admin=True)
-                admin_user.set_password(admin_password)
-                db.session.add(admin_user)
-                db.session.commit()
+                try:
+                    admin_user = User(username=admin_username, email=admin_email, is_admin=True)
+                    admin_user.set_password(admin_password)
+                    db.session.add(admin_user)
+                    db.session.commit()
+                except SQLAlchemyError:
+                    db.session.rollback()
     
     # Registrar blueprints (rutas)
     from app.routes import main_bp

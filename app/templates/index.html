@@ -1,37 +1,36 @@
 {% extends "base.html" %}
 
-{% block title %}Inicio - Asadero Rossy Pollo{% endblock %}
+{% block title %}Asadero Rossy Pollo - Mundial 2026{% endblock %}
 
 {% block content %}
-<div class="container my-5">
-    <!-- Hero Section -->
+<div class="container py-5">
     <section class="worldcup-hero mb-5">
         <div class="row align-items-center gy-4">
             <div class="col-lg-7">
-                <span class="worldcup-champ">Copa Mundial 2026</span>
-                <h1 class="display-4 fw-bold">Marcador Rossy Pollo con <span>Y7</span></h1>
-                <p class="lead text-white-75 mb-4">Vive la pasión del Mundial con un estilo deportivo, premios oficiales y la mascota Y7 como protagonista de cada jugada.</p>
+                <span class="worldcup-champ">Rossypollo Mundial 2026</span>
+                <h1 class="display-4 fw-bold">Vive la pasión del Mundial con <span>Rossypollo</span></h1>
+                <p class="lead text-white-75 mb-4">Regístrate, elige tus marcadores exclusivos y compite por premios y descuentos en cada fase del torneo.</p>
                 <div class="d-flex flex-column flex-sm-row gap-3 mb-4">
-                    <a href="#posts" class="btn btn-light btn-lg">Ver artículos</a>
-                    <a href="#premios" class="btn btn-outline-light btn-lg">Tabla de premios</a>
+                    <a href="{{ url_for('auth.register') }}" class="btn btn-light btn-lg">Participar Ahora</a>
+                    <a href="{{ url_for('main.list_matches') }}" class="btn btn-outline-light btn-lg">Ver Partidos</a>
                 </div>
                 <div class="row row-cols-1 row-cols-md-3 g-3 worldcup-kpis">
                     <div class="col">
                         <div class="kpi-card">
-                            <span class="kpi-label">Equipos</span>
-                            <strong>48 selecciones</strong>
+                            <span class="kpi-label">Ranking</span>
+                            <strong>{{ leaderboard|length }} líderes</strong>
                         </div>
                     </div>
                     <div class="col">
                         <div class="kpi-card">
                             <span class="kpi-label">Partidos</span>
-                            <strong>104 encuentros</strong>
+                            <strong>{{ upcoming_matches|length }} disponibles</strong>
                         </div>
                     </div>
                     <div class="col">
                         <div class="kpi-card">
                             <span class="kpi-label">Premios</span>
-                            <strong>Descuentos + combos</strong>
+                            <strong>5 fases</strong>
                         </div>
                     </div>
                 </div>
@@ -39,236 +38,84 @@
             <div class="col-lg-5">
                 <div class="mascot-card p-4">
                     <div class="mascot-top">
-                        <div class="mascot-ear left"></div>
+                        <div class="mascot-ear"></div>
                         <div class="mascot-head">
-                            <div class="mascot-face">Y7</div>
+                            <div class="mascot-face">R</div>
                         </div>
                         <div class="mascot-ear right"></div>
                     </div>
-                    <div class="mascot-body mt-4">
-                        <div class="mascot-shirt"></div>
-                        <div class="mascot-ball"></div>
-                    </div>
-                    <div class="mascot-info text-center mt-4">
-                        <h2 class="mb-2">Y7, la nueva mascota</h2>
-                        <p class="small text-white-75 mb-3">Una combinación de sabor, fútbol y diversión para el Mundial.</p>
-                        <div class="d-flex justify-content-center gap-2 flex-wrap">
-                            <span class="badge rounded-pill bg-white text-dark fw-bold">#TeamMundial</span>
-                            <span class="badge rounded-pill bg-white text-dark fw-bold">#Y7</span>
-                        </div>
-                    </div>
+                    <div class="mascot-body"></div>
+                    <div class="mascot-ball"></div>
                 </div>
             </div>
         </div>
     </section>
 
-    <section id="premios" class="worldcup-highlights mb-5">
-        <div class="row g-4">
-            <div class="col-md-4">
-                <div class="promo-card p-4 h-100">
-                    <span class="promo-tag">Fase de Grupos</span>
-                    <h3>2 presas Broaster</h3>
-                    <p>Consumo mínimo $20.000 en local.</p>
+    <div class="row g-4 mb-5">
+        <div class="col-lg-6">
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-transparent py-4">
+                    <h3 class="fw-bold mb-1">Ranking en Vivo</h3>
+                    <p class="text-muted small mb-0">Los mejores pronosticadores del torneo.</p>
                 </div>
-            </div>
-            <div class="col-md-4">
-                <div class="promo-card p-4 h-100">
-                    <span class="promo-tag">Cuartos / Semifinal</span>
-                    <h3>25% de descuento</h3>
-                    <p>En compras desde $30.000. Tope máximo $15.000.</p>
-                </div>
-            </div>
-            <div class="col-md-4">
-                <div class="promo-card p-4 h-100">
-                    <span class="promo-tag">Final</span>
-                    <h3>50% de descuento</h3>
-                    <p>En compras desde $40.000. Tope máximo $30.000.</p>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Posts -->
-    <div id="posts" class="row">
-        <div class="col-md-8">
-            <h2 class="mb-4 fw-bold d-flex align-items-center">
-                <i class="far fa-newspaper text-primary me-2"></i> Últimos Artículos
-            </h2>
-            
-            {% if posts.items %}
-                {% for post in posts.items %}
-                    <div class="card mb-4 border-0">
-                        <div class="card-body p-4">
-                            <div class="d-flex align-items-center justify-content-between mb-3">
-                                {% if post.category %}
-                                    <span class="badge bg-primary">
-                                        <i class="fas fa-tag me-1"></i>{{ post.category.name }}
-                                    </span>
-                                {% else %}
-                                    <span class="badge bg-light text-muted border border-light-subtle">
-                                        <i class="fas fa-hashtag me-1"></i>General
-                                    </span>
-                                {% endif %}
-                                <span class="small text-muted">
-                                    <i class="far fa-calendar-alt me-1"></i>{{ post.created_at.strftime('%d/%m/%Y') }}
-                                </span>
-                            </div>
-                            
-                            <h3 class="card-title h4 fw-bold mb-3">
-                                <a href="{{ url_for('main.view_post', slug=post.slug) }}" class="text-decoration-none text-dark">
-                                    {{ post.title }}
-                                </a>
-                            </h3>
-                            
-                            <p class="card-text text-muted">{{ post.excerpt or post.content[:200] }}...</p>
-                            
-                            <div class="d-flex align-items-center justify-content-between mt-4 pt-3 border-top border-light-subtle">
-                                <div class="d-flex align-items-center">
-                                    <div class="avatar bg-primary text-white rounded-circle d-flex align-items-center justify-content-center me-2" style="width: 32px; height: 32px; font-weight: 700; font-size: 0.85rem;">
-                                        {{ post.author.username[0]|upper }}
+                <div class="card-body p-0">
+                    {% if leaderboard %}
+                        <div class="list-group list-group-flush">
+                            {% for user in leaderboard %}
+                                <div class="list-group-item d-flex justify-content-between align-items-center py-3">
+                                    <div>
+                                        <strong class="d-block">{{ loop.index }}. {{ user.username }}</strong>
+                                        <small class="text-muted">{{ user.total_points }} puntos</small>
                                     </div>
-                                    <span class="small text-secondary">Por <strong>{{ post.author.username }}</strong></span>
+                                    <span class="badge bg-primary rounded-pill">{{ user.total_points }}</span>
                                 </div>
-                                <div class="d-flex align-items-center small text-muted">
-                                    <span class="me-3"><i class="far fa-eye me-1"></i>{{ post.views }} vistas</span>
-                                    <a href="{{ url_for('main.view_post', slug=post.slug) }}" class="text-decoration-none fw-bold text-primary">
-                                        Leer más <i class="fas fa-arrow-right ms-1"></i>
-                                    </a>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                {% endfor %}
-
-                <!-- Paginación -->
-                {% if posts.pages > 1 %}
-                    <nav aria-label="Page navigation" class="mt-4">
-                        <ul class="pagination justify-content-center">
-                            {% if posts.has_prev %}
-                                <li class="page-item">
-                                    <a class="page-link" href="{{ url_for('main.index', page=posts.prev_num) }}">
-                                        <i class="fas fa-chevron-left me-1"></i> Anterior
-                                    </a>
-                                </li>
-                            {% endif %}
-                            
-                            {% for page_num in posts.iter_pages() %}
-                                {% if page_num %}
-                                    <li class="page-item {% if page_num == posts.page %}active{% endif %}">
-                                        <a class="page-link" href="{{ url_for('main.index', page=page_num) }}">
-                                            {{ page_num }}
-                                        </a>
-                                    </li>
-                                {% endif %}
                             {% endfor %}
-                            
-                            {% if posts.has_next %}
-                                <li class="page-item">
-                                    <a class="page-link" href="{{ url_for('main.index', page=posts.next_num) }}">
-                                        Siguiente <i class="fas fa-chevron-right ms-1"></i>
-                                    </a>
-                                </li>
-                            {% endif %}
-                        </ul>
-                    </nav>
-                {% endif %}
-            {% else %}
-                <div class="card p-5 text-center border-0">
-                    <div class="card-body">
-                        <i class="far fa-folder-open text-muted mb-3" style="font-size: 3rem;"></i>
-                        <h4 class="fw-bold">No hay artículos publicados todavía</h4>
-                        <p class="text-muted">¡Vuelve pronto para descubrir nuevas recetas y guías de asado!</p>
-                    </div>
-                </div>
-            {% endif %}
-        </div>
-
-        <!-- Sidebar -->
-        <div class="col-md-4 mt-4 mt-md-0">
-            <!-- Buscar -->
-            <div class="card border-0 mb-4">
-                <div class="card-header bg-transparent py-3">
-                    <h5 class="mb-0 fw-bold"><i class="fas fa-search me-2 text-primary"></i>Buscar artículos</h5>
-                </div>
-                <div class="card-body">
-                    <form id="search-form" class="input-group">
-                        <input type="text" id="search-input" class="form-control" placeholder="Escribe para buscar..." required>
-                        <button class="btn btn-primary" type="submit">
-                            <i class="fas fa-search"></i>
-                        </button>
-                    </form>
-                    <div id="search-results" class="mt-3"></div>
+                        </div>
+                    {% else %}
+                        <div class="p-4 text-center text-muted">Todavía no hay resultados registrados.</div>
+                    {% endif %}
                 </div>
             </div>
-
-            <!-- Categorías -->
-            <div class="card border-0">
-                <div class="card-header bg-transparent py-3">
-                    <h5 class="mb-0 fw-bold"><i class="fas fa-folder me-2 text-primary"></i>Categorías</h5>
+        </div>
+        <div class="col-lg-6">
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-transparent py-4">
+                    <h3 class="fw-bold mb-1">Próximos Partidos</h3>
+                    <p class="text-muted small mb-0">No te quedes sin elegir tu marcador.</p>
                 </div>
-                <div class="list-group list-group-flush">
-                    <a href="{{ url_for('main.index') }}" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center fw-medium">
-                        <span><i class="fas fa-th-large me-2 text-muted"></i>Todas las categorías</span>
-                    </a>
-                    {% if categories %}
-                        {% for cat in categories %}
-                            <a href="{{ url_for('main.view_category', slug=cat.slug) }}" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
-                                <span><i class="far fa-folder-open me-2 text-muted"></i>{{ cat.name }}</span>
-                                <span class="badge rounded-pill bg-primary opacity-75">{{ cat.posts|length }}</span>
-                            </a>
-                        {% endfor %}
+                <div class="card-body p-0">
+                    {% if upcoming_matches %}
+                        <div class="list-group list-group-flush">
+                            {% for match in upcoming_matches %}
+                                <a href="{{ url_for('main.match_detail', match_id=match.id) }}" class="list-group-item list-group-item-action py-3">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <div>
+                                            <h5 class="mb-1 fw-bold">{{ match.home_team }} vs {{ match.away_team }}</h5>
+                                            <small class="text-white-75">{{ match.match_date.strftime('%d %b %Y - %H:%M UTC') }}{% if match.group %} · Grupo {{ match.group }}{% endif %}</small>
+                                        </div>
+                                        <span class="badge bg-warning text-dark">Pronosticar</span>
+                                    </div>
+                                </a>
+                            {% endfor %}
+                        </div>
                     {% else %}
-                        <div class="p-3 text-muted text-center small">No hay categorías creadas.</div>
+                        <div class="p-4 text-center text-muted">No hay partidos programados.</div>
                     {% endif %}
                 </div>
             </div>
         </div>
     </div>
+
+    <div class="row g-4">
+        {% for prize in prizes %}
+            <div class="col-md-4">
+                <div class="promo-card p-4 h-100">
+                    <span class="promo-tag">{{ prize.phase }}</span>
+                    <h3>{{ prize.title }}</h3>
+                    <p class="mb-0 text-muted">{{ prize.detail }}</p>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
 </div>
-
-<style>
-@keyframes pulse {
-    0%, 100% { transform: scale(1) rotate(0deg); }
-    50% { transform: scale(1.05) rotate(5deg); }
-}
-</style>
-{% endblock %}
-
-{% block extra_js %}
-<script>
-document.getElementById('search-form').addEventListener('submit', function(e) {
-    e.preventDefault();
-});
-
-document.getElementById('search-input').addEventListener('input', function() {
-    const query = this.value;
-    const results = document.getElementById('search-results');
-    
-    if (query.length >= 2) {
-        fetch(`{{ url_for('main.search') }}?q=${encodeURIComponent(query)}`)
-            .then(r => r.json())
-            .then(data => {
-                results.innerHTML = '';
-                if (data.results.length > 0) {
-                    data.results.forEach(post => {
-                        results.innerHTML += `
-                            <a href="/post/${post.slug}" class="d-flex align-items-center p-2 mb-1 text-decoration-none">
-                                <i class="fas fa-file-alt text-primary me-2"></i>
-                                <span>${post.title}</span>
-                            </a>
-                        `;
-                    });
-                } else {
-                    results.innerHTML = '<div class="p-2 small text-muted"><i class="fas fa-info-circle me-1"></i>No se encontraron resultados</div>';
-                }
-            })
-            .catch(err => {
-                console.error(err);
-                results.innerHTML = '<div class="p-2 small text-danger">Error al realizar la búsqueda</div>';
-            });
-    } else {
-        results.innerHTML = '';
-    }
-});
-</script>
 {% endblock %}

@@ -37,5 +37,10 @@ ENV PYTHONUNBUFFERED=1
 # Evitar que Python genere archivos .pyc
 ENV PYTHONDONTWRITEBYTECODE=1
 
-# Comando por defecto
-CMD ["python", "run.py"]
+# Copiar entrypoint y otorgar permisos
+COPY entrypoint.sh /app/entrypoint.sh
+RUN chmod +x /app/entrypoint.sh
+
+# Exponer comando por defecto (gunicorn en producción)
+ENTRYPOINT ["/app/entrypoint.sh"]
+CMD ["gunicorn", "run:app", "--bind", "0.0.0.0:5000", "--workers", "3"]

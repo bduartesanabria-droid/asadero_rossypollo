@@ -32,11 +32,17 @@
                             <a class="nav-link" href="{{ url_for('main.dashboard') }}">Mi Panel</a>
                         </li>
                         <li class="nav-item">
+                            <a class="nav-link" href="{{ url_for('main.list_matches') }}">Partidos</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ url_for('main.leaderboard') }}">Ranking</a>
+                        </li>
+                        <li class="nav-item">
                             <a class="nav-link" href="{{ url_for('main.results') }}">Resultados</a>
                         </li>
                         {% if current_user.is_admin %}
                             <li class="nav-item">
-                                <a class="nav-link" href="{{ url_for('main.create_post') }}"><i class="fas fa-plus me-1"></i>Nuevo Post</a>
+                                <a class="nav-link" href="{{ url_for('main.admin_matches') }}"><i class="fas fa-plus me-1"></i>Admin</a>
                             </li>
                         {% endif %}
                         <li class="nav-item">

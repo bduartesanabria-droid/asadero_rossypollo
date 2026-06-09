@@ -1,21 +1,56 @@
 {% extends 'base.html' %}
-{% block title %}Lista de Partidos - Polla{% endblock %}
+
+{% block title %}Partidos - Rossypollo Mundial 2026{% endblock %}
+
 {% block content %}
-<div class="container mx-auto py-8">
-  <h1 class="text-3xl font-bold text-center mb-6" style="color: hsl(210, 70%, 50%);">Partidos Disponibles</h1>
-  <div class="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-    {% for match in matches %}
-    <div class="p-6 bg-white rounded-lg shadow-md hover:shadow-xl transition-shadow duration-300" style="background: linear-gradient(135deg, hsl(210, 20%, 95%), hsl(210, 35%, 90%));">
-      <h2 class="text-xl font-semibold mb-2">{{ match.home_team }} vs {{ match.away_team }}</h2>
-      <p class="text-gray-600 mb-2">{{ match.match_date.strftime('%Y-%m-%d %H:%M UTC') }}</p>
-      {% if match.group %}<p class="text-gray-500 mb-2">Grupo {{ match.group }}</p>{% endif %}
-      {% if predictions[match.id] %}
-        <p class="text-green-600 font-medium">Ya has pronosticado: {{ predictions[match.id].predicted_home_score }} - {{ predictions[match.id].predicted_away_score }}</p>
-      {% else %}
-        <a href="{{ url_for('main.match_detail', match_id=match.id) }}" class="inline-block mt-2 px-4 py-2 bg-gradient-to-r from-indigo-500 to-purple-500 text-white rounded hover:opacity-90 transition-opacity">Pronosticar</a>
-      {% endif %}
+<div class="container py-5">
+    <div class="d-flex align-items-center justify-content-between mb-4">
+        <div>
+            <h1 class="h2 fw-bold mb-1">Partidos Disponibles</h1>
+            <p class="text-muted mb-0">Selecciona un partido y registra tu pronóstico único.</p>
+        </div>
+        <a href="{{ url_for('main.dashboard') }}" class="btn btn-outline-secondary">Volver al Panel</a>
     </div>
-    {% endfor %}
-  </div>
+
+    <div class="row g-4">
+        {% for match in matches %}
+        <div class="col-md-6">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body">
+                    <div class="d-flex align-items-center justify-content-between mb-3">
+                        <div>
+                            <h3 class="h5 fw-bold mb-1">{{ match.home_team }} vs {{ match.away_team }}</h3>
+                            <p class="small text-muted mb-0">{{ match.match_date.strftime('%d %b %Y • %H:%M UTC') }}{% if match.group %} · Grupo {{ match.group }}{% endif %}</p>
+                        </div>
+                        <span class="badge bg-warning text-dark">{{ 'Bloqueado' if match.is_locked else 'Abierto' }}</span>
+                    </div>
+
+                    {% if predictions[match.id] %}
+                        <div class="alert alert-success py-3 mb-3" role="alert">
+                            <strong>Pronóstico guardado:</strong> {{ predictions[match.id].predicted_home_score }} - {{ predictions[match.id].predicted_away_score }}
+                        </div>
+                    {% else %}
+                        <p class="text-muted">Cada marcador es único. Si alguien ya eligió el mismo resultado, deberás escoger otro.</p>
+                    {% endif %}
+                </div>
+                <div class="card-footer bg-transparent border-top d-flex justify-content-between align-items-center">
+                    <span class="text-muted small">Estado: {{ 'Bloqueado' if match.is_locked else 'Disponible' }}</span>
+                    {% if predictions[match.id] %}
+                        <a class="btn btn-sm btn-outline-secondary disabled">Pronostico registrado</a>
+                    {% else %}
+                        <a href="{{ url_for('main.match_detail', match_id=match.id) }}" class="btn btn-primary btn-sm">Pronosticar</a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        {% else %}
+            <div class="col-12">
+                <div class="card border-0 shadow-sm p-5 text-center">
+                    <h3 class="fw-bold">No hay partidos disponibles</h3>
+                    <p class="text-muted mb-0">Visita el panel más tarde para ver nuevos encuentros.</p>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
 </div>
 {% endblock %}

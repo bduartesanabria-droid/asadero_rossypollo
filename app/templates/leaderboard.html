@@ -1,0 +1,64 @@
+{% extends 'base.html' %}
+
+{% block title %}Ranking - Rossypollo Mundial 2026{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row align-items-center mb-4">
+        <div class="col-md-8">
+            <h1 class="h2 fw-bold mb-1">Ranking General</h1>
+            <p class="text-muted">Los usuarios con mejor puntaje en la competición.</p>
+        </div>
+        <div class="col-md-4 text-md-end">
+            <a href="{{ url_for('main.dashboard') }}" class="btn btn-outline-secondary">Volver al Panel</a>
+        </div>
+    </div>
+
+    {% if users_points %}
+        <div class="row g-4">
+            {% for user in users_points[:3] %}
+                <div class="col-md-4">
+                    <div class="card border-0 shadow-sm text-center p-4">
+                        <div class="mb-3">
+                            <span class="fs-1 fw-bold">{{ loop.index }}</span>
+                        </div>
+                        <h3 class="h5 fw-bold mb-1">{{ user.username }}</h3>
+                        <p class="text-muted mb-3">{{ user.total_points }} puntos</p>
+                        <span class="badge bg-primary">Top {{ loop.index }}</span>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+
+        <div class="card border-0 shadow-sm mt-4">
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th>#</th>
+                                <th>Nombre</th>
+                                <th class="text-end">Puntos</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for user in users_points %}
+                                <tr>
+                                    <td>{{ loop.index }}</td>
+                                    <td>{{ user.username }}</td>
+                                    <td class="text-end"><strong>{{ user.total_points }}</strong></td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    {% else %}
+        <div class="card border-0 shadow-sm p-5 text-center">
+            <h3 class="fw-bold mb-3">Aún no hay ranking disponible</h3>
+            <p class="text-muted mb-0">Registra pronósticos para aparecer en el tablero.</p>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

@@ -1,5 +1,9 @@
+from datetime import datetime
+
 from flask import Blueprint, render_template, request, jsonify, flash, redirect, url_for
 from flask_login import login_required, current_user
+from sqlalchemy import func
+
 from app.models import db, Post, Category, Match, Prediction, User, Result
 
 main_bp = Blueprint('main', __name__)
@@ -26,12 +30,24 @@ def match_detail(match_id):
         if existing_prediction:
             flash('Ya has hecho un pronóstico para este partido', 'error')
             return redirect(url_for('main.match_detail', match_id=match.id))
+
+        home_score = int(request.form.get('home_score'))
+        away_score = int(request.form.get('away_score'))
+        existing_match_score = Prediction.query.filter_by(
+            match_id=match.id,
+            predicted_home_score=home_score,
+            predicted_away_score=away_score
+        ).first()
+        if existing_match_score:
+            flash('Este marcador ya fue seleccionado por otro participante. Debes elegir un resultado diferente.', 'error')
+            return redirect(url_for('main.match_detail', match_id=match.id))
+
         try:
             pred = Prediction(
                 user_id=current_user.id,
                 match_id=match.id,
-                predicted_home_score=int(request.form.get('home_score')),
-                predicted_away_score=int(request.form.get('away_score'))
+                predicted_home_score=home_score,
+                predicted_away_score=away_score
             )
             db.session.add(pred)
             db.session.commit()
@@ -106,10 +122,12 @@ def create_match():
         return jsonify({'error': 'Acceso denegado'}), 403
     if request.method == 'POST':
         try:
+            from datetime import datetime
+            match_date = datetime.fromisoformat(request.form.get('match_date'))
             match = Match(
                 home_team=request.form.get('home_team'),
                 away_team=request.form.get('away_team'),
-                match_date=request.form.get('match_date'),
+                match_date=match_date,
                 group=request.form.get('group') or None
             )
             db.session.add(match)
@@ -124,20 +142,20 @@ def create_match():
 @main_bp.route('/admin/match/<int:match_id>/edit', methods=['GET', 'POST'])
 @login_required
 def edit_match(match_id):
-    """Editar un partido (solo admin, bloqueado si está bloqueado)"""
+    """Editar un partido o actualizar resultado (solo admin)"""
     if not current_user.is_admin:
         return jsonify({'error': 'Acceso denegado'}), 403
     match = Match.query.get_or_404(match_id)
-    if match.is_locked:
-        flash('Este partido ya está bloqueado y no puede editarse', 'error')
-        return redirect(url_for('main.admin_matches'))
+    locked = match.is_locked
+
     if request.method == 'POST':
         try:
-            match.home_team = request.form.get('home_team')
-            match.away_team = request.form.get('away_team')
-            match.match_date = request.form.get('match_date')
-            match.home_score = request.form.get('home_score') or None
-            match.away_score = request.form.get('away_score') or None
+            if not locked:
+                match.home_team = request.form.get('home_team')
+                match.away_team = request.form.get('away_team')
+                match.match_date = datetime.fromisoformat(request.form.get('match_date'))
+            match.home_score = int(request.form.get('home_score')) if request.form.get('home_score') else None
+            match.away_score = int(request.form.get('away_score')) if request.form.get('away_score') else None
             match.group = request.form.get('group') or None
             db.session.commit()
             flash('Partido actualizado exitosamente', 'success')
@@ -145,19 +163,56 @@ def edit_match(match_id):
         except Exception as e:
             db.session.rollback()
             flash(f'Error al actualizar partido: {str(e)}', 'error')
-    return render_template('admin/edit_match.html', match=match)
+    return render_template('admin/edit_match.html', match=match, locked=locked)
+
+@main_bp.route('/admin/update_rankings')
+@login_required
+def update_rankings_admin():
+    """Actualizar el ranking usando los puntos acumulados de cada usuario."""
+    if not current_user.is_admin:
+        return jsonify({'error': 'Acceso denegado'}), 403
+
+    from app.models import Ranking
+    user_points = db.session.query(
+        User.id.label('user_id'),
+        func.coalesce(func.sum(Prediction.points_earned), 0).label('total_points')
+    ).outerjoin(Prediction, Prediction.user_id == User.id).group_by(User.id).all()
+
+    for row in user_points:
+        ranking = Ranking.query.filter_by(user_id=row.user_id).first()
+        if ranking:
+            ranking.points = row.total_points
+        else:
+            ranking = Ranking(user_id=row.user_id, points=row.total_points)
+            db.session.add(ranking)
+
+    db.session.commit()
+    flash('Ranking actualizado correctamente', 'success')
+    return redirect(url_for('main.admin_matches'))
 
 
 @main_bp.route('/')
 def index():
-    """Página principal - lista de posts"""
-    page = request.args.get('page', 1, type=int)
-    posts = Post.query.filter_by(is_published=True).order_by(
-        Post.created_at.desc()
-    ).paginate(page=page, per_page=10)
-    categories = Category.query.all()
+    """Página principal con hero, próximos partidos y ranking"""
+    upcoming_matches = Match.query.filter(Match.match_date >= datetime.utcnow())
+    upcoming_matches = upcoming_matches.order_by(Match.match_date.asc()).limit(6).all()
 
-    return render_template('index.html', posts=posts, categories=categories)
+    leaderboard = db.session.query(
+        User.username,
+        func.coalesce(func.sum(Prediction.points_earned), 0).label('total_points')
+    ).outerjoin(Prediction, Prediction.user_id == User.id)
+    leaderboard = leaderboard.group_by(User.id)
+    leaderboard = leaderboard.order_by(func.sum(Prediction.points_earned).desc()).limit(5).all()
+
+    prizes = [
+        {'phase': 'Fase de Grupos', 'title': 'Presas Broaster', 'detail': 'Disfruta un combo especial de presas Rossy Pollo.'},
+        {'phase': 'Octavos', 'title': '5% Descuento', 'detail': 'Gana un cupón para tu próxima orden.'},
+        {'phase': 'Cuartos', 'title': '25% Descuento', 'detail': 'Aprovecha un ahorro especial en combos.'},
+        {'phase': 'Semifinal', 'title': 'Combo Familiar', 'detail': 'Premio para compartir con tu familia.'},
+        {'phase': 'Final', 'title': '50% Descuento', 'detail': 'El máximo premio para cerrar la fase.'},
+    ]
+
+    return render_template('index.html', upcoming_matches=upcoming_matches, leaderboard=leaderboard, prizes=prizes)
 
 @main_bp.route('/post/<slug>')
 def view_post(slug):
@@ -187,13 +242,27 @@ def view_category(slug):
 @main_bp.route('/dashboard')
 @login_required
 def dashboard():
-    """Panel de usuario - ver sus propios posts"""
-    page = request.args.get('page', 1, type=int)
-    posts = Post.query.filter_by(user_id=current_user.id).order_by(
-        Post.created_at.desc()
-    ).paginate(page=page, per_page=10)
+    """Panel de usuario con estadísticas de pronósticos y próximos partidos"""
+    predictions = Prediction.query.filter_by(user_id=current_user.id).join(Match).order_by(Match.match_date.asc()).all()
+    total_points = sum((p.points_earned or 0) for p in predictions)
+    exact_hits = sum(1 for p in predictions if p.points_earned == 3)
+    winner_hits = sum(1 for p in predictions if p.points_earned == 1)
+    total_forecasts = len(predictions)
+    accuracy = int(((exact_hits + winner_hits) / total_forecasts) * 100) if total_forecasts else 0
 
-    return render_template('dashboard.html', posts=posts)
+    upcoming_matches = Match.query.filter(Match.match_date >= datetime.utcnow())
+    upcoming_matches = upcoming_matches.order_by(Match.match_date.asc()).limit(4).all()
+
+    return render_template(
+        'dashboard.html',
+        predictions=predictions,
+        total_points=total_points,
+        exact_hits=exact_hits,
+        winner_hits=winner_hits,
+        total_forecasts=total_forecasts,
+        accuracy=accuracy,
+        upcoming_matches=upcoming_matches
+    )
 
 @main_bp.route('/results')
 @login_required

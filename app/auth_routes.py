@@ -39,8 +39,9 @@ def register():
             db.session.add(user)
             db.session.commit()
             
-            flash('Registro exitoso. Por favor inicia sesión.', 'success')
-            return redirect(url_for('auth.login'))
+            login_user(user)
+            flash('Registro exitoso. Bienvenido a Rossy Pollo!', 'success')
+            return redirect(url_for('main.dashboard'))
         except Exception as e:
             db.session.rollback()
             flash(f'Error al registrar: {str(e)}', 'error')
@@ -62,13 +63,14 @@ def login():
             flash('Usuario y contraseña son requeridos', 'error')
             return redirect(url_for('auth.login'))
         
-        user = User.query.filter_by(username=username).first()
+        # Permitir login por nombre de usuario o correo
+        user = User.query.filter((User.username == username) | (User.email == username)).first()
         
         if user and user.check_password(password):
-            login_user(user, remember=request.form.get('remember_me'))
-            flash(f'Bienvenido, {username}!', 'success')
+            remember = bool(request.form.get('remember_me'))
+            login_user(user, remember=remember)
+            flash(f'Bienvenido, {user.username}!', 'success')
             
-            # Redirigir a página anterior o al dashboard
             next_page = request.args.get('next')
             return redirect(next_page) if next_page else redirect(url_for('main.dashboard'))
         else:
