@@ -9,7 +9,6 @@ services:
     env_file:
       - .env
     environment:
-      FLASK_ENV: ${FLASK_ENV:-development}
       DATABASE_URL: ${DATABASE_URL:-sqlite:///asadero.db}
     volumes:
       - instance_data:/app/instance

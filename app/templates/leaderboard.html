@@ -25,7 +25,7 @@
     <div class="card-body p-0">
       <table class="ranking-table">
         <thead>
-          <tr><th>#</th><th>Participante</th><th>Aciertos</th><th style="text-align:right;">Puntos</th></tr>
+          <tr><th>#</th><th>Participante</th><th style="text-align:right;">Puntos</th></tr>
         </thead>
         <tbody>
           {% for user in users_points %}
@@ -43,7 +43,6 @@
                 <strong>{{ user.username }}</strong>
               </div>
             </td>
-            <td><span class="badge" style="background:rgba(76,175,80,0.15);color:#81C784;">{{ user.total_points }}</span></td>
             <td style="text-align:right;"><strong style="font-size:1.2rem;color:var(--yellow);">{{ user.total_points }}</strong></td>
           </tr>
           {% endfor %}
