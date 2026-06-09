@@ -148,9 +148,9 @@ def edit_match(match_id):
             db.session.rollback()
             flash(f'Error al actualizar partido: {str(e)}', 'error')
     return render_template('admin/edit_match.html', match=match)
-, Result
 
-main_bp = Blueprint('main', __name__)
+
+
 
 @main_bp.route('/')
 def index():
