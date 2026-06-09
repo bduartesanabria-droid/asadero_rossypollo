@@ -2,65 +2,18 @@ version: '3.8'
 
 services:
   app:
-    build:
-      context: .
-      dockerfile: Dockerfile
-    container_name: asadero_rossypollo_app
+    build: .
+    container_name: asadero_rossypollo
     ports:
       - "5000:5000"
     env_file:
       - .env
     environment:
-      FLASK_ENV: ${FLASK_ENV:-production}
-      FLASK_APP: run.py
-      SECRET_KEY: ${SECRET_KEY}
-      DATABASE_URL: ${DATABASE_URL:-mysql+pymysql://asadero:asadero_pass@db:3306/asadero}
-      ADMIN_USERNAME: ${ADMIN_USERNAME}
-      ADMIN_EMAIL: ${ADMIN_EMAIL}
-      ADMIN_PASSWORD: ${ADMIN_PASSWORD}
+      FLASK_ENV: ${FLASK_ENV:-development}
+      DATABASE_URL: ${DATABASE_URL:-sqlite:///asadero.db}
     volumes:
       - instance_data:/app/instance
-    # Entrypoint manejará migraciones y luego ejecutará el servidor (gunicorn)
-    depends_on:
-      db:
-        condition: service_healthy
     restart: unless-stopped
-    networks:
-      - asadero_network
-    healthcheck:
-      test: ["CMD-SHELL", "curl -f http://127.0.0.1:5000/ || exit 1"]
-      interval: 30s
-      timeout: 10s
-      retries: 5
-      start_period: 60s
-
-  db:
-    image: mysql:8.0
-    container_name: asadero_rossypollo_db
-    environment:
-      MYSQL_DATABASE: ${MYSQL_DATABASE:-asadero}
-      MYSQL_USER: ${MYSQL_USER:-asadero}
-      MYSQL_PASSWORD: ${MYSQL_PASSWORD:-asadero_pass}
-      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-root_pass}
-    volumes:
-      - db_data:/var/lib/mysql
-    ports:
-      - "3306:3306"
-    healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
-      interval: 30s
-      retries: 5
-      start_period: 60s
-    networks:
-      - asadero_network
-
-networks:
-  asadero_network:
-    driver: bridge
 
 volumes:
   instance_data:
-    driver: local
-  db_data:
-    driver: local
-
