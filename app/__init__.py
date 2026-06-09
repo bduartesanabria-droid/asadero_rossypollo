@@ -18,6 +18,10 @@ def create_app(config_name='development'):
     # Inicializar extensiones
     db.init_app(app)
 
+    # Inicializar migraciones
+    from flask_migrate import Migrate
+    migrate = Migrate(app, db)
+
     # Configurar Flask-Login
     login_manager = LoginManager()
     login_manager.init_app(app)
@@ -28,9 +32,10 @@ def create_app(config_name='development'):
     def load_user(user_id):
         return User.query.get(int(user_id))
 
-    # Crear tablas
-    with app.app_context():
-        db.create_all()
+    # Crear tablas solo en desarrollo (en producción usar migraciones)
+    if config_name == 'development':
+        with app.app_context():
+            db.create_all()
 
     # Crear super admin si variables de entorno definidas
     with app.app_context():
