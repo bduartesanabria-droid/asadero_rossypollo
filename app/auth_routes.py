@@ -39,7 +39,9 @@ def register():
             db.session.add(user)
             db.session.commit()
             
-            login_user(user)
+            if not login_user(user):
+                flash('Registro exitoso. Por favor inicia sesión.', 'success')
+                return redirect(url_for('auth.login'))
             flash('Registro exitoso. Bienvenido a Rossy Pollo!', 'success')
             return redirect(url_for('main.dashboard'))
         except Exception as e:
@@ -67,6 +69,9 @@ def login():
         user = User.query.filter((User.username == username) | (User.email == username)).first()
         
         if user and user.check_password(password):
+            if not user.is_active:
+                flash('Tu cuenta ha sido bloqueada. Contacta al administrador.', 'error')
+                return redirect(url_for('auth.login'))
             remember = bool(request.form.get('remember_me'))
             login_user(user, remember=remember)
             flash(f'Bienvenido, {user.username}!', 'success')

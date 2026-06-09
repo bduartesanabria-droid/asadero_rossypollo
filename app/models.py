@@ -31,7 +31,7 @@ class User(UserMixin, db.Model):
     
     @property
     def is_active(self):
-        return self.is_active_col
+        return True if self.is_active_col is None else self.is_active_col
 
     @is_active.setter
     def is_active(self, value):
