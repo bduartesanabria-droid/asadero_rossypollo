@@ -50,33 +50,17 @@
           </div>
         </div>
       </div>
-      <div class="col-lg-5">
-        <div class="mascot-wrapper animate-slide-right">
-          <div class="mascot-3d">
-            <div class="mascot-head-chicken">
-              <div class="mascot-comb"></div>
-              <div class="mascot-eye left"></div>
-              <div class="mascot-eye right"></div>
-              <div class="mascot-beak"></div>
-              <div class="mascot-beak-lower"></div>
-              <div class="mascot-wattle"></div>
-            </div>
-            <div class="mascot-body-chicken">
-              <div class="mascot-wings left"></div>
-              <div class="mascot-wings right"></div>
-              <div class="mascot-shirt">R</div>
-            </div>
-            <div class="mascot-feet">
-              <div class="mascot-foot"></div>
-              <div class="mascot-foot"></div>
-            </div>
-            <div class="mascot-ball-area">
-              <div class="mascot-soccer-ball"></div>
-            </div>
-          </div>
-        </div>
+      <div class="col-lg-5 text-center">
+        <img src="{{ url_for('static', filename='img/mascota.png') }}" alt="Mascota Rossypollo" class="img-fluid animate-slide-right" style="max-height:400px;filter:drop-shadow(0 0 20px rgba(255,215,0,0.4));">
       </div>
     </div>
+  </div>
+</section>
+
+<!-- PRESENTATION BANNER -->
+<section class="py-5">
+  <div class="container text-center animate-fade-up">
+    <img src="{{ url_for('static', filename='img/presentacion.png') }}" alt="Presentación Rossypollo Mundial 2026" class="img-fluid rounded-4" style="max-width:800px;box-shadow:0 8px 32px rgba(0,0,0,0.3);">
   </div>
 </section>
 
@@ -117,6 +101,9 @@
           <p>Canjea descuentos y combos exclusivos por fase</p>
         </div>
       </div>
+    </div>
+    <div class="text-center mt-4 animate-fade-up">
+      <img src="{{ url_for('static', filename='img/dinamica.png') }}" alt="Guía de participación" class="img-fluid rounded-4" style="max-width:700px;box-shadow:0 8px 32px rgba(0,0,0,0.3);">
     </div>
   </div>
 </section>
@@ -202,6 +189,9 @@
       <div class="section-divider"></div>
       <h2>Tabla de <span class="highlight">Premios</span></h2>
       <p>Recompensas por cada fase del Mundial 2026</p>
+    </div>
+    <div class="text-center mb-4 animate-fade-up">
+      <img src="{{ url_for('static', filename='img/premios.png') }}" alt="Guía de premios" class="img-fluid rounded-4" style="max-width:700px;box-shadow:0 8px 32px rgba(0,0,0,0.3);">
     </div>
     <div class="prize-timeline">
       {% if prizes %}

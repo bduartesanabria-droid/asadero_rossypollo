@@ -7,17 +7,7 @@
       <div class="card text-center p-4">
         <div class="card-body p-md-4">
           <div class="d-flex justify-content-center mb-4">
-            <div class="mascot-3d" style="width:120px;height:160px;">
-              <div class="mascot-head-chicken" style="width:60px;height:60px;top:5px;">
-                <div class="mascot-comb" style="width:25px;height:14px;top:-10px;"></div>
-                <div class="mascot-eye left" style="width:8px;height:10px;top:22px;left:16px;"></div>
-                <div class="mascot-eye right" style="width:8px;height:10px;top:22px;right:16px;"></div>
-                <div class="mascot-beak" style="border-left-width:6px;border-right-width:6px;border-top-width:10px;bottom:14px;"></div>
-              </div>
-              <div class="mascot-body-chicken" style="width:65px;height:80px;bottom:25px;">
-                <div class="mascot-shirt" style="width:75px;height:40px;font-size:1.1rem;">R</div>
-              </div>
-            </div>
+            <img src="{{ url_for('static', filename='img/mascota.png') }}" alt="Mascota" height="140" style="filter:drop-shadow(0 0 15px rgba(255,215,0,0.4));">
           </div>
           <h2 class="fw-bold mb-1">{{ current_user.username }}</h2>
           <p class="text-secondary mb-3"><i class="far fa-envelope me-2"></i>{{ current_user.email }}</p>

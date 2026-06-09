@@ -16,7 +16,7 @@
   <nav class="navbar navbar-expand-lg">
     <div class="container">
       <a class="navbar-brand" href="{{ url_for('main.index') }}">
-        <span class="brand-icon">R</span>
+        <img src="{{ url_for('static', filename='img/logo.png') }}" alt="Rossypollo" height="36" class="me-2">
         Rossypollo Mundial
       </a>
       <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
@@ -73,7 +73,7 @@
     <div class="container">
       <div class="row g-4">
         <div class="col-md-4">
-          <h5><span class="brand-icon" style="display:inline-flex;width:32px;height:32px;font-size:1rem;margin-right:8px;">R</span> Rossypollo</h5>
+          <h5><img src="{{ url_for('static', filename='img/logo.png') }}" alt="Rossypollo" height="28" class="me-2"> Rossypollo</h5>
           <p class="text-secondary" style="font-size:0.9rem;">Vive la pasión del Mundial con Rossypollo. Registra tus pronósticos y gana premios exclusivos.</p>
         </div>
         <div class="col-md-4">

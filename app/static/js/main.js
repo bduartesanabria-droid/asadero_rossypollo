@@ -75,11 +75,18 @@ function initConfetti() {
   const triggers = document.querySelectorAll('[data-confetti]');
   triggers.forEach(function (el) {
     el.addEventListener('click', function (e) {
-      e.preventDefault();
-      fireConfetti();
-      var href = el.getAttribute('href');
-      if (href) {
-        setTimeout(function () { window.location.href = href; }, 800);
+      if (el.tagName === 'A') {
+        e.preventDefault();
+        fireConfetti();
+        var href = el.getAttribute('href');
+        if (href) {
+          setTimeout(function () { window.location.href = href; }, 800);
+        }
+      } else if (el.type === 'submit') {
+        fireConfetti();
+      } else {
+        e.preventDefault();
+        fireConfetti();
       }
     });
   });

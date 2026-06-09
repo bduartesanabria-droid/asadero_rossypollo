@@ -91,22 +91,105 @@ def calculate_points_admin():
 @main_bp.route('/admin/seed_matches')
 @login_required
 def seed_matches_admin():
-    """Seed initial matches data (admin only)"""
+    """Seed all 72 group stage matches of World Cup 2026 (admin only)"""
     if not current_user.is_admin:
         return jsonify({'error': 'Acceso denegado'}), 403
-    from datetime import datetime, timedelta
+    from datetime import datetime as dt
     seed_data = [
-        {'home_team': 'Brasil', 'away_team': 'Argentina', 'match_date': datetime.now() + timedelta(days=1), 'group': 'A'},
-        {'home_team': 'España', 'away_team': 'Portugal', 'match_date': datetime.now() + timedelta(days=2), 'group': 'B'},
-        {'home_team': 'Alemania', 'away_team': 'Francia', 'match_date': datetime.now() + timedelta(days=3), 'group': 'C'},
+        # ---- Group A ----
+        {'home_team': 'México', 'away_team': 'Sudáfrica', 'match_date': dt(2026, 6, 11, 15, 0), 'group': 'A'},
+        {'home_team': 'Corea del Sur', 'away_team': 'República Checa', 'match_date': dt(2026, 6, 11, 22, 0), 'group': 'A'},
+        {'home_team': 'República Checa', 'away_team': 'Sudáfrica', 'match_date': dt(2026, 6, 18, 12, 0), 'group': 'A'},
+        {'home_team': 'México', 'away_team': 'Corea del Sur', 'match_date': dt(2026, 6, 18, 21, 0), 'group': 'A'},
+        {'home_team': 'República Checa', 'away_team': 'México', 'match_date': dt(2026, 6, 24, 21, 0), 'group': 'A'},
+        {'home_team': 'Sudáfrica', 'away_team': 'Corea del Sur', 'match_date': dt(2026, 6, 24, 21, 0), 'group': 'A'},
+        # ---- Group B ----
+        {'home_team': 'Canadá', 'away_team': 'Bosnia y Herzegovina', 'match_date': dt(2026, 6, 12, 15, 0), 'group': 'B'},
+        {'home_team': 'Qatar', 'away_team': 'Suiza', 'match_date': dt(2026, 6, 13, 15, 0), 'group': 'B'},
+        {'home_team': 'Suiza', 'away_team': 'Bosnia y Herzegovina', 'match_date': dt(2026, 6, 18, 15, 0), 'group': 'B'},
+        {'home_team': 'Canadá', 'away_team': 'Qatar', 'match_date': dt(2026, 6, 18, 18, 0), 'group': 'B'},
+        {'home_team': 'Suiza', 'away_team': 'Canadá', 'match_date': dt(2026, 6, 24, 15, 0), 'group': 'B'},
+        {'home_team': 'Bosnia y Herzegovina', 'away_team': 'Qatar', 'match_date': dt(2026, 6, 24, 15, 0), 'group': 'B'},
+        # ---- Group C ----
+        {'home_team': 'Brasil', 'away_team': 'Marruecos', 'match_date': dt(2026, 6, 13, 18, 0), 'group': 'C'},
+        {'home_team': 'Haití', 'away_team': 'Escocia', 'match_date': dt(2026, 6, 13, 21, 0), 'group': 'C'},
+        {'home_team': 'Escocia', 'away_team': 'Marruecos', 'match_date': dt(2026, 6, 19, 18, 0), 'group': 'C'},
+        {'home_team': 'Brasil', 'away_team': 'Haití', 'match_date': dt(2026, 6, 19, 20, 30), 'group': 'C'},
+        {'home_team': 'Escocia', 'away_team': 'Brasil', 'match_date': dt(2026, 6, 24, 18, 0), 'group': 'C'},
+        {'home_team': 'Marruecos', 'away_team': 'Haití', 'match_date': dt(2026, 6, 24, 18, 0), 'group': 'C'},
+        # ---- Group D ----
+        {'home_team': 'EE.UU.', 'away_team': 'Paraguay', 'match_date': dt(2026, 6, 12, 21, 0), 'group': 'D'},
+        {'home_team': 'Australia', 'away_team': 'Turquía', 'match_date': dt(2026, 6, 14, 0, 0), 'group': 'D'},
+        {'home_team': 'EE.UU.', 'away_team': 'Australia', 'match_date': dt(2026, 6, 19, 15, 0), 'group': 'D'},
+        {'home_team': 'Turquía', 'away_team': 'Paraguay', 'match_date': dt(2026, 6, 19, 23, 0), 'group': 'D'},
+        {'home_team': 'Turquía', 'away_team': 'EE.UU.', 'match_date': dt(2026, 6, 25, 22, 0), 'group': 'D'},
+        {'home_team': 'Paraguay', 'away_team': 'Australia', 'match_date': dt(2026, 6, 25, 22, 0), 'group': 'D'},
+        # ---- Group E ----
+        {'home_team': 'Alemania', 'away_team': 'Curazao', 'match_date': dt(2026, 6, 14, 13, 0), 'group': 'E'},
+        {'home_team': 'Costa de Marfil', 'away_team': 'Ecuador', 'match_date': dt(2026, 6, 14, 19, 0), 'group': 'E'},
+        {'home_team': 'Alemania', 'away_team': 'Costa de Marfil', 'match_date': dt(2026, 6, 20, 16, 0), 'group': 'E'},
+        {'home_team': 'Ecuador', 'away_team': 'Curazao', 'match_date': dt(2026, 6, 20, 20, 0), 'group': 'E'},
+        {'home_team': 'Curazao', 'away_team': 'Costa de Marfil', 'match_date': dt(2026, 6, 25, 16, 0), 'group': 'E'},
+        {'home_team': 'Ecuador', 'away_team': 'Alemania', 'match_date': dt(2026, 6, 25, 16, 0), 'group': 'E'},
+        # ---- Group F ----
+        {'home_team': 'Países Bajos', 'away_team': 'Japón', 'match_date': dt(2026, 6, 14, 16, 0), 'group': 'F'},
+        {'home_team': 'Suecia', 'away_team': 'Túnez', 'match_date': dt(2026, 6, 14, 22, 0), 'group': 'F'},
+        {'home_team': 'Países Bajos', 'away_team': 'Suecia', 'match_date': dt(2026, 6, 20, 13, 0), 'group': 'F'},
+        {'home_team': 'Túnez', 'away_team': 'Japón', 'match_date': dt(2026, 6, 21, 0, 0), 'group': 'F'},
+        {'home_team': 'Japón', 'away_team': 'Suecia', 'match_date': dt(2026, 6, 25, 19, 0), 'group': 'F'},
+        {'home_team': 'Túnez', 'away_team': 'Países Bajos', 'match_date': dt(2026, 6, 25, 19, 0), 'group': 'F'},
+        # ---- Group G ----
+        {'home_team': 'Bélgica', 'away_team': 'Egipto', 'match_date': dt(2026, 6, 15, 15, 0), 'group': 'G'},
+        {'home_team': 'Irán', 'away_team': 'Nueva Zelanda', 'match_date': dt(2026, 6, 15, 21, 0), 'group': 'G'},
+        {'home_team': 'Bélgica', 'away_team': 'Irán', 'match_date': dt(2026, 6, 21, 15, 0), 'group': 'G'},
+        {'home_team': 'Nueva Zelanda', 'away_team': 'Egipto', 'match_date': dt(2026, 6, 21, 21, 0), 'group': 'G'},
+        {'home_team': 'Egipto', 'away_team': 'Irán', 'match_date': dt(2026, 6, 26, 23, 0), 'group': 'G'},
+        {'home_team': 'Nueva Zelanda', 'away_team': 'Bélgica', 'match_date': dt(2026, 6, 26, 23, 0), 'group': 'G'},
+        # ---- Group H ----
+        {'home_team': 'España', 'away_team': 'Cabo Verde', 'match_date': dt(2026, 6, 15, 12, 0), 'group': 'H'},
+        {'home_team': 'Arabia Saudita', 'away_team': 'Uruguay', 'match_date': dt(2026, 6, 15, 18, 0), 'group': 'H'},
+        {'home_team': 'España', 'away_team': 'Arabia Saudita', 'match_date': dt(2026, 6, 21, 12, 0), 'group': 'H'},
+        {'home_team': 'Uruguay', 'away_team': 'Cabo Verde', 'match_date': dt(2026, 6, 21, 18, 0), 'group': 'H'},
+        {'home_team': 'Cabo Verde', 'away_team': 'Arabia Saudita', 'match_date': dt(2026, 6, 26, 20, 0), 'group': 'H'},
+        {'home_team': 'Uruguay', 'away_team': 'España', 'match_date': dt(2026, 6, 26, 20, 0), 'group': 'H'},
+        # ---- Group I ----
+        {'home_team': 'Francia', 'away_team': 'Senegal', 'match_date': dt(2026, 6, 16, 15, 0), 'group': 'I'},
+        {'home_team': 'Irak', 'away_team': 'Noruega', 'match_date': dt(2026, 6, 16, 18, 0), 'group': 'I'},
+        {'home_team': 'Francia', 'away_team': 'Irak', 'match_date': dt(2026, 6, 22, 17, 0), 'group': 'I'},
+        {'home_team': 'Noruega', 'away_team': 'Senegal', 'match_date': dt(2026, 6, 22, 20, 0), 'group': 'I'},
+        {'home_team': 'Noruega', 'away_team': 'Francia', 'match_date': dt(2026, 6, 26, 15, 0), 'group': 'I'},
+        {'home_team': 'Senegal', 'away_team': 'Irak', 'match_date': dt(2026, 6, 26, 15, 0), 'group': 'I'},
+        # ---- Group J ----
+        {'home_team': 'Argentina', 'away_team': 'Argelia', 'match_date': dt(2026, 6, 16, 21, 0), 'group': 'J'},
+        {'home_team': 'Austria', 'away_team': 'Jordania', 'match_date': dt(2026, 6, 17, 0, 0), 'group': 'J'},
+        {'home_team': 'Argentina', 'away_team': 'Austria', 'match_date': dt(2026, 6, 22, 13, 0), 'group': 'J'},
+        {'home_team': 'Jordania', 'away_team': 'Argelia', 'match_date': dt(2026, 6, 22, 23, 0), 'group': 'J'},
+        {'home_team': 'Argelia', 'away_team': 'Austria', 'match_date': dt(2026, 6, 27, 22, 0), 'group': 'J'},
+        {'home_team': 'Jordania', 'away_team': 'Argentina', 'match_date': dt(2026, 6, 27, 22, 0), 'group': 'J'},
+        # ---- Group K ----
+        {'home_team': 'Portugal', 'away_team': 'RD Congo', 'match_date': dt(2026, 6, 17, 13, 0), 'group': 'K'},
+        {'home_team': 'Uzbekistán', 'away_team': 'Colombia', 'match_date': dt(2026, 6, 17, 22, 0), 'group': 'K'},
+        {'home_team': 'Portugal', 'away_team': 'Uzbekistán', 'match_date': dt(2026, 6, 23, 13, 0), 'group': 'K'},
+        {'home_team': 'Colombia', 'away_team': 'RD Congo', 'match_date': dt(2026, 6, 23, 22, 0), 'group': 'K'},
+        {'home_team': 'Colombia', 'away_team': 'Portugal', 'match_date': dt(2026, 6, 27, 19, 30), 'group': 'K'},
+        {'home_team': 'RD Congo', 'away_team': 'Uzbekistán', 'match_date': dt(2026, 6, 27, 19, 30), 'group': 'K'},
+        # ---- Group L ----
+        {'home_team': 'Inglaterra', 'away_team': 'Croacia', 'match_date': dt(2026, 6, 17, 16, 0), 'group': 'L'},
+        {'home_team': 'Ghana', 'away_team': 'Panamá', 'match_date': dt(2026, 6, 17, 19, 0), 'group': 'L'},
+        {'home_team': 'Inglaterra', 'away_team': 'Ghana', 'match_date': dt(2026, 6, 23, 16, 0), 'group': 'L'},
+        {'home_team': 'Panamá', 'away_team': 'Croacia', 'match_date': dt(2026, 6, 23, 19, 0), 'group': 'L'},
+        {'home_team': 'Panamá', 'away_team': 'Inglaterra', 'match_date': dt(2026, 6, 27, 17, 0), 'group': 'L'},
+        {'home_team': 'Croacia', 'away_team': 'Ghana', 'match_date': dt(2026, 6, 27, 17, 0), 'group': 'L'},
     ]
+    count = 0
     for data in seed_data:
         exists = Match.query.filter_by(home_team=data['home_team'], away_team=data['away_team'], match_date=data['match_date']).first()
         if not exists:
             m = Match(**data)
             db.session.add(m)
+            count += 1
     db.session.commit()
-    flash('Partidos iniciales sembrados', 'success')
+    flash(f'Se sembraron {count} partidos de la fase de grupos', 'success')
     return redirect(url_for('main.admin_matches'))
 
 # Admin match management routes
