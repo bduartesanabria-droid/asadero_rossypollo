@@ -18,6 +18,11 @@ RUN pip install --no-cache-dir -r requirements.txt
 # Copiar el código de la aplicación
 COPY . .
 
+# Limpiar cualquier cache de Python compilado
+RUN find /app -type d -name __pycache__ -exec rm -rf {} + 2>/dev/null || true
+RUN find /app -name "*.pyc" -delete 2>/dev/null || true
+RUN find /app -name "*.pyo" -delete 2>/dev/null || true
+
 # Crear directorio para la base de datos
 RUN mkdir -p /app/instance
 
@@ -26,6 +31,9 @@ EXPOSE 5000
 
 # Variable de entorno para evitar buffering de stdout
 ENV PYTHONUNBUFFERED=1
+
+# Evitar que Python genere archivos .pyc
+ENV PYTHONDONTWRITEBYTECODE=1
 
 # Comando por defecto
 CMD ["python", "run.py"]
