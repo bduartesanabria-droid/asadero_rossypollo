@@ -5,22 +5,91 @@
 {% block content %}
 <div class="container my-5">
     <!-- Hero Section -->
-    <div class="jumbotron p-5 rounded mb-5 text-center text-lg-start">
-        <div class="row align-items-center">
-            <div class="col-lg-9">
-                <h1 class="display-4">🍗 Bienvenidos a Asadero Rossy Pollo</h1>
-                <p class="lead fs-4">El arte del auténtico sabor a las brasas y recetas deliciosas.</p>
-                <hr class="my-4 bg-white opacity-25">
-                <p class="mb-0 text-white-50">Explora consejos de expertos, secretos del asado y las mejores guías para cocinar pollo y carnes a la parrilla de forma única.</p>
+    <section class="worldcup-hero mb-5">
+        <div class="row align-items-center gy-4">
+            <div class="col-lg-7">
+                <span class="worldcup-champ">Copa Mundial 2026</span>
+                <h1 class="display-4 fw-bold">Marcador Rossy Pollo con <span>Y7</span></h1>
+                <p class="lead text-white-75 mb-4">Vive la pasión del Mundial con un estilo deportivo, premios oficiales y la mascota Y7 como protagonista de cada jugada.</p>
+                <div class="d-flex flex-column flex-sm-row gap-3 mb-4">
+                    <a href="#posts" class="btn btn-light btn-lg">Ver artículos</a>
+                    <a href="#premios" class="btn btn-outline-light btn-lg">Tabla de premios</a>
+                </div>
+                <div class="row row-cols-1 row-cols-md-3 g-3 worldcup-kpis">
+                    <div class="col">
+                        <div class="kpi-card">
+                            <span class="kpi-label">Equipos</span>
+                            <strong>48 selecciones</strong>
+                        </div>
+                    </div>
+                    <div class="col">
+                        <div class="kpi-card">
+                            <span class="kpi-label">Partidos</span>
+                            <strong>104 encuentros</strong>
+                        </div>
+                    </div>
+                    <div class="col">
+                        <div class="kpi-card">
+                            <span class="kpi-label">Premios</span>
+                            <strong>Descuentos + combos</strong>
+                        </div>
+                    </div>
+                </div>
             </div>
-            <div class="col-lg-3 text-center d-none d-lg-block">
-                <i class="fas fa-fire-alt" style="font-size: 7rem; opacity: 0.25; animation: pulse 3s infinite ease-in-out;"></i>
+            <div class="col-lg-5">
+                <div class="mascot-card p-4">
+                    <div class="mascot-top">
+                        <div class="mascot-ear left"></div>
+                        <div class="mascot-head">
+                            <div class="mascot-face">Y7</div>
+                        </div>
+                        <div class="mascot-ear right"></div>
+                    </div>
+                    <div class="mascot-body mt-4">
+                        <div class="mascot-shirt"></div>
+                        <div class="mascot-ball"></div>
+                    </div>
+                    <div class="mascot-info text-center mt-4">
+                        <h2 class="mb-2">Y7, la nueva mascota</h2>
+                        <p class="small text-white-75 mb-3">Una combinación de sabor, fútbol y diversión para el Mundial.</p>
+                        <div class="d-flex justify-content-center gap-2 flex-wrap">
+                            <span class="badge rounded-pill bg-white text-dark fw-bold">#TeamMundial</span>
+                            <span class="badge rounded-pill bg-white text-dark fw-bold">#Y7</span>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
-    </div>
+    </section>
+
+    <section id="premios" class="worldcup-highlights mb-5">
+        <div class="row g-4">
+            <div class="col-md-4">
+                <div class="promo-card p-4 h-100">
+                    <span class="promo-tag">Fase de Grupos</span>
+                    <h3>2 presas Broaster</h3>
+                    <p>Consumo mínimo $20.000 en local.</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="promo-card p-4 h-100">
+                    <span class="promo-tag">Cuartos / Semifinal</span>
+                    <h3>25% de descuento</h3>
+                    <p>En compras desde $30.000. Tope máximo $15.000.</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="promo-card p-4 h-100">
+                    <span class="promo-tag">Final</span>
+                    <h3>50% de descuento</h3>
+                    <p>En compras desde $40.000. Tope máximo $30.000.</p>
+                </div>
+            </div>
+        </div>
+    </section>
 
     <!-- Posts -->
-    <div class="row">
+    <div id="posts" class="row">
         <div class="col-md-8">
             <h2 class="mb-4 fw-bold d-flex align-items-center">
                 <i class="far fa-newspaper text-primary me-2"></i> Últimos Artículos
