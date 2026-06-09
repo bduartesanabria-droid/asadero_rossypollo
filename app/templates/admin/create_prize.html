@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+{% block title %}Crear Premio{% endblock %}
+{% block content %}
+<div class="container py-5">
+  <h1 class="mb-4">Crear Nuevo Premio</h1>
+  <form method="POST" class="row g-3">
+    <div class="col-md-6">
+      <label class="form-label">Nombre del Premio</label>
+      <input type="text" name="name" class="form-control" required>
+    </div>
+    <div class="col-md-6">
+      <label class="form-label">Fase</label>
+      <input type="text" name="phase" class="form-control" placeholder="Ej. Fase de Grupos" required>
+    </div>
+    <div class="col-12">
+      <label class="form-label">Descripción</label>
+      <textarea name="description" class="form-control" rows="4" required></textarea>
+    </div>
+    <div class="col-12">
+      <label class="form-label">URL de imagen (opcional)</label>
+      <input type="url" name="image_url" class="form-control">
+    </div>
+    <div class="col-12">
+      <button type="submit" class="btn btn-primary">Guardar Premio</button>
+      <a href="{{ url_for('main.admin_prizes') }}" class="btn btn-outline-secondary ms-2">Cancelar</a>
+    </div>
+  </form>
+</div>
+{% endblock %}

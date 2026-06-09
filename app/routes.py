@@ -4,7 +4,7 @@ from flask import Blueprint, render_template, request, jsonify, flash, redirect,
 from flask_login import login_required, current_user
 from sqlalchemy import func
 
-from app.models import db, Post, Category, Match, Prediction, User, Result
+from app.models import db, Post, Category, Match, Prediction, User, Result, Prize
 
 main_bp = Blueprint('main', __name__)
 
@@ -212,7 +212,92 @@ def index():
         {'phase': 'Final', 'title': '50% Descuento', 'detail': 'El máximo premio para cerrar la fase.'},
     ]
 
+    prizes = Prize.query.order_by(Prize.phase.asc()).all()
+    if not prizes:
+        prizes = [
+            Prize(name='Presas Broaster', description='Disfruta un combo especial de presas Rossy Pollo.', phase='Fase de Grupos'),
+            Prize(name='5% Descuento', description='Gana un cupón para tu próxima orden.', phase='Octavos'),
+            Prize(name='25% Descuento', description='Aprovecha un ahorro especial en combos.', phase='Cuartos'),
+            Prize(name='Combo Familiar', description='Premio para compartir con tu familia.', phase='Semifinal'),
+            Prize(name='50% Descuento', description='El máximo premio para cerrar la fase.', phase='Final')
+        ]
+
     return render_template('index.html', upcoming_matches=upcoming_matches, leaderboard=leaderboard, prizes=prizes)
+
+@main_bp.route('/admin/prizes')
+@login_required
+def admin_prizes():
+    """Lista de premios para administradores"""
+    if not current_user.is_admin:
+        return jsonify({'error': 'Acceso denegado'}), 403
+    prizes = Prize.query.order_by(Prize.phase.asc()).all()
+    return render_template('admin/prizes.html', prizes=prizes)
+
+@main_bp.route('/admin/prize/new', methods=['GET', 'POST'])
+@login_required
+def create_prize():
+    """Crear un nuevo premio"""
+    if not current_user.is_admin:
+        return jsonify({'error': 'Acceso denegado'}), 403
+
+    if request.method == 'POST':
+        try:
+            prize = Prize(
+                name=request.form.get('name'),
+                description=request.form.get('description'),
+                image_url=request.form.get('image_url'),
+                phase=request.form.get('phase')
+            )
+            db.session.add(prize)
+            db.session.commit()
+            flash('Premio creado exitosamente', 'success')
+            return redirect(url_for('main.admin_prizes'))
+        except Exception as e:
+            db.session.rollback()
+            flash(f'Error al crear premio: {str(e)}', 'error')
+
+    return render_template('admin/create_prize.html')
+
+@main_bp.route('/admin/prize/<int:prize_id>/edit', methods=['GET', 'POST'])
+@login_required
+def edit_prize(prize_id):
+    """Editar un premio"""
+    if not current_user.is_admin:
+        return jsonify({'error': 'Acceso denegado'}), 403
+    prize = Prize.query.get_or_404(prize_id)
+
+    if request.method == 'POST':
+        try:
+            prize.name = request.form.get('name')
+            prize.description = request.form.get('description')
+            prize.image_url = request.form.get('image_url')
+            prize.phase = request.form.get('phase')
+            db.session.commit()
+            flash('Premio actualizado exitosamente', 'success')
+            return redirect(url_for('main.admin_prizes'))
+        except Exception as e:
+            db.session.rollback()
+            flash(f'Error al actualizar premio: {str(e)}', 'error')
+
+    return render_template('admin/edit_prize.html', prize=prize)
+
+@main_bp.route('/admin/prize/<int:prize_id>/delete', methods=['POST'])
+@login_required
+def delete_prize(prize_id):
+    """Eliminar un premio"""
+    if not current_user.is_admin:
+        return jsonify({'error': 'Acceso denegado'}), 403
+    prize = Prize.query.get_or_404(prize_id)
+
+    try:
+        db.session.delete(prize)
+        db.session.commit()
+        flash('Premio eliminado exitosamente', 'success')
+    except Exception as e:
+        db.session.rollback()
+        flash(f'Error al eliminar premio: {str(e)}', 'error')
+
+    return redirect(url_for('main.admin_prizes'))
 
 @main_bp.route('/post/<slug>')
 def view_post(slug):

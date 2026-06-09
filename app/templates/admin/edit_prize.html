@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+{% block title %}Editar Premio{% endblock %}
+{% block content %}
+<div class="container py-5">
+  <h1 class="mb-4">Editar Premio</h1>
+  <form method="POST" class="row g-3">
+    <div class="col-md-6">
+      <label class="form-label">Nombre del Premio</label>
+      <input type="text" name="name" class="form-control" value="{{ prize.name }}" required>
+    </div>
+    <div class="col-md-6">
+      <label class="form-label">Fase</label>
+      <input type="text" name="phase" class="form-control" value="{{ prize.phase }}" required>
+    </div>
+    <div class="col-12">
+      <label class="form-label">Descripción</label>
+      <textarea name="description" class="form-control" rows="4" required>{{ prize.description }}</textarea>
+    </div>
+    <div class="col-12">
+      <label class="form-label">URL de imagen (opcional)</label>
+      <input type="url" name="image_url" class="form-control" value="{{ prize.image_url or '' }}">
+    </div>
+    <div class="col-12">
+      <button type="submit" class="btn btn-primary">Actualizar Premio</button>
+      <a href="{{ url_for('main.admin_prizes') }}" class="btn btn-outline-secondary ms-2">Volver</a>
+    </div>
+  </form>
+</div>
+{% endblock %}

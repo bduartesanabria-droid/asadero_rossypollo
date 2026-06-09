@@ -107,15 +107,21 @@
     </div>
 
     <div class="row g-4">
-        {% for prize in prizes %}
-            <div class="col-md-4">
-                <div class="promo-card p-4 h-100">
-                    <span class="promo-tag">{{ prize.phase }}</span>
-                    <h3>{{ prize.title }}</h3>
-                    <p class="mb-0 text-muted">{{ prize.detail }}</p>
+        {% if prizes %}
+            {% for prize in prizes %}
+                <div class="col-md-4">
+                    <div class="promo-card p-4 h-100">
+                        <span class="promo-tag">{{ prize.phase }}</span>
+                        <h3>{{ prize.name }}</h3>
+                        <p class="mb-0 text-muted">{{ prize.description }}</p>
+                    </div>
                 </div>
+            {% endfor %}
+        {% else %}
+            <div class="col-12">
+                <div class="alert alert-secondary">No hay premios configurados por el administrador.</div>
             </div>
-        {% endfor %}
+        {% endif %}
     </div>
 </div>
 {% endblock %}
