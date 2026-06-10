@@ -16,11 +16,17 @@ def service_worker():
 @main_bp.route('/matches')
 @login_required
 def list_matches():
-    """List all matches grouped by day for users"""
+    """List all matches grouped by day for users (HARDCODED FOR TESTING)"""
     from itertools import groupby
-
-    matches = Match.query.order_by(Match.match_date.asc()).all()
-    user_predictions = {p.match_id: p for p in current_user.predictions}
+    
+    matches = [
+        Match(id=1, home_team='Colombia', away_team='Brasil', match_date=datetime(2026, 6, 15, 15, 0), group='A'),
+        Match(id=2, home_team='Argentina', away_team='Francia', match_date=datetime(2026, 6, 16, 18, 0), group='B'),
+        Match(id=3, home_team='España', away_team='Alemania', match_date=datetime(2026, 6, 17, 14, 0), group='C'),
+        Match(id=4, home_team='México', away_team='Italia', match_date=datetime(2026, 6, 18, 20, 0), group='D'),
+        Match(id=5, home_team='Uruguay', away_team='Inglaterra', match_date=datetime(2026, 6, 19, 16, 0), group='E'),
+    ]
+    user_predictions = {}
 
     # Agrupar partidos por fecha (día)
     matches_by_day = {}
@@ -80,13 +86,19 @@ def match_detail(match_id):
 
 @main_bp.route('/leaderboard')
 def leaderboard():
-    """Display leaderboard based on total points"""
-    from sqlalchemy import func
-    users_points = db.session.query(User.username, func.coalesce(func.sum(Prediction.points_earned), 0).label('total_points'))\
-        .outerjoin(Prediction, Prediction.user_id == User.id)\
-        .group_by(User.id)\
-        .order_by(func.coalesce(func.sum(Prediction.points_earned), 0).desc())\
-        .all()
+    """Display leaderboard based on total points (HARDCODED FOR TESTING)"""
+    from collections import namedtuple
+    MockRow = namedtuple('MockRow', ['username', 'total_points'])
+    users_points = [
+        MockRow('carlos_colombia', 45),
+        MockRow('maria_goles', 38),
+        MockRow('juan_perez', 30),
+        MockRow('testuser', 25),
+        MockRow('ana_futbol', 22),
+        MockRow('pedro_99', 18),
+        MockRow('luisa_p', 15),
+        MockRow('david_r', 10),
+    ]
     return render_template('leaderboard.html', users_points=users_points)
 
 @main_bp.route('/admin/calculate_points')
@@ -336,26 +348,25 @@ def update_rankings_admin():
 
 @main_bp.route('/')
 def index():
-    """Página principal con hero, próximos partidos y ranking"""
-    upcoming_matches = Match.query.filter(Match.match_date >= datetime.now())
-    upcoming_matches = upcoming_matches.order_by(Match.match_date.asc()).limit(6).all()
+    """Página principal con hero, próximos partidos y ranking (HARDCODED FOR TESTING)"""
+    from collections import namedtuple
+    MockRow = namedtuple('MockRow', ['username', 'total_points'])
 
-    leaderboard = db.session.query(
-        User.username,
-        func.coalesce(func.sum(Prediction.points_earned), 0).label('total_points')
-    ).outerjoin(Prediction, Prediction.user_id == User.id)
-    leaderboard = leaderboard.group_by(User.id)
-    leaderboard = leaderboard.order_by(func.coalesce(func.sum(Prediction.points_earned), 0).desc()).limit(5).all()
+    upcoming_matches = [
+        Match(id=1, home_team='Colombia', away_team='Brasil', match_date=datetime(2026, 6, 15, 15, 0), group='A'),
+        Match(id=2, home_team='Argentina', away_team='Francia', match_date=datetime(2026, 6, 16, 18, 0), group='B'),
+        Match(id=3, home_team='España', away_team='Alemania', match_date=datetime(2026, 6, 17, 14, 0), group='C')
+    ]
 
-    prizes = Prize.query.order_by(Prize.id.asc()).all()
-    if not prizes:
-        prizes = [
-            Prize(name='Presas Broaster', description='Disfruta un combo especial de presas Rossy Pollo.', phase='Fase de Grupos'),
-            Prize(name='5% Descuento', description='Gana un cupón para tu próxima orden.', phase='Octavos'),
-            Prize(name='25% Descuento', description='Aprovecha un ahorro especial en combos.', phase='Cuartos'),
-            Prize(name='Combo Familiar', description='Premio para compartir con tu familia.', phase='Semifinal'),
-            Prize(name='50% Descuento', description='El máximo premio para cerrar la fase.', phase='Final')
-        ]
+    leaderboard = [
+        MockRow('carlos_colombia', 45),
+        MockRow('maria_goles', 38),
+        MockRow('juan_perez', 30),
+        MockRow('testuser', 25),
+        MockRow('ana_futbol', 22)
+    ]
+
+    prizes = [1, 2, 3, 4, 5] # Mock list just for length count
 
     return render_template('index.html', upcoming_matches=upcoming_matches, leaderboard=leaderboard, prizes=prizes)
 

@@ -188,28 +188,10 @@
     <div class="section-title">
       <div class="section-divider"></div>
       <h2>Tabla de <span class="highlight">Premios</span></h2>
-      <p>Recompensas por cada fase del Mundial 2026</p>
+      <p>Recompensas dinámicas por cada fase del Mundial 2026</p>
     </div>
     <div class="text-center mb-4 animate-fade-up">
-      <img src="{{ url_for('static', filename='img/premios.png') }}" alt="Guía de premios" class="img-fluid rounded-4" style="max-width:700px;box-shadow:0 8px 32px rgba(0,0,0,0.3);">
-    </div>
-    <div class="prize-timeline">
-      {% if prizes %}
-        {% for prize in prizes %}
-        <div class="prize-card {% if loop.last %}final{% endif %}">
-          <div class="prize-phase">{{ prize.phase }}</div>
-          <div class="prize-icon"><i class="fas fa-{% if loop.index == 1 %}drumstick-bite{% elif loop.index == 2 %}percent{% elif loop.index == 3 %}percent{% elif loop.index == 4 %}utensils{% else %}crown{% endif %}"></i></div>
-          <div class="prize-name">{{ prize.name }}</div>
-          <div class="prize-desc">{{ prize.description }}</div>
-        </div>
-        {% endfor %}
-      {% else %}
-        <div class="empty-state">
-          <div class="empty-icon"><i class="fas fa-gift"></i></div>
-          <h4>Premios próximamente</h4>
-          <p>El administrador configurará los premios pronto</p>
-        </div>
-      {% endif %}
+      <img src="{{ url_for('static', filename='img/tabla_premios.jpg') }}" alt="Tabla de Premios Rossypollo" class="img-fluid rounded-4" style="max-width:1000px;box-shadow:0 12px 40px rgba(0,0,0,0.5); border: 2px solid var(--yellow);">
     </div>
   </div>
 </section>
