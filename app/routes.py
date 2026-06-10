@@ -85,7 +85,7 @@ def leaderboard():
     users_points = db.session.query(User.username, func.coalesce(func.sum(Prediction.points_earned), 0).label('total_points'))\
         .outerjoin(Prediction, Prediction.user_id == User.id)\
         .group_by(User.id)\
-        .order_by(func.sum(Prediction.points_earned).desc())\
+        .order_by(func.coalesce(func.sum(Prediction.points_earned), 0).desc())\
         .all()
     return render_template('leaderboard.html', users_points=users_points)
 
@@ -345,17 +345,9 @@ def index():
         func.coalesce(func.sum(Prediction.points_earned), 0).label('total_points')
     ).outerjoin(Prediction, Prediction.user_id == User.id)
     leaderboard = leaderboard.group_by(User.id)
-    leaderboard = leaderboard.order_by(func.sum(Prediction.points_earned).desc()).limit(5).all()
+    leaderboard = leaderboard.order_by(func.coalesce(func.sum(Prediction.points_earned), 0).desc()).limit(5).all()
 
-    prizes = [
-        {'phase': 'Fase de Grupos', 'title': 'Presas Broaster', 'detail': 'Disfruta un combo especial de presas Rossy Pollo.'},
-        {'phase': 'Octavos', 'title': '5% Descuento', 'detail': 'Gana un cupón para tu próxima orden.'},
-        {'phase': 'Cuartos', 'title': '25% Descuento', 'detail': 'Aprovecha un ahorro especial en combos.'},
-        {'phase': 'Semifinal', 'title': 'Combo Familiar', 'detail': 'Premio para compartir con tu familia.'},
-        {'phase': 'Final', 'title': '50% Descuento', 'detail': 'El máximo premio para cerrar la fase.'},
-    ]
-
-    prizes = Prize.query.order_by(Prize.phase.asc()).all()
+    prizes = Prize.query.order_by(Prize.id.asc()).all()
     if not prizes:
         prizes = [
             Prize(name='Presas Broaster', description='Disfruta un combo especial de presas Rossy Pollo.', phase='Fase de Grupos'),
