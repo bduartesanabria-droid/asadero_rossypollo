@@ -16,19 +16,14 @@ def service_worker():
 @main_bp.route('/matches')
 @login_required
 def list_matches():
-    """List all matches grouped by day for users (HARDCODED FOR TESTING)"""
-    from itertools import groupby
+    """List all matches grouped by day for users from the database"""
+    matches = Match.query.order_by(Match.match_date.asc()).all()
     
-    matches = [
-        Match(id=1, home_team='Colombia', away_team='Brasil', match_date=datetime(2026, 6, 15, 15, 0), group='A'),
-        Match(id=2, home_team='Argentina', away_team='Francia', match_date=datetime(2026, 6, 16, 18, 0), group='B'),
-        Match(id=3, home_team='España', away_team='Alemania', match_date=datetime(2026, 6, 17, 14, 0), group='C'),
-        Match(id=4, home_team='México', away_team='Italia', match_date=datetime(2026, 6, 18, 20, 0), group='D'),
-        Match(id=5, home_team='Uruguay', away_team='Inglaterra', match_date=datetime(2026, 6, 19, 16, 0), group='E'),
-    ]
-    user_predictions = {}
+    # Get user predictions for these matches
+    predictions = Prediction.query.filter_by(user_id=current_user.id).all()
+    user_predictions = {p.match_id: p for p in predictions}
 
-    # Agrupar partidos por fecha (día)
+    # Group matches by date (day)
     matches_by_day = {}
     for match in matches:
         day_key = match.match_date.strftime('%Y-%m-%d')
@@ -38,6 +33,10 @@ def list_matches():
 
     return render_template(
         'matches.html',
+        matches_by_day=matches_by_day,
+        matches=matches,
+        predictions=user_predictions
+    )
         matches_by_day=matches_by_day,
         matches=matches,
         predictions=user_predictions
@@ -86,19 +85,13 @@ def match_detail(match_id):
 
 @main_bp.route('/leaderboard')
 def leaderboard():
-    """Display leaderboard based on total points (HARDCODED FOR TESTING)"""
-    from collections import namedtuple
-    MockRow = namedtuple('MockRow', ['username', 'total_points'])
-    users_points = [
-        MockRow('carlos_colombia', 45),
-        MockRow('maria_goles', 38),
-        MockRow('juan_perez', 30),
-        MockRow('testuser', 25),
-        MockRow('ana_futbol', 22),
-        MockRow('pedro_99', 18),
-        MockRow('luisa_p', 15),
-        MockRow('david_r', 10),
-    ]
+    """Display leaderboard based on total points using actual rankings from DB"""
+    # Query users and their points from the Ranking table
+    users_points = db.session.query(
+        User.username,
+        func.coalesce(Ranking.points, 0).label('total_points')
+    ).outerjoin(Ranking, User.id == Ranking.user_id).order_by(Ranking.points.desc()).all()
+    
     return render_template('leaderboard.html', users_points=users_points)
 
 @main_bp.route('/admin/calculate_points')
@@ -348,27 +341,18 @@ def update_rankings_admin():
 
 @main_bp.route('/')
 def index():
-    """Página principal con hero, próximos partidos y ranking (HARDCODED FOR TESTING)"""
-    from collections import namedtuple
-    MockRow = namedtuple('MockRow', ['username', 'total_points'])
+    """Página principal con hero, próximos partidos y ranking real"""
+    upcoming_matches = Match.query.filter(Match.match_date >= datetime.now()).order_by(Match.match_date.asc()).limit(3).all()
 
-    upcoming_matches = [
-        Match(id=1, home_team='Colombia', away_team='Brasil', match_date=datetime(2026, 6, 15, 15, 0), group='A'),
-        Match(id=2, home_team='Argentina', away_team='Francia', match_date=datetime(2026, 6, 16, 18, 0), group='B'),
-        Match(id=3, home_team='España', away_team='Alemania', match_date=datetime(2026, 6, 17, 14, 0), group='C')
-    ]
+    leaderboard_data = db.session.query(
+        User.username,
+        func.coalesce(Ranking.points, 0).label('total_points')
+    ).outerjoin(Ranking, User.id == Ranking.user_id).order_by(Ranking.points.desc()).limit(5).all()
 
-    leaderboard = [
-        MockRow('carlos_colombia', 45),
-        MockRow('maria_goles', 38),
-        MockRow('juan_perez', 30),
-        MockRow('testuser', 25),
-        MockRow('ana_futbol', 22)
-    ]
+    prizes_count = Prize.query.count()
+    prizes_mock = range(prizes_count) # Just to pass something iterable to the template if needed
 
-    prizes = [1, 2, 3, 4, 5] # Mock list just for length count
-
-    return render_template('index.html', upcoming_matches=upcoming_matches, leaderboard=leaderboard, prizes=prizes)
+    return render_template('index.html', upcoming_matches=upcoming_matches, leaderboard=leaderboard_data, prizes=prizes_mock)
 
 @main_bp.route('/admin/prizes')
 @login_required

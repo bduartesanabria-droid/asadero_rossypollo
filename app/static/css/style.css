@@ -83,8 +83,8 @@ body {
   flex-direction: column;
   min-height: 100vh;
   overflow-x: hidden;
-  /* Overlay oscuro semitransparente para que el texto sea legible en todas las páginas */
-  background: rgba(8, 16, 42, 0.72);
+  /* Overlay oscuro semitransparente ajustado para que el fondo sea más vibrante y visible */
+  background: rgba(8, 16, 42, 0.45);
 }
 
 /* El ::before agrega un velo sutil de color sin tapar el fondo */
