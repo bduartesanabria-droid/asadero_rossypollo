@@ -35,9 +35,6 @@ def create_app(config_name='development'):
 
     # Crear tablas y admin
     with app.app_context():
-        # Si se define RESET_DB=1 en .env, fuerza recreación de tablas
-        if os.getenv('RESET_DB') == '1':
-            db.drop_all()
         db.create_all()
         admin_username = os.getenv('ADMIN_USERNAME')
         admin_email = os.getenv('ADMIN_EMAIL')
