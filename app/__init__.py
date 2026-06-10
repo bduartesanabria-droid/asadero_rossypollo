@@ -35,6 +35,7 @@ def create_app(config_name='development'):
 
     # Crear tablas y admin
     with app.app_context():
+        db.drop_all()
         db.create_all()
         admin_username = os.getenv('ADMIN_USERNAME')
         admin_email = os.getenv('ADMIN_EMAIL')
