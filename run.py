@@ -1,8 +1,8 @@
 #!/usr/bin/env python
-"""
-Script principal para ejecutar la aplicación Flask
-"""
 import os
+from dotenv import load_dotenv
+load_dotenv()  # Must run before app is imported so Config class reads correct env vars
+
 from app import create_app
 
 # Usar FLASK_ENV para seleccionar la configuración correcta

@@ -1,3 +1,6 @@
+from dotenv import load_dotenv
+load_dotenv()  # Must run before Config class is evaluated below
+
 from flask import Flask
 import os
 from flask_login import LoginManager
@@ -6,10 +9,6 @@ from app.config import config
 from app.models import db, User
 
 def create_app(config_name='development'):
-    """Factory pattern para crear la aplicación Flask"""
-    # Cargar variables de entorno desde .env
-    from dotenv import load_dotenv
-    load_dotenv()
 
     app = Flask(__name__)
 
