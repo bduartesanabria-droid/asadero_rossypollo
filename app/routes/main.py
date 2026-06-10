@@ -37,10 +37,6 @@ def list_matches():
         matches=matches,
         predictions=user_predictions
     )
-        matches_by_day=matches_by_day,
-        matches=matches,
-        predictions=user_predictions
-    )
 
 @main_bp.route('/match/<int:match_id>', methods=['GET', 'POST'])
 @login_required
