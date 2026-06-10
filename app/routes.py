@@ -16,11 +16,26 @@ def service_worker():
 @main_bp.route('/matches')
 @login_required
 def list_matches():
-    """List all upcoming matches for users"""
+    """List all matches grouped by day for users"""
+    from itertools import groupby
+
     matches = Match.query.order_by(Match.match_date.asc()).all()
-    # Get user's existing predictions
     user_predictions = {p.match_id: p for p in current_user.predictions}
-    return render_template('matches.html', matches=matches, predictions=user_predictions)
+
+    # Agrupar partidos por fecha (día)
+    matches_by_day = {}
+    for match in matches:
+        day_key = match.match_date.strftime('%Y-%m-%d')
+        if day_key not in matches_by_day:
+            matches_by_day[day_key] = []
+        matches_by_day[day_key].append(match)
+
+    return render_template(
+        'matches.html',
+        matches_by_day=matches_by_day,
+        matches=matches,
+        predictions=user_predictions
+    )
 
 @main_bp.route('/match/<int:match_id>', methods=['GET', 'POST'])
 @login_required
