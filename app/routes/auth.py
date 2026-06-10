@@ -76,11 +76,18 @@ def login():
                 return redirect(url_for('auth.login'))
             remember = bool(request.form.get('remember_me'))
             login_user(user, remember=remember)
+            
+            import logging
+            logging.info(f"Usuario logueado: {user.username}")
             flash(f'Bienvenido, {user.username}!', 'success')
             
             next_page = request.args.get('next')
-            return redirect(next_page) if next_page else redirect(url_for('main.dashboard'))
+            if not next_page or not next_page.startswith('/'):
+                next_page = url_for('main.dashboard')
+            return redirect(next_page)
         else:
+            import logging
+            logging.warning(f"Intento de login fallido para: {username}")
             flash('Usuario o contraseña incorrectos', 'error')
     
     return render_template('login.html')

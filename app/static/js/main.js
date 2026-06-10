@@ -83,9 +83,9 @@ function initConfetti() {
           setTimeout(function () { window.location.href = href; }, 800);
         }
       } else if (el.type === 'submit') {
+        // Just fire confetti, don't prevent default form submission
         fireConfetti();
       } else {
-        e.preventDefault();
         fireConfetti();
       }
     });
