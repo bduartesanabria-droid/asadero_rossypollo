@@ -228,9 +228,9 @@ def toggle_block_user(user_id):
     if not current_user.is_admin:
         return jsonify({'error': 'Acceso denegado'}), 403
     user = User.query.get_or_404(user_id)
-    user.is_active_col = not user.is_active_col
+    user.is_active = not user.is_active
     db.session.commit()
-    flash(f'Usuario {"bloqueado" if not user.is_active_col else "desbloqueado"} exitosamente', 'success')
+    flash(f'Usuario {"bloqueado" if not user.is_active else "desbloqueado"} exitosamente', 'success')
     return redirect(url_for('main.admin_users'))
 
 @main_bp.route('/admin/matches')

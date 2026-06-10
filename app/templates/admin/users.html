@@ -30,7 +30,7 @@
               <td>{% if u.is_admin %}<span class="badge badge-yellow">Admin</span>{% else %}<span class="badge" style="background:var(--bg-card);color:var(--text-secondary);">Usuario</span>{% endif %}</td>
               <td><small class="text-secondary">{{ u.created_at.strftime('%d/%m/%Y') }}</small></td>
               <td>
-                {% if u.is_active_col %}
+                {% if u.is_active %}
                   <span class="badge" style="background:rgba(76,175,80,0.2);color:#4CAF50;">Activo</span>
                 {% else %}
                   <span class="badge" style="background:rgba(211,47,47,0.2);color:#EF9A9A;">Bloqueado</span>
@@ -38,8 +38,8 @@
               </td>
               <td>
                 <form method="POST" action="{{ url_for('main.toggle_block_user', user_id=u.id) }}" class="d-inline">
-                  <button type="submit" class="btn btn-sm {{ 'btn-outline-danger' if u.is_active_col else 'btn-outline-yellow' }}">
-                    {{ 'Bloquear' if u.is_active_col else 'Desbloquear' }}
+                  <button type="submit" class="btn btn-sm {{ 'btn-outline-danger' if u.is_active else 'btn-outline-yellow' }}">
+                    {{ 'Bloquear' if u.is_active else 'Desbloquear' }}
                   </button>
                 </form>
               </td>
