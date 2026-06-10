@@ -33,10 +33,8 @@ def create_app(config_name='development'):
     def load_user(user_id):
         return User.query.get(int(user_id))
 
-    # Crear tablas y admin
+    # Crear admin por defecto si se especifica en env
     with app.app_context():
-        db.drop_all()
-        db.create_all()
         admin_username = os.getenv('ADMIN_USERNAME')
         admin_email = os.getenv('ADMIN_EMAIL')
         admin_password = os.getenv('ADMIN_PASSWORD')
@@ -56,8 +54,8 @@ def create_app(config_name='development'):
                     db.session.rollback()
     
     # Registrar blueprints (rutas)
-    from app.routes import main_bp
-    from app.auth_routes import auth_bp
+    from app.routes.main import main_bp
+    from app.routes.auth import auth_bp
     
     app.register_blueprint(main_bp)
     app.register_blueprint(auth_bp, url_prefix='/auth')

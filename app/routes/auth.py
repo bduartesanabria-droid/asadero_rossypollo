@@ -40,7 +40,7 @@ def register():
             db.session.commit()
             
             login_user(user)
-            flash('Registro exitoso. ¡Bienvenido a Rossy Pollo!', 'success')
+            flash('usuario registradooooo', 'success')
             return redirect(url_for('main.dashboard'))
         except Exception as e:
             db.session.rollback()
