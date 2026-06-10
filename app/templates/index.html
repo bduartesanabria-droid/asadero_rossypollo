@@ -1,199 +1,234 @@
 {% extends "base.html" %}
-{% block title %}Rossypollo Mundial 2026 - Pronósticos y Premios{% endblock %}
+{% block title %}Rossypollo Mundial 2026 - Inicio{% endblock %}
 {% block content %}
+<style>
+  body {
+    background: linear-gradient(135deg, rgba(10,31,68,0.85) 0%, rgba(6,18,43,0.95) 100%), url("{{ url_for('static', filename='img/stadium.png') }}") center/cover no-repeat fixed;
+    color: white;
+  }
+  .navbar {
+    background: transparent !important;
+    border-bottom: none;
+    box-shadow: none;
+    padding: 20px 0;
+  }
+  .hero-section {
+    min-height: calc(100vh - 80px);
+    display: flex;
+    align-items: center;
+    position: relative;
+    padding-bottom: 50px;
+  }
+  .hero-pill {
+    background: var(--yellow);
+    color: var(--blue-dark);
+    font-weight: 900;
+    font-size: 0.8rem;
+    padding: 6px 16px;
+    border-radius: 50px;
+    display: inline-block;
+    margin-bottom: 1.5rem;
+    box-shadow: 0 4px 15px rgba(255,215,0,0.3);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+  .hero-title {
+    font-size: clamp(3rem, 5vw, 4.5rem);
+    font-weight: 800;
+    line-height: 1.1;
+    margin-bottom: 1.5rem;
+    text-shadow: 0 4px 20px rgba(0,0,0,0.5);
+  }
+  .hero-title .highlight {
+    color: var(--yellow);
+  }
+  .hero-subtitle {
+    font-size: 1.15rem;
+    color: rgba(255,255,255,0.75);
+    max-width: 550px;
+    line-height: 1.6;
+    margin-bottom: 2.5rem;
+  }
+  .hero-buttons {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+    margin-bottom: 3rem;
+  }
+  .hero-btn {
+    padding: 14px 30px;
+    border-radius: 12px;
+    font-weight: 700;
+    font-size: 1.05rem;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    transition: all 0.3s ease;
+    text-decoration: none;
+  }
+  .hero-btn-primary {
+    background: linear-gradient(135deg, var(--yellow), #E5C100);
+    color: var(--blue-dark);
+    box-shadow: 0 8px 25px rgba(255,215,0,0.4);
+    border: none;
+  }
+  .hero-btn-primary:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 12px 30px rgba(255,215,0,0.6);
+    color: var(--blue-dark);
+  }
+  .hero-btn-outline {
+    background: rgba(10,31,68,0.5);
+    border: 1px solid rgba(255,215,0,0.5);
+    color: var(--yellow);
+    backdrop-filter: blur(10px);
+  }
+  .hero-btn-outline:hover {
+    background: rgba(255,215,0,0.1);
+    border-color: var(--yellow);
+    color: var(--yellow);
+    transform: translateY(-3px);
+  }
+  
+  .score-cards-container {
+    display: flex;
+    gap: 15px;
+  }
+  .score-card {
+    background: rgba(10,31,68,0.6);
+    border: 1px solid rgba(255,255,255,0.05);
+    backdrop-filter: blur(15px);
+    border-radius: 16px;
+    width: 100px;
+    height: 100px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: inset 0 2px 10px rgba(255,255,255,0.05), 0 8px 32px rgba(0,0,0,0.3);
+    transition: all 0.3s ease;
+  }
+  .score-card:hover {
+    transform: translateY(-5px);
+    border-color: rgba(255,215,0,0.3);
+  }
+  .score-card span {
+    font-family: 'Black Ops One', cursive;
+    font-size: 3rem;
+    color: var(--yellow);
+    text-shadow: 0 0 20px rgba(255,215,0,0.4);
+  }
 
-<!-- HERO SECTION -->
+  .mascot-container {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  .mascot-image {
+    max-height: 80vh;
+    filter: drop-shadow(0 20px 40px rgba(0,0,0,0.6));
+    z-index: 2;
+    position: relative;
+    animation: float 4s ease-in-out infinite;
+  }
+  .mascot-glow {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 400px;
+    height: 400px;
+    background: radial-gradient(circle, rgba(255,215,0,0.15) 0%, rgba(0,0,0,0) 70%);
+    z-index: 1;
+    pointer-events: none;
+  }
+
+  @keyframes float {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-15px); }
+  }
+
+  @media (max-width: 991px) {
+    .hero-section {
+      text-align: center;
+      padding-top: 40px;
+    }
+    .hero-subtitle {
+      margin: 0 auto 2rem;
+    }
+    .hero-buttons, .score-cards-container {
+      justify-content: center;
+    }
+    .mascot-image {
+      max-height: 50vh;
+      margin-top: 40px;
+    }
+  }
+</style>
+
 <section class="hero-section">
-  <div class="hero-stadium-lights"></div>
   <div class="container">
-    <div class="row align-items-center gy-5">
-      <div class="col-lg-7">
-        <span class="badge badge-yellow mb-3 animate-fade-up">Mundial 2026</span>
+    <div class="row align-items-center">
+      <!-- Izquierda: Textos y Botones -->
+      <div class="col-lg-6 z-2">
+        <div class="hero-pill animate-fade-up">MUNDIAL 2026</div>
         <h1 class="hero-title animate-fade-up delay-1">
-          Vive la pasión del Mundial<br>con <span class="highlight">Rossypollo</span>
+          Vive la pasión del<br>Mundial<br>con <span class="highlight">Rossypollo</span>
         </h1>
         <p class="hero-subtitle animate-fade-up delay-2">
           Regístrate, elige tus marcadores exclusivos y compite por premios y descuentos en cada fase del torneo. Cada marcador es único.
         </p>
-        <div class="d-flex flex-column flex-sm-row gap-3 animate-fade-up delay-3">
+        
+        <div class="hero-buttons animate-fade-up delay-3">
           {% if current_user.is_authenticated %}
-            <a href="{{ url_for('main.list_matches') }}" class="btn btn-yellow btn-lg btn-glow" data-confetti="true">
-              <i class="fas fa-futbol me-2"></i>Pronosticar Ahora
+            <a href="{{ url_for('main.list_matches') }}" class="hero-btn hero-btn-primary">
+              <i class="fas fa-futbol"></i> Pronosticar Ahora
+            </a>
+            <a href="{{ url_for('main.leaderboard') }}" class="hero-btn hero-btn-outline">
+              <i class="fas fa-trophy"></i> Ver Ranking
             </a>
           {% else %}
-            <a href="{{ url_for('auth.register') }}" class="btn btn-yellow btn-lg btn-glow" data-confetti="true">
-              <i class="fas fa-user-plus me-2"></i>Participar Ahora
+            <a href="{{ url_for('auth.register') }}" class="hero-btn hero-btn-primary">
+              <i class="fas fa-user-plus"></i> Participar Ahora
             </a>
-            <a href="{{ url_for('auth.login') }}" class="btn btn-outline-yellow btn-lg">
-              <i class="fas fa-sign-in-alt me-2"></i>Iniciar Sesión
+            <a href="{{ url_for('auth.login') }}" class="hero-btn hero-btn-outline">
+              <i class="fas fa-sign-in-alt"></i> Iniciar Sesión
             </a>
           {% endif %}
         </div>
-        <div class="row g-3 mt-4 animate-fade-up delay-4">
-          <div class="col-4">
-            <div class="stat-card p-3">
-              <div class="stat-number">{{ leaderboard|length }}</div>
-              <div class="stat-label">Ranking</div>
-            </div>
-          </div>
-          <div class="col-4">
-            <div class="stat-card p-3">
-              <div class="stat-number">{{ upcoming_matches|length }}</div>
-              <div class="stat-label">Partidos</div>
-            </div>
-          </div>
-          <div class="col-4">
-            <div class="stat-card p-3">
-              <div class="stat-number">{{ prizes|length }}</div>
-              <div class="stat-label">Premios</div>
-            </div>
-          </div>
+
+        <div class="score-cards-container animate-fade-up delay-4">
+          <div class="score-card"><span>1</span></div>
+          <div class="score-card"><span>0</span></div>
+          <div class="score-card"><span>5</span></div>
         </div>
       </div>
-      <div class="col-lg-5 text-center">
-        <img src="{{ url_for('static', filename='img/mascota.png') }}" alt="Mascota Rossypollo" class="img-fluid animate-slide-right" style="max-height:400px;filter:drop-shadow(0 0 20px rgba(255,215,0,0.4));">
+
+      <!-- Derecha: Mascota y Logos -->
+      <div class="col-lg-6 z-1">
+        <div class="mascot-container animate-fade-up delay-2">
+          <div class="mascot-glow"></div>
+          <!-- Si tienes un logo del asadero puedes ponerlo aquí detrás absoluto -->
+          <!-- <img src="{{ url_for('static', filename='img/logo.png') }}" class="position-absolute" style="top:0; opacity:0.8; z-index:1; width: 60%;"> -->
+          <img src="{{ url_for('static', filename='img/mascota.png') }}" alt="Mascota Rossypollo" class="img-fluid mascot-image">
+        </div>
       </div>
     </div>
   </div>
 </section>
 
-<!-- PRESENTATION BANNER -->
-<section class="py-5">
-  <div class="container text-center animate-fade-up">
-    <img src="{{ url_for('static', filename='img/presentacion.png') }}" alt="Presentación Rossypollo Mundial 2026" class="img-fluid rounded-4" style="max-width:800px;box-shadow:0 8px 32px rgba(0,0,0,0.3);">
-  </div>
-</section>
-
-<!-- HOW TO PARTICIPATE -->
-<section class="steps-section">
-  <div class="container">
-    <div class="section-title">
-      <div class="section-divider"></div>
-      <h2>Cómo <span class="highlight">Participar</span></h2>
-      <p>Cuatro pasos simples para unirte a la competencia</p>
+<!-- El resto de las secciones como los pasos para participar y el ranking se pueden mantener más abajo con estilos oscurecidos -->
+<section class="py-5" style="background: rgba(6,18,43,0.95); border-top: 1px solid rgba(255,255,255,0.05);">
+  <div class="container text-center">
+    <div class="section-title mb-5">
+      <div class="section-divider mx-auto mb-3" style="width: 60px; height: 3px; background: var(--yellow);"></div>
+      <h2 style="font-weight:800;">Tabla de <span class="highlight" style="color:var(--yellow);">Premios</span></h2>
     </div>
-    <div class="row g-4 justify-content-center">
-      <div class="col-md-3">
-        <div class="step-card animate-on-scroll">
-          <div class="step-number">1</div>
-          <h4>Regístrate</h4>
-          <p>Crea tu cuenta gratis en Rossypollo</p>
-        </div>
-      </div>
-      <div class="col-md-3">
-        <div class="step-card animate-on-scroll delay-1">
-          <div class="step-number">2</div>
-          <h4>Elige Marcador</h4>
-          <p>Selecciona tu resultado único para cada partido</p>
-        </div>
-      </div>
-      <div class="col-md-3">
-        <div class="step-card animate-on-scroll delay-2">
-          <div class="step-number">3</div>
-          <h4>Acumula Puntos</h4>
-          <p>Gana 3 pts por resultado exacto, 1 por ganador correcto</p>
-        </div>
-      </div>
-      <div class="col-md-3">
-        <div class="step-card animate-on-scroll delay-3">
-          <div class="step-number">4</div>
-          <h4>Gana Premios</h4>
-          <p>Canjea descuentos y combos exclusivos por fase</p>
-        </div>
-      </div>
-    </div>
-    <div class="text-center mt-4 animate-fade-up">
-      <img src="{{ url_for('static', filename='img/dinamica.png') }}" alt="Guía de participación" class="img-fluid rounded-4" style="max-width:700px;box-shadow:0 8px 32px rgba(0,0,0,0.3);">
+    <div class="animate-fade-up">
+      <img src="{{ url_for('static', filename='img/tabla_premios.jpg') }}" alt="Tabla de Premios" class="img-fluid rounded-4" style="max-width:900px; box-shadow:0 12px 40px rgba(0,0,0,0.5); border: 1px solid rgba(255,215,0,0.2);">
     </div>
   </div>
 </section>
-
-<!-- RANKING & MATCHES -->
-<div class="container">
-  <div class="row g-4 mb-5">
-    <div class="col-lg-6">
-      <div class="section-title text-start mb-4">
-        <div class="section-divider" style="margin:0 0 1rem 0;"></div>
-        <h2 style="text-align:left;">Ranking <span class="highlight">en Vivo</span></h2>
-      </div>
-      {% if leaderboard %}
-        <table class="ranking-table">
-          <thead>
-            <tr><th>#</th><th>Participante</th><th style="text-align:right;">Puntos</th></tr>
-          </thead>
-          <tbody>
-            {% for user in leaderboard %}
-            <tr>
-              <td>
-                {% if loop.index == 1 %}<span class="rank-badge rank-1">1</span>
-                {% elif loop.index == 2 %}<span class="rank-badge rank-2">2</span>
-                {% elif loop.index == 3 %}<span class="rank-badge rank-3">3</span>
-                {% else %}<span class="rank-badge" style="background:var(--bg-card);color:var(--text-secondary);">{{ loop.index }}</span>
-                {% endif %}
-              </td>
-              <td><strong>{{ user.username }}</strong></td>
-              <td style="text-align:right;font-weight:800;color:var(--yellow);">{{ user.total_points }}</td>
-            </tr>
-            {% endfor %}
-          </tbody>
-        </table>
-        <div class="mt-3 text-center">
-          <a href="{{ url_for('main.leaderboard') }}" class="btn btn-outline-yellow btn-sm">Ver Ranking Completo</a>
-        </div>
-      {% else %}
-        <div class="empty-state">
-          <div class="empty-icon"><i class="fas fa-trophy"></i></div>
-          <h4>Sin participantes aún</h4>
-          <p>Sé el primero en registrarte y participar</p>
-        </div>
-      {% endif %}
-    </div>
-    <div class="col-lg-6">
-      <div class="section-title text-start mb-4">
-        <div class="section-divider" style="margin:0 0 1rem 0;"></div>
-        <h2 style="text-align:left;">Próximos <span class="highlight">Partidos</span></h2>
-      </div>
-      {% if upcoming_matches %}
-        {% for match in upcoming_matches %}
-        <a href="{{ url_for('main.match_detail', match_id=match.id) }}" class="text-decoration-none" style="display:block;">
-          <div class="match-card mb-3">
-            <div class="match-teams">
-              <div class="team"><i class="fas fa-shield-alt me-2" style="color:var(--yellow);"></i>{{ match.home_team }}</div>
-              <div class="d-flex align-items-center gap-3">
-                <span class="match-status {{ 'locked' if match.is_locked else 'open' }}">{{ 'Bloqueado' if match.is_locked else 'Abierto' }}</span>
-              </div>
-              <div class="team">{{ match.away_team }}<i class="fas fa-shield-alt ms-2" style="color:var(--yellow);"></i></div>
-            </div>
-            <div class="d-flex justify-content-between align-items-center mt-2">
-              <span class="match-info">{{ match.match_date.strftime('%d/%m/%Y %H:%M') }}</span>
-              {% if match.group %}<span class="match-info">Grupo {{ match.group }}</span>{% endif %}
-            </div>
-          </div>
-        </a>
-        {% endfor %}
-      {% else %}
-        <div class="empty-state">
-          <div class="empty-icon"><i class="fas fa-calendar"></i></div>
-          <h4>No hay partidos</h4>
-          <p>Pronto se anunciarán los encuentros del Mundial</p>
-        </div>
-      {% endif %}
-    </div>
-  </div>
-</div>
-
-<!-- PRIZES -->
-<section class="steps-section">
-  <div class="container">
-    <div class="section-title">
-      <div class="section-divider"></div>
-      <h2>Tabla de <span class="highlight">Premios</span></h2>
-      <p>Recompensas dinámicas por cada fase del Mundial 2026</p>
-    </div>
-    <div class="text-center mb-4 animate-fade-up">
-      <img src="{{ url_for('static', filename='img/tabla_premios.jpg') }}" alt="Tabla de Premios Rossypollo" class="img-fluid rounded-4" style="max-width:1000px;box-shadow:0 12px 40px rgba(0,0,0,0.5); border: 2px solid var(--yellow);">
-    </div>
-  </div>
-</section>
-
 {% endblock %}
