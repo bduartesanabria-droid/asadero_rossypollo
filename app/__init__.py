@@ -33,8 +33,9 @@ def create_app(config_name='development'):
     def load_user(user_id):
         return User.query.get(int(user_id))
 
-    # Crear admin por defecto si se especifica en env
+    # Crear tablas (si no existen) + admin por defecto
     with app.app_context():
+        db.create_all()
         admin_username = os.getenv('ADMIN_USERNAME')
         admin_email = os.getenv('ADMIN_EMAIL')
         admin_password = os.getenv('ADMIN_PASSWORD')

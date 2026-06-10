@@ -2,12 +2,6 @@
 {% block title %}Rossypollo Mundial 2026 - Inicio{% endblock %}
 {% block content %}
 <style>
-  .navbar {
-    background: transparent !important;
-    border-bottom: none;
-    box-shadow: none;
-    padding: 20px 0;
-  }
   .hero-section {
     min-height: calc(100vh - 80px);
     display: flex;
@@ -123,7 +117,7 @@
     align-items: center;
   }
   .mascot-image {
-    max-height: 80vh;
+    max-height: 70vh;
     filter: drop-shadow(0 20px 40px rgba(0,0,0,0.6));
     z-index: 2;
     position: relative;
@@ -137,6 +131,31 @@
     width: 400px;
     height: 400px;
     background: radial-gradient(circle, rgba(255,215,0,0.15) 0%, rgba(0,0,0,0) 70%);
+    z-index: 1;
+    pointer-events: none;
+  }
+
+  .hero-logo-container {
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  .hero-logo-img {
+    max-height: 60vh;
+    filter: drop-shadow(0 15px 35px rgba(0,0,0,0.5));
+    z-index: 2;
+    position: relative;
+    animation: float 5s ease-in-out infinite;
+  }
+  .hero-logo-glow {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 350px;
+    height: 350px;
+    background: radial-gradient(circle, rgba(255,215,0,0.12) 0%, rgba(0,0,0,0) 70%);
     z-index: 1;
     pointer-events: none;
   }
@@ -166,18 +185,28 @@
 
 <section class="hero-section">
   <div class="container">
-    <div class="row align-items-center">
-      <!-- Izquierda: Textos y Botones -->
-      <div class="col-lg-6 z-2">
-        <div class="hero-pill animate-fade-up">MUNDIAL 2026</div>
-        <h1 class="hero-title animate-fade-up delay-1">
-          Vive la pasión del<br>Mundial<br>con <span class="highlight">Rossypollo</span>
-        </h1>
-        <p class="hero-subtitle animate-fade-up delay-2">
-          Regístrate, elige tus marcadores exclusivos y compite por premios y descuentos en cada fase del torneo. Cada marcador es único.
-        </p>
-        
-        <div class="hero-buttons animate-fade-up delay-3">
+    <div class="row align-items-center justify-content-center">
+      <!-- Centro-Izquierda: Logo oficial grande -->
+      <div class="col-lg-5 col-md-6 text-center z-2 mb-4 mb-lg-0">
+        <div class="hero-logo-container animate-fade-up delay-1">
+          <div class="hero-logo-glow"></div>
+          <img src="{{ url_for('static', filename='img/logoo.png') }}" alt="Asadero Rossypollo" class="img-fluid hero-logo-img">
+        </div>
+      </div>
+
+      <!-- Centro-Derecha: Mascota 3D -->
+      <div class="col-lg-5 col-md-6 text-center z-1">
+        <div class="mascot-container animate-fade-up delay-2">
+          <div class="mascot-glow"></div>
+          <img src="{{ url_for('static', filename='img/mascota.png') }}" alt="Mascota Rossypollo Futbolista" class="img-fluid mascot-image">
+        </div>
+      </div>
+    </div>
+
+    <!-- Botones debajo de las imágenes -->
+    <div class="row mt-4">
+      <div class="col-12 text-center">
+        <div class="hero-buttons justify-content-center animate-fade-up delay-3">
           {% if current_user.is_authenticated %}
             <a href="{{ url_for('main.list_matches') }}" class="hero-btn hero-btn-primary">
               <i class="fas fa-futbol"></i> Pronosticar Ahora
@@ -193,22 +222,6 @@
               <i class="fas fa-sign-in-alt"></i> Iniciar Sesión
             </a>
           {% endif %}
-        </div>
-
-        <div class="score-cards-container animate-fade-up delay-4">
-          <div class="score-card"><span>1</span></div>
-          <div class="score-card"><span>0</span></div>
-          <div class="score-card"><span>5</span></div>
-        </div>
-      </div>
-
-      <!-- Derecha: Mascota y Logos -->
-      <div class="col-lg-6 z-1">
-        <div class="mascot-container animate-fade-up delay-2">
-          <div class="mascot-glow"></div>
-          <!-- Si tienes un logo del asadero puedes ponerlo aquí detrás absoluto -->
-          <!-- <img src="{{ url_for('static', filename='img/logo.png') }}" class="position-absolute" style="top:0; opacity:0.8; z-index:1; width: 60%;"> -->
-          <img src="{{ url_for('static', filename='img/mascota.png') }}" alt="Mascota Rossypollo" class="img-fluid mascot-image">
         </div>
       </div>
     </div>

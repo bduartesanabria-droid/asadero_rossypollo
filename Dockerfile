@@ -42,4 +42,4 @@ RUN chmod +x /app/entrypoint.sh
 
 # Exponer comando por defecto (gunicorn en producción)
 ENTRYPOINT ["/app/entrypoint.sh"]
-CMD ["gunicorn", "run:app", "--bind", "0.0.0.0:5000", "--workers", "3"]
+CMD ["gunicorn", "run:app", "--bind", "0.0.0.0:5000", "--workers", "1", "--threads", "4"]
