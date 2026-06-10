@@ -46,6 +46,8 @@ def register():
             return redirect(url_for('main.dashboard'))
         except Exception as e:
             db.session.rollback()
+            import logging
+            logging.error(f"Error en registro: {str(e)}")
             flash(f'Error al registrar: {str(e)}', 'error')
             return redirect(url_for('auth.register'))
     

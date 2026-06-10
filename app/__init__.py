@@ -31,7 +31,7 @@ def create_app(config_name='development'):
 
     @login_manager.user_loader
     def load_user(user_id):
-        return User.query.get(int(user_id))
+        return db.session.get(User, int(user_id))
 
     # Crear tablas (si no existen) + admin por defecto
     with app.app_context():
