@@ -19,21 +19,54 @@
       <div class="table-responsive">
         <table class="table table-hover align-middle mb-0">
           <thead>
-            <tr><th>Local</th><th>Visitante</th><th>Fecha</th><th>Grupo</th><th>Resultado</th><th>Estado</th><th>Acciones</th></tr>
+            <tr>
+              <th>Local</th>
+              <th>Visitante</th>
+              <th>Fecha</th>
+              <th>Grupo</th>
+              <th>Resultado</th>
+              <th>Estado</th>
+              <th>Pronósticos</th>
+              <th>Acciones</th>
+            </tr>
           </thead>
           <tbody>
             {% for match in matches %}
             <tr>
               <td><strong>{{ match.home_team }}</strong></td>
               <td><strong>{{ match.away_team }}</strong></td>
-              <td><small>{{ match.match_date.strftime('%Y-%m-%d %H:%M') }}</small></td>
+              <td><small>{{ match.match_date.strftime('%d/%m/%Y %H:%M') }}</small></td>
               <td>{% if match.group %}<span class="badge badge-yellow">{{ match.group }}</span>{% else %}—{% endif %}</td>
-              <td><strong>{% if match.home_score is not none %}{{ match.home_score }} - {{ match.away_score }}{% else %}—{% endif %}</strong></td>
-              <td><span class="badge" style="background:{{ 'rgba(255,152,0,0.2)' if match.is_locked else 'rgba(76,175,80,0.2)' }};color:{{ '#FF9800' if match.is_locked else '#4CAF50' }};">{{ 'Bloqueado' if match.is_locked else 'Abierto' }}</span></td>
               <td>
-                <a href="{{ url_for('main.edit_match', match_id=match.id) }}" class="btn btn-sm btn-outline-yellow">
-                  <i class="fas fa-edit"></i> {{ 'Resultado' if match.is_locked else 'Editar' }}
-                </a>
+                <strong>
+                  {% if match.home_score is not none %}
+                    {{ match.home_score }} - {{ match.away_score }}
+                  {% else %}—{% endif %}
+                </strong>
+              </td>
+              <td>
+                {% if match.status == 'finished' %}
+                  <span class="badge" style="background:rgba(76,175,80,0.2);color:#4CAF50;">✅ Finalizado</span>
+                {% elif match.status == 'live' %}
+                  <span class="badge" style="background:rgba(244,67,54,0.2);color:#EF9A9A;">🔴 En curso</span>
+                {% else %}
+                  <span class="badge" style="background:rgba(255,152,0,0.2);color:#FF9800;">⏳ Pendiente</span>
+                {% endif %}
+              </td>
+              <td>
+                <small class="text-secondary">{{ match.predictions | length }}</small>
+              </td>
+              <td>
+                <div class="d-flex gap-1">
+                  <a href="{{ url_for('main.edit_match', match_id=match.id) }}" class="btn btn-sm btn-outline-yellow">
+                    <i class="fas fa-edit"></i>
+                  </a>
+                  <form method="POST" action="{{ url_for('main.delete_match', match_id=match.id) }}" onsubmit="return confirm('¿Eliminar este partido y todos sus pronósticos?')">
+                    <button type="submit" class="btn btn-sm btn-outline-danger">
+                      <i class="fas fa-trash"></i>
+                    </button>
+                  </form>
+                </div>
               </td>
             </tr>
             {% endfor %}

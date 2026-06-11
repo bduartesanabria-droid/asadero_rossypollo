@@ -298,16 +298,103 @@ def edit_match(match_id):
                 match.home_team = request.form.get('home_team')
                 match.away_team = request.form.get('away_team')
                 match.match_date = datetime.fromisoformat(request.form.get('match_date'))
-            match.home_score = int(request.form.get('home_score')) if request.form.get('home_score') else None
-            match.away_score = int(request.form.get('away_score')) if request.form.get('away_score') else None
+            home_score_raw = request.form.get('home_score')
+            away_score_raw = request.form.get('away_score')
+            match.home_score = int(home_score_raw) if home_score_raw != '' and home_score_raw is not None else None
+            match.away_score = int(away_score_raw) if away_score_raw != '' and away_score_raw is not None else None
             match.group = request.form.get('group') or None
+            new_status = request.form.get('status')
+            if new_status in ('scheduled', 'live', 'finished'):
+                match.status = new_status
+            # Auto-set finished and calculate points when scores are provided
+            if match.home_score is not None and match.away_score is not None:
+                match.status = 'finished'
+                for pred in match.predictions:
+                    pred.calculate_points()
+                # Update rankings
+                user_points = db.session.query(
+                    User.id.label('user_id'),
+                    func.coalesce(func.sum(Prediction.points_earned), 0).label('total_points')
+                ).outerjoin(Prediction, Prediction.user_id == User.id).group_by(User.id).all()
+                for row in user_points:
+                    ranking = Ranking.query.filter_by(user_id=row.user_id).first()
+                    if ranking:
+                        ranking.points = row.total_points
+                    else:
+                        ranking = Ranking(user_id=row.user_id, points=row.total_points)
+                        db.session.add(ranking)
             db.session.commit()
-            flash('Partido actualizado exitosamente', 'success')
+            flash('Partido actualizado y puntos calculados automáticamente', 'success')
             return redirect(url_for('main.admin_matches'))
         except Exception as e:
             db.session.rollback()
             flash(f'Error al actualizar partido: {str(e)}', 'error')
     return render_template('admin/edit_match.html', match=match, locked=locked)
+
+
+@main_bp.route('/admin/match/<int:match_id>/delete', methods=['POST'])
+@login_required
+def delete_match(match_id):
+    """Eliminar un partido (solo admin)"""
+    if not current_user.is_admin:
+        return jsonify({'error': 'Acceso denegado'}), 403
+    match = Match.query.get_or_404(match_id)
+    try:
+        Prediction.query.filter_by(match_id=match.id).delete()
+        db.session.delete(match)
+        db.session.commit()
+        flash('Partido eliminado exitosamente', 'success')
+    except Exception as e:
+        db.session.rollback()
+        flash(f'Error al eliminar partido: {str(e)}', 'error')
+    return redirect(url_for('main.admin_matches'))
+
+
+@main_bp.route('/admin/user/new', methods=['GET', 'POST'])
+@login_required
+def admin_create_user():
+    """Crear un usuario manualmente (solo superadmin)"""
+    if not current_user.is_admin:
+        return jsonify({'error': 'Acceso denegado'}), 403
+    if request.method == 'POST':
+        username = request.form.get('username', '').strip()
+        email = request.form.get('email', '').strip()
+        password = request.form.get('password', '')
+        is_admin = request.form.get('is_admin') == 'on'
+        if not username or not email or not password:
+            flash('Todos los campos son requeridos', 'error')
+        elif User.query.filter_by(username=username).first():
+            flash('El nombre de usuario ya existe', 'error')
+        elif User.query.filter_by(email=email).first():
+            flash('El correo ya está registrado', 'error')
+        else:
+            try:
+                user = User(username=username, email=email, is_admin=is_admin)
+                user.set_password(password)
+                db.session.add(user)
+                db.session.commit()
+                flash(f'Usuario {username} creado exitosamente', 'success')
+                return redirect(url_for('main.admin_users'))
+            except Exception as e:
+                db.session.rollback()
+                flash(f'Error al crear usuario: {str(e)}', 'error')
+    return render_template('admin/create_user.html')
+
+
+@main_bp.route('/admin/user/<int:user_id>/toggle_role', methods=['POST'])
+@login_required
+def toggle_role_user(user_id):
+    """Cambiar rol admin/usuario"""
+    if not current_user.is_admin:
+        return jsonify({'error': 'Acceso denegado'}), 403
+    if current_user.id == user_id:
+        flash('No puedes cambiar tu propio rol', 'error')
+        return redirect(url_for('main.admin_users'))
+    user = User.query.get_or_404(user_id)
+    user.is_admin = not user.is_admin
+    db.session.commit()
+    flash(f'Rol de {user.username} cambiado a {"Superadmin" if user.is_admin else "Usuario"}', 'success')
+    return redirect(url_for('main.admin_users'))
 
 @main_bp.route('/admin/update_rankings')
 @login_required

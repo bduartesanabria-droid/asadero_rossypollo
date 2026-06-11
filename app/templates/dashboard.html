@@ -64,9 +64,10 @@
                     <td><span class="badge badge-yellow">{{ pred.predicted_home_score }} - {{ pred.predicted_away_score }}</span></td>
                     <td><strong>{{ pred.points_earned if pred.points_earned is not none else '-' }}</strong></td>
                     <td>
-                      {% if pred.points_earned == 3 %}<span class="badge" style="background:#4CAF50;">Exacto <i class="fas fa-check-circle"></i></span>
-                      {% elif pred.points_earned == 1 %}<span class="badge" style="background:#FF9800;">Ganador <i class="fas fa-check"></i></span>
-                      {% else %}<span class="badge" style="background:var(--text-muted);">Pendiente</span>
+                      {% if pred.points_earned == 3 %}<span class="badge" style="background:#4CAF50;">🎯 Exacto</span>
+                      {% elif pred.points_earned == 1 %}<span class="badge" style="background:#FF9800;">✅ Ganó</span>
+                      {% elif pred.points_earned == 0 %}<span class="badge" style="background:#d32f2f;">❌ Perdió</span>
+                      {% else %}<span class="badge" style="background:var(--text-muted);">⏳ Pendiente</span>
                       {% endif %}
                     </td>
                   </tr>

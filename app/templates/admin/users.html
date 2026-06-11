@@ -7,7 +7,10 @@
       <h1 class="fw-bold mb-1">Gestión de Usuarios</h1>
       <p class="text-secondary mb-0">{{ users|length }} usuarios registrados</p>
     </div>
-    <a href="{{ url_for('main.admin_dashboard') }}" class="btn btn-outline-yellow"><i class="fas fa-arrow-left me-2"></i>Admin</a>
+    <div class="d-flex gap-2">
+      <a href="{{ url_for('main.admin_create_user') }}" class="btn btn-yellow"><i class="fas fa-user-plus me-2"></i>Crear Usuario</a>
+      <a href="{{ url_for('main.admin_dashboard') }}" class="btn btn-outline-yellow"><i class="fas fa-arrow-left me-2"></i>Admin</a>
+    </div>
   </div>
 
   <div class="card">
@@ -24,10 +27,17 @@
                 <div class="d-flex align-items-center gap-2">
                   <div style="width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,var(--blue-light),var(--blue));display:flex;align-items:center;justify-content:center;font-weight:700;font-size:0.8rem;color:var(--yellow);">{{ u.username[0]|upper }}</div>
                   <strong>{{ u.username }}</strong>
+                  {% if u.id == current_user.id %}<span class="badge" style="background:rgba(245,197,24,0.15);color:var(--yellow);font-size:0.7rem;">Tú</span>{% endif %}
                 </div>
               </td>
               <td><small>{{ u.email }}</small></td>
-              <td>{% if u.is_admin %}<span class="badge badge-yellow">Admin</span>{% else %}<span class="badge" style="background:var(--bg-card);color:var(--text-secondary);">Usuario</span>{% endif %}</td>
+              <td>
+                {% if u.is_admin %}
+                  <span class="badge badge-yellow"><i class="fas fa-shield-alt me-1"></i>Superadmin</span>
+                {% else %}
+                  <span class="badge" style="background:var(--bg-card);color:var(--text-secondary);">Usuario</span>
+                {% endif %}
+              </td>
               <td><small class="text-secondary">{{ u.created_at.strftime('%d/%m/%Y') }}</small></td>
               <td>
                 {% if u.is_active %}
@@ -37,11 +47,20 @@
                 {% endif %}
               </td>
               <td>
-                <form method="POST" action="{{ url_for('main.toggle_block_user', user_id=u.id) }}" class="d-inline">
-                  <button type="submit" class="btn btn-sm {{ 'btn-outline-danger' if u.is_active else 'btn-outline-yellow' }}">
-                    {{ 'Bloquear' if u.is_active else 'Desbloquear' }}
-                  </button>
-                </form>
+                <div class="d-flex gap-1 flex-wrap">
+                  <form method="POST" action="{{ url_for('main.toggle_block_user', user_id=u.id) }}" class="d-inline">
+                    <button type="submit" class="btn btn-sm {{ 'btn-outline-danger' if u.is_active else 'btn-outline-yellow' }}">
+                      <i class="fas fa-{{ 'ban' if u.is_active else 'unlock' }} me-1"></i>{{ 'Bloquear' if u.is_active else 'Desbloquear' }}
+                    </button>
+                  </form>
+                  {% if u.id != current_user.id %}
+                  <form method="POST" action="{{ url_for('main.toggle_role_user', user_id=u.id) }}" class="d-inline">
+                    <button type="submit" class="btn btn-sm btn-outline-secondary" onclick="return confirm('¿Cambiar el rol de {{ u.username }}?')">
+                      <i class="fas fa-user-shield me-1"></i>{{ 'Quitar Admin' if u.is_admin else 'Hacer Admin' }}
+                    </button>
+                  </form>
+                  {% endif %}
+                </div>
               </td>
             </tr>
             {% endfor %}

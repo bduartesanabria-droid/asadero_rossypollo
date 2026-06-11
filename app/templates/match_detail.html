@@ -27,12 +27,24 @@
       {% endif %}
 
       {% if prediction %}
-        <div class="alert alert-success">
-          <i class="fas fa-check-circle me-2"></i>Tu pronóstico: <strong>{{ prediction.predicted_home_score }} - {{ prediction.predicted_away_score }}</strong>
-          {% if prediction.points_earned is not none %}
-            <span class="badge badge-yellow ms-2">{{ prediction.points_earned }} pts</span>
-          {% endif %}
-        </div>
+        {% if prediction.points_earned == 3 %}
+          <div class="alert" style="background:rgba(76,175,80,0.15);border:1px solid #4CAF50;color:#4CAF50;">
+            <i class="fas fa-trophy me-2"></i><strong>¡Resultado exacto!</strong> Tu pronóstico <strong>{{ prediction.predicted_home_score }} - {{ prediction.predicted_away_score }}</strong> fue perfecto. <span class="badge badge-yellow ms-2">+3 pts</span>
+          </div>
+        {% elif prediction.points_earned == 1 %}
+          <div class="alert" style="background:rgba(255,152,0,0.15);border:1px solid #FF9800;color:#FF9800;">
+            <i class="fas fa-check-circle me-2"></i><strong>¡Ganaste!</strong> Acertaste el ganador con <strong>{{ prediction.predicted_home_score }} - {{ prediction.predicted_away_score }}</strong>. <span class="badge ms-2" style="background:#FF9800;">+1 pt</span>
+          </div>
+        {% elif prediction.points_earned == 0 %}
+          <div class="alert" style="background:rgba(211,47,47,0.15);border:1px solid #d32f2f;color:#EF9A9A;">
+            <i class="fas fa-times-circle me-2"></i><strong>Perdiste.</strong> Tu pronóstico fue <strong>{{ prediction.predicted_home_score }} - {{ prediction.predicted_away_score }}</strong>. ¡Suerte en el próximo partido!
+          </div>
+        {% else %}
+          <div class="alert alert-success">
+            <i class="fas fa-check-circle me-2"></i>Tu pronóstico registrado: <strong>{{ prediction.predicted_home_score }} - {{ prediction.predicted_away_score }}</strong>
+            <span class="badge" style="background:rgba(255,255,255,0.15);ms-2">⏳ Resultado pendiente</span>
+          </div>
+        {% endif %}
       {% endif %}
 
       <div class="card">

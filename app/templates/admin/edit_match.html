@@ -10,39 +10,56 @@
         </div>
         <div class="card-body">
           {% if locked %}
-            <div class="alert alert-info"><i class="fas fa-info-circle me-2"></i>Partido bloqueado. Solo puedes actualizar el resultado.</div>
+            <div class="alert alert-info"><i class="fas fa-lock me-2"></i>Partido iniciado. Puedes actualizar el resultado y el estado.</div>
           {% endif %}
           <form method="POST">
             <div class="row g-3 mb-3">
               <div class="col-6">
-                <label class="form-label">Local</label>
-                <input type="text" name="home_team" class="form-control" value="{{ match.home_team }}" {% if locked %}disabled{% endif %}>
+                <label class="form-label">Equipo Local</label>
+                <input type="text" name="home_team" class="form-control" value="{{ match.home_team }}" {% if locked %}disabled{% endif %} required>
               </div>
               <div class="col-6">
-                <label class="form-label">Visitante</label>
-                <input type="text" name="away_team" class="form-control" value="{{ match.away_team }}" {% if locked %}disabled{% endif %}>
+                <label class="form-label">Equipo Visitante</label>
+                <input type="text" name="away_team" class="form-control" value="{{ match.away_team }}" {% if locked %}disabled{% endif %} required>
               </div>
             </div>
-            <div class="row g-3 mb-3">
-              <div class="col-6">
-                <label class="form-label">Goles Local</label>
-                <input type="number" name="home_score" class="form-control" value="{{ match.home_score or '' }}" min="0">
+
+            <div class="mb-3">
+              <label class="form-label fw-semibold" style="color:var(--yellow);">Resultado Oficial</label>
+              <div class="row g-2">
+                <div class="col-6">
+                  <label class="form-label small text-secondary">Goles Local</label>
+                  <input type="number" name="home_score" class="form-control form-control-lg text-center" value="{{ match.home_score if match.home_score is not none else '' }}" min="0" placeholder="—">
+                </div>
+                <div class="col-6">
+                  <label class="form-label small text-secondary">Goles Visitante</label>
+                  <input type="number" name="away_score" class="form-control form-control-lg text-center" value="{{ match.away_score if match.away_score is not none else '' }}" min="0" placeholder="—">
+                </div>
               </div>
-              <div class="col-6">
-                <label class="form-label">Goles Visitante</label>
-                <input type="number" name="away_score" class="form-control" value="{{ match.away_score or '' }}" min="0">
-              </div>
+              <div class="form-text"><i class="fas fa-info-circle me-1"></i>Al guardar con resultado, el partido se marca como <strong>Finalizado</strong> y los puntos se calculan automáticamente.</div>
             </div>
+
+            <div class="mb-3">
+              <label class="form-label">Estado del partido</label>
+              <select name="status" class="form-select">
+                <option value="scheduled" {% if match.status == 'scheduled' %}selected{% endif %}>⏳ Pendiente</option>
+                <option value="live" {% if match.status == 'live' %}selected{% endif %}>🔴 En curso</option>
+                <option value="finished" {% if match.status == 'finished' %}selected{% endif %}>✅ Finalizado</option>
+              </select>
+            </div>
+
             <div class="mb-3">
               <label class="form-label">Fecha y Hora</label>
               <input type="datetime-local" name="match_date" class="form-control" value="{{ match.match_date.isoformat()[:16] }}" {% if locked %}disabled{% endif %}>
             </div>
-            <div class="mb-3">
-              <label class="form-label">Grupo</label>
-              <input type="text" name="group" class="form-control" value="{{ match.group or '' }}" {% if locked %}disabled{% endif %}>
+
+            <div class="mb-4">
+              <label class="form-label">Grupo / Fase</label>
+              <input type="text" name="group" class="form-control" value="{{ match.group or '' }}" placeholder="Ej: A, Octavos, Final">
             </div>
+
             <div class="d-flex gap-2">
-              <button type="submit" class="btn btn-yellow"><i class="fas fa-save me-2"></i>{{ 'Guardar Resultado' if locked else 'Actualizar' }}</button>
+              <button type="submit" class="btn btn-yellow"><i class="fas fa-save me-2"></i>Guardar</button>
               <a href="{{ url_for('main.admin_matches') }}" class="btn btn-outline-yellow">Cancelar</a>
             </div>
           </form>
