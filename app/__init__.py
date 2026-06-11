@@ -85,30 +85,40 @@ def create_app(config_name='development'):
         except Exception:
             db.session.rollback()
 
-    # Country flag emoji context processor — use {{ flag('México') }} in templates
-    COUNTRY_FLAGS = {
-        'México': '🇲🇽', 'Sudáfrica': '🇿🇦', 'Corea del Sur': '🇰🇷',
-        'Rep. Checa': '🇨🇿', 'Canadá': '🇨🇦', 'Bosnia y Herzegovina': '🇧🇦',
-        'Estados Unidos': '🇺🇸', 'Paraguay': '🇵🇾', 'Qatar': '🇶🇦',
-        'Suiza': '🇨🇭', 'Brasil': '🇧🇷', 'Marruecos': '🇲🇦',
-        'Haití': '🇭🇹', 'Escocia': '🏴󠁧󠁢󠁳󠁣󠁴󠁿', 'Australia': '🇦🇺',
-        'Turquía': '🇹🇷', 'Alemania': '🇩🇪', 'Curazao': '🇨🇼',
-        'Países Bajos': '🇳🇱', 'Japón': '🇯🇵', 'Costa de Marfil': '🇨🇮',
-        'Ecuador': '🇪🇨', 'Suecia': '🇸🇪', 'Túnez': '🇹🇳',
-        'España': '🇪🇸', 'Cabo Verde': '🇨🇻', 'Bélgica': '🇧🇪',
-        'Egipto': '🇪🇬', 'Arabia Saudí': '🇸🇦', 'Uruguay': '🇺🇾',
-        'Irán': '🇮🇷', 'Nueva Zelanda': '🇳🇿', 'Francia': '🇫🇷',
-        'Senegal': '🇸🇳', 'Irak': '🇮🇶', 'Noruega': '🇳🇴',
-        'Argentina': '🇦🇷', 'Argelia': '🇩🇿', 'Austria': '🇦🇹',
-        'Jordania': '🇯🇴', 'Portugal': '🇵🇹', 'Rep. del Congo': '🇨🇩',
-        'Inglaterra': '🏴󠁧󠁢󠁥󠁮󠁧󠁿', 'Croacia': '🇭🇷', 'Ghana': '🇬🇭',
-        'Panamá': '🇵🇦', 'Uzbekistán': '🇺🇿', 'Colombia': '🇨🇴',
+    # Country flag images — maps team name to PNG filename in /static/img/flags/
+    COUNTRY_FLAG_FILES = {
+        'México': 'Mexico', 'Sudáfrica': 'Sudafrica', 'Corea del Sur': 'Corea_del_Sur',
+        'Rep. Checa': 'Rep_Checa', 'Canadá': 'Canada', 'Bosnia y Herzegovina': 'Bosnia_y_Herzegovina',
+        'Estados Unidos': 'Estados_Unidos', 'Paraguay': 'Paraguay', 'Qatar': 'Qatar',
+        'Suiza': 'Suiza', 'Brasil': 'Brasil', 'Marruecos': 'Marruecos',
+        'Haití': 'Haiti', 'Escocia': 'Escocia', 'Australia': 'Australia',
+        'Turquía': 'Turquia', 'Alemania': 'Alemania', 'Curazao': 'Curazao',
+        'Países Bajos': 'Paises_Bajos', 'Japón': 'Japon', 'Costa de Marfil': 'Costa_de_Marfil',
+        'Ecuador': 'Ecuador', 'Suecia': 'Suecia', 'Túnez': 'Tunez',
+        'España': 'Espana', 'Cabo Verde': 'Cabo_Verde', 'Bélgica': 'Belgica',
+        'Egipto': 'Egipto', 'Arabia Saudí': 'Arabia_Saudi', 'Uruguay': 'Uruguay',
+        'Irán': 'Iran', 'Nueva Zelanda': 'Nueva_Zelanda', 'Francia': 'Francia',
+        'Senegal': 'Senegal', 'Irak': 'Irak', 'Noruega': 'Noruega',
+        'Argentina': 'Argentina', 'Argelia': 'Argelia', 'Austria': 'Austria',
+        'Jordania': 'Jordania', 'Portugal': 'Portugal', 'Rep. del Congo': 'Rep_del_Congo',
+        'Inglaterra': 'Inglaterra', 'Croacia': 'Croacia', 'Ghana': 'Ghana',
+        'Panamá': 'Panama', 'Uzbekistán': 'Uzbekistan', 'Colombia': 'Colombia',
     }
 
     @app.context_processor
     def inject_flags():
-        def flag(team_name):
-            return COUNTRY_FLAGS.get(team_name, '')
+        from markupsafe import Markup
+        def flag(team_name, size=24):
+            filename = COUNTRY_FLAG_FILES.get(team_name)
+            if not filename:
+                return Markup('')
+            h = int(size * 0.75)
+            return Markup(
+                f'<img src="/static/img/flags/{filename}.png" '
+                f'alt="{team_name}" width="{size}" height="{h}" '
+                f'style="border-radius:2px;vertical-align:middle;margin-right:4px;" '
+                f'loading="lazy">'
+            )
         return {'flag': flag}
 
     return app

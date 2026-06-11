@@ -256,43 +256,134 @@
   </div>
 </section>
 
-<!-- El resto de las secciones como los pasos para participar y el ranking se pueden mantener más abajo con estilos oscurecidos -->
-<section class="py-5" style="background: rgba(6,18,43,0.95); border-top: 1px solid rgba(255,255,255,0.05);">
-  <div class="container text-center">
-    <div class="section-title mb-5">
-      <div class="section-divider mx-auto mb-3" style="width: 60px; height: 3px; background: var(--yellow);"></div>
-      <h2 style="font-weight:800;">Tabla de <span class="highlight" style="color:var(--yellow);">Premios</span></h2>
+<!-- Tabla Oficial de Premios -->
+<section class="py-5" style="background: rgba(6,18,43,0.97); border-top: 1px solid rgba(255,255,255,0.05);">
+  <div class="container">
+    <div class="section-title mb-4">
+      <div class="section-divider mx-auto mb-3"></div>
+      <h2 style="font-weight:900;letter-spacing:1px;">⭐ TABLA OFICIAL DE <span style="color:var(--yellow);">PREMIOS</span> ⭐</h2>
+      <p style="color:rgba(255,255,255,0.6);font-size:0.9rem;">¡Juega, acerta y gana grandes premios!</p>
     </div>
-    <div class="animate-fade-up prize-grid">
-      <div class="prize-card">
-        <div class="prize-icon"><i class="fas fa-drumstick-bite"></i></div>
-        <div class="prize-label">Fase de Grupos</div>
-        <div class="prize-title">Presas Broaster</div>
-        <div class="prize-description">Disfruta un combo especial de presas Rossy Pollo.</div>
+
+    <!-- Tabla de premios -->
+    <div class="table-responsive mb-4">
+      <table style="width:100%;border-collapse:separate;border-spacing:0 6px;">
+        <thead>
+          <tr style="background:rgba(255,215,0,0.12);">
+            <th style="padding:10px 16px;color:var(--yellow);font-weight:800;font-size:0.8rem;text-transform:uppercase;letter-spacing:1px;border-bottom:2px solid var(--yellow);">Fase</th>
+            <th style="padding:10px 16px;color:var(--yellow);font-weight:800;font-size:0.8rem;text-transform:uppercase;letter-spacing:1px;border-bottom:2px solid var(--yellow);">Premio</th>
+            <th style="padding:10px 16px;color:var(--yellow);font-weight:800;font-size:0.8rem;text-transform:uppercase;letter-spacing:1px;border-bottom:2px solid var(--yellow);" class="d-none d-sm-table-cell">Condiciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr style="background:rgba(255,255,255,0.04);border-radius:8px;">
+            <td style="padding:14px 16px;font-weight:700;white-space:nowrap;">
+              <i class="fas fa-users me-2" style="color:#aaa;"></i>Fase de Grupos
+            </td>
+            <td style="padding:14px 16px;">
+              <div style="font-weight:900;font-size:1.05rem;color:var(--yellow);">
+                <i class="fas fa-drumstick-bite me-2"></i>2 Presas Broaster
+                <span style="font-size:0.75rem;background:rgba(76,175,80,0.2);color:#4CAF50;padding:2px 8px;border-radius:12px;margin-left:6px;font-weight:700;">GRATIS</span>
+              </div>
+              <div style="font-size:0.8rem;color:rgba(255,255,255,0.55);margin-top:2px;">Se añaden a tu pedido</div>
+            </td>
+            <td style="padding:14px 16px;" class="d-none d-sm-table-cell">
+              <div style="font-size:0.82rem;color:rgba(255,255,255,0.65);">En compras desde <strong style="color:white;">$20.000</strong></div>
+              <div style="font-size:0.78rem;color:rgba(255,255,255,0.45);">Consumo en local</div>
+            </td>
+          </tr>
+          <tr style="background:rgba(255,255,255,0.03);">
+            <td style="padding:14px 16px;font-weight:700;white-space:nowrap;">
+              <i class="fas fa-random me-2" style="color:#aaa;"></i>Octavos de Final
+            </td>
+            <td style="padding:14px 16px;">
+              <div style="font-weight:900;font-size:1.25rem;color:var(--yellow);">
+                <i class="fas fa-percent me-2"></i>5% de Descuento
+              </div>
+            </td>
+            <td style="padding:14px 16px;" class="d-none d-sm-table-cell">
+              <div style="font-size:0.82rem;color:rgba(255,255,255,0.65);">En compras desde <strong style="color:white;">$25.000</strong></div>
+              <div style="font-size:0.78rem;color:rgba(255,255,255,0.45);">Consumo en local</div>
+            </td>
+          </tr>
+          <tr style="background:rgba(255,255,255,0.04);">
+            <td style="padding:14px 16px;font-weight:700;white-space:nowrap;">
+              <i class="fas fa-random me-2" style="color:#aaa;"></i>Cuartos de Final
+            </td>
+            <td style="padding:14px 16px;">
+              <div style="font-weight:900;font-size:1.25rem;color:var(--yellow);">
+                <i class="fas fa-percent me-2"></i>25% de Descuento
+              </div>
+            </td>
+            <td style="padding:14px 16px;" class="d-none d-sm-table-cell">
+              <div style="font-size:0.82rem;color:rgba(255,255,255,0.65);">En compras desde <strong style="color:white;">$30.000</strong></div>
+              <div style="font-size:0.78rem;color:rgba(255,255,255,0.45);">Tope máximo: <strong style="color:var(--yellow);">$15.000</strong></div>
+            </td>
+          </tr>
+          <tr style="background:rgba(255,255,255,0.03);">
+            <td style="padding:14px 16px;font-weight:700;white-space:nowrap;">
+              <i class="fas fa-trophy me-2" style="color:#aaa;"></i>Semifinal
+            </td>
+            <td style="padding:14px 16px;">
+              <div style="font-weight:900;font-size:1.05rem;color:var(--yellow);">
+                <i class="fas fa-utensils me-2"></i>Combo para 2 Personas
+              </div>
+            </td>
+            <td style="padding:14px 16px;" class="d-none d-sm-table-cell">
+              <div style="font-size:0.82rem;color:rgba(255,255,255,0.65);">Consumo en el local</div>
+            </td>
+          </tr>
+          <tr style="background:linear-gradient(135deg,rgba(255,215,0,0.1),rgba(255,150,0,0.07));border:1px solid rgba(255,215,0,0.25);">
+            <td style="padding:14px 16px;font-weight:700;white-space:nowrap;">
+              <i class="fas fa-crown me-2" style="color:var(--yellow);"></i><span style="color:var(--yellow);">Final</span>
+            </td>
+            <td style="padding:14px 16px;">
+              <div style="font-weight:900;font-size:1.4rem;color:var(--yellow);text-shadow:0 0 20px rgba(255,215,0,0.4);">
+                <i class="fas fa-percent me-2"></i>50% de Descuento
+              </div>
+            </td>
+            <td style="padding:14px 16px;" class="d-none d-sm-table-cell">
+              <div style="font-size:0.82rem;color:rgba(255,255,255,0.65);">En compras desde <strong style="color:white;">$40.000</strong></div>
+              <div style="font-size:0.78rem;color:rgba(255,255,255,0.45);">Tope máximo: <strong style="color:var(--yellow);">$30.000</strong></div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Reglas del juego -->
+    <div style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,215,0,0.15);border-radius:12px;padding:1.2rem 1.5rem;">
+      <div style="font-weight:800;font-size:0.8rem;text-transform:uppercase;letter-spacing:1px;color:var(--yellow);margin-bottom:0.85rem;">
+        <i class="fas fa-gavel me-2"></i>Reglas del Juego
       </div>
-      <div class="prize-card">
-        <div class="prize-icon"><i class="fas fa-percent"></i></div>
-        <div class="prize-label">Octavos</div>
-        <div class="prize-title">5% Descuento</div>
-        <div class="prize-description">Gana un cupón para tu próxima orden.</div>
+      <div class="row g-2">
+        <div class="col-6 col-md-4" style="font-size:0.8rem;color:rgba(255,255,255,0.65);display:flex;gap:8px;align-items:flex-start;">
+          <i class="fas fa-comment-dots" style="color:var(--yellow);margin-top:2px;flex-shrink:0;"></i>
+          <span>Comenta el marcador exacto</span>
+        </div>
+        <div class="col-6 col-md-4" style="font-size:0.8rem;color:rgba(255,255,255,0.65);display:flex;gap:8px;align-items:flex-start;">
+          <i class="fas fa-user" style="color:var(--yellow);margin-top:2px;flex-shrink:0;"></i>
+          <span>Un marcador por persona</span>
+        </div>
+        <div class="col-6 col-md-4" style="font-size:0.8rem;color:rgba(255,255,255,0.65);display:flex;gap:8px;align-items:flex-start;">
+          <i class="fas fa-lock" style="color:var(--yellow);margin-top:2px;flex-shrink:0;"></i>
+          <span>No se permite repetir marcador</span>
+        </div>
+        <div class="col-6 col-md-4" style="font-size:0.8rem;color:rgba(255,255,255,0.65);display:flex;gap:8px;align-items:flex-start;">
+          <i class="fas fa-clock" style="color:var(--yellow);margin-top:2px;flex-shrink:0;"></i>
+          <span>Válido antes de iniciar el partido</span>
+        </div>
+        <div class="col-6 col-md-4" style="font-size:0.8rem;color:rgba(255,255,255,0.65);display:flex;gap:8px;align-items:flex-start;">
+          <i class="fas fa-medal" style="color:var(--yellow);margin-top:2px;flex-shrink:0;"></i>
+          <span>Solo 1 ganador por partido</span>
+        </div>
+        <div class="col-6 col-md-4" style="font-size:0.8rem;color:rgba(255,215,0,0.85);display:flex;gap:8px;align-items:flex-start;font-weight:700;">
+          <i class="fas fa-star" style="color:var(--yellow);margin-top:2px;flex-shrink:0;"></i>
+          <span>Premio NO acumulable</span>
+        </div>
       </div>
-      <div class="prize-card">
-        <div class="prize-icon"><i class="fas fa-percent"></i></div>
-        <div class="prize-label">Cuartos</div>
-        <div class="prize-title">25% Descuento</div>
-        <div class="prize-description">Aprovecha un ahorro especial en combos.</div>
-      </div>
-      <div class="prize-card">
-        <div class="prize-icon"><i class="fas fa-utensils"></i></div>
-        <div class="prize-label">Semifinal</div>
-        <div class="prize-title">Combo Familiar</div>
-        <div class="prize-description">Premio para compartir con tu familia.</div>
-      </div>
-      <div class="prize-card highlight">
-        <div class="prize-icon"><i class="fas fa-crown"></i></div>
-        <div class="prize-label">Final</div>
-        <div class="prize-title">50% Descuento</div>
-        <div class="prize-description">El máximo premio para cerrar la fase.</div>
+      <div style="margin-top:0.75rem;padding-top:0.75rem;border-top:1px solid rgba(255,255,255,0.07);font-size:0.75rem;color:rgba(255,255,255,0.4);">
+        Máximo 4 o 5 participantes por partido · Si nadie acierta, no habrá ganador · Premios no canjeables por dinero
       </div>
     </div>
   </div>

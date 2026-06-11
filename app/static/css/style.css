@@ -688,6 +688,9 @@ main { flex-grow: 1; position: relative; z-index: 1; }
   font-size: 1.3rem;
   color: white;
   text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+  min-width: 0;
+  word-break: break-word;
+  overflow-wrap: break-word;
 }
 
 .scoreboard .score-display {
@@ -1301,24 +1304,134 @@ main { flex-grow: 1; position: relative; z-index: 1; }
   .steps-section::before { display: none; }
   .scoreboard .score-display { font-size: 2rem; }
   .scoreboard .team-name { font-size: 1rem; }
+
+  /* Collapsed navbar: dark background */
+  .navbar .navbar-collapse {
+    background: rgba(6, 18, 43, 0.97);
+    border-top: 1px solid rgba(255, 215, 0, 0.15);
+    border-radius: 0 0 var(--radius-sm) var(--radius-sm);
+    padding: 0.5rem 0.75rem 0.75rem;
+    margin-top: 8px;
+  }
+  .navbar .navbar-nav { gap: 0 !important; }
+  .navbar .nav-link { padding: 0.55rem 1rem !important; }
+  .navbar .ms-2 { margin-left: 0 !important; margin-top: 4px; }
 }
 
 @media (max-width: 768px) {
-  .navbar-brand { font-size: 1.1rem; }
+  .navbar-brand { font-size: 1.05rem; gap: 8px; }
+  .navbar-brand .brand-icon { width: 34px; height: 34px; }
+  .navbar { padding: 10px 0; }
   .hero-title { font-size: 2rem; }
   .prize-timeline { flex-direction: column; }
   .mascot-3d { width: 150px; height: 200px; }
   .mascot-body-chicken { width: 90px; height: 105px; }
   .mascot-head-chicken { width: 75px; height: 75px; }
   .mascot-shirt { width: 100px; height: 55px; font-size: 1.5rem; }
-  .match-card .match-teams { flex-direction: column; text-align: center; }
   .match-card .match-score { font-size: 1.5rem; }
+
+  /* Cards: less padding */
+  .card-body { padding: 1.1rem; }
+  .card-header { padding: 0.9rem 1.1rem; }
+  .card-footer { padding: 0.9rem 1.1rem; }
+
+  /* Widgets */
+  .widget { padding: 1.1rem; }
+  .widget .widget-value { font-size: 1.7rem; }
+
+  /* Scoreboard */
+  .scoreboard { padding: 1rem; }
+  .scoreboard .team-name { font-size: 0.92rem; }
+  .scoreboard .score-display { font-size: 1.9rem; letter-spacing: 2px; }
+
+  /* Ranking */
+  .top-three { gap: 0.75rem; padding: 1rem 0; }
+  .top-three .rank-card { min-width: 110px; padding: 1rem 0.75rem; }
+  .rank-avatar { width: 50px; height: 50px; font-size: 1.1rem; margin-bottom: 0.6rem; }
+  .rank-crown { font-size: 1.3rem; }
+
+  /* Tables */
+  .table th, .table td { padding: 0.7rem 0.75rem; }
+
+  /* Match card */
+  .match-card { padding: 1.1rem; }
+
+  /* Footer */
+  .footer { padding: 2rem 0 1rem; }
 }
 
 @media (max-width: 576px) {
-  .container { padding-left: 1rem; padding-right: 1rem; }
-  .section-title h2 { font-size: 1.5rem; }
+  .container { padding-left: 0.75rem; padding-right: 0.75rem; }
+
+  /* Cards */
+  .card-body { padding: 0.85rem; }
+  .card-header { padding: 0.75rem 0.85rem; }
+  .card-footer { padding: 0.75rem 0.85rem; }
+
+  /* Widgets: 2x2 grid (via col-6 in template) */
+  .widget { padding: 0.85rem; }
+  .widget .widget-value { font-size: 1.45rem; }
+  .widget .widget-label { font-size: 0.73rem; }
+  .widget .widget-icon { font-size: 2rem; top: 0.75rem; right: 0.75rem; }
+
+  /* Scoreboard */
+  .scoreboard { padding: 0.85rem; }
+  .scoreboard .team-name { font-size: 0.78rem; }
+  .scoreboard .score-display { font-size: 1.6rem; letter-spacing: 1px; }
+  .scoreboard .vs-badge { width: 44px !important; height: 44px !important; font-size: 1rem !important; }
+
+  /* Rankings */
+  .top-three .rank-card { min-width: 88px; padding: 0.75rem 0.5rem; }
+  .rank-avatar { width: 40px; height: 40px; font-size: 0.9rem; margin-bottom: 0.5rem; }
+  .rank-badge { width: 28px; height: 28px; font-size: 0.72rem; }
+  .ranking-table th, .ranking-table td { padding: 0.6rem 0.65rem; }
+
+  /* Buttons */
+  .btn { padding: 0.55rem 1rem; font-size: 0.88rem; }
+  .btn-lg { padding: 0.7rem 1.3rem; font-size: 0.95rem; }
+  .btn-sm { padding: 0.3rem 0.6rem; font-size: 0.76rem; }
+
+  /* Tables */
+  .table { font-size: 0.82rem; }
+  .table th, .table td { padding: 0.5rem 0.55rem; }
+
+  /* Match cards */
+  .match-card { padding: 0.9rem; }
+  .match-card .match-teams { flex-direction: column; text-align: center; }
+  .match-card .team { font-size: 0.85rem; }
+  .match-status { font-size: 0.63rem; padding: 0.25rem 0.6rem; }
+  .vs-badge { width: 30px !important; height: 30px !important; font-size: 0.75rem !important; }
+
+  /* Section titles */
+  .section-title { margin-bottom: 1.5rem; }
+  .section-title h2 { font-size: 1.4rem !important; }
   .stat-card .stat-number { font-size: 1.8rem; }
+
+  /* Prize grid */
+  .prize-grid { grid-template-columns: repeat(2, 1fr) !important; gap: 0.75rem !important; }
+
+  /* Footer */
+  .footer { padding: 1.5rem 0 1rem; }
+  .footer-bottom { margin-top: 1.2rem; padding-top: 1rem; }
+
+  /* Vertical padding pages */
+  .py-4 { padding-top: 1.2rem !important; padding-bottom: 1.2rem !important; }
+
+  /* Hide Estado column in predictions table */
+  .predictions-table .pred-col-estado { display: none; }
+
+  /* Admin action buttons: icon only */
+  .btn-icon-label { display: none; }
+}
+
+@media (max-width: 400px) {
+  .scoreboard .team-name { font-size: 0.7rem; }
+  .scoreboard .score-display { font-size: 1.35rem; }
+  .top-three .rank-card { min-width: 76px; padding: 0.6rem 0.35rem; font-size: 0.78rem; }
+  .rank-avatar { width: 34px; height: 34px; font-size: 0.78rem; }
+  .prize-grid { grid-template-columns: 1fr !important; }
+  .widget .widget-value { font-size: 1.25rem; }
+  .btn { padding: 0.5rem 0.85rem; font-size: 0.82rem; }
 }
 
 /* ========== ANIMATIONS ========== */

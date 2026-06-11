@@ -81,13 +81,14 @@ def match_detail(match_id):
 
 @main_bp.route('/leaderboard')
 def leaderboard():
-    """Display leaderboard based on total points using actual rankings from DB"""
-    # Query users and their points from the Ranking table
+    """Ranking público — excluye superadmins, muestra solo username y puntos."""
     users_points = db.session.query(
         User.username,
         func.coalesce(Ranking.points, 0).label('total_points')
-    ).outerjoin(Ranking, User.id == Ranking.user_id).order_by(Ranking.points.desc()).all()
-    
+    ).outerjoin(Ranking, User.id == Ranking.user_id)\
+     .filter(User.is_admin == False, User.is_active == True)\
+     .order_by(Ranking.points.desc()).all()
+
     return render_template('leaderboard.html', users_points=users_points)
 
 @main_bp.route('/admin/calculate_points')
@@ -437,7 +438,9 @@ def index():
     leaderboard_data = db.session.query(
         User.username,
         func.coalesce(Ranking.points, 0).label('total_points')
-    ).outerjoin(Ranking, User.id == Ranking.user_id).order_by(Ranking.points.desc()).limit(5).all()
+    ).outerjoin(Ranking, User.id == Ranking.user_id)\
+     .filter(User.is_admin == False, User.is_active == True)\
+     .order_by(Ranking.points.desc()).limit(5).all()
 
     prizes_count = Prize.query.count()
     prizes_mock = range(prizes_count) # Just to pass something iterable to the template if needed
