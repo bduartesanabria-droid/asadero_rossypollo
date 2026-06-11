@@ -34,7 +34,11 @@ python - <<'PY'
 import os
 from sqlalchemy import create_engine, text, inspect
 
-url = os.environ.get('DATABASE_URL', 'sqlite:///asadero.db')
+url = os.environ.get('DATABASE_URL', 'sqlite:////app/instance/asadero.db')
+# For relative sqlite:/// paths, Flask-SQLAlchemy resolves to instance folder,
+# but raw SQLAlchemy uses CWD. Normalize to absolute path.
+if url == 'sqlite:///asadero.db':
+    url = 'sqlite:////app/instance/asadero.db'
 print(f"Verificando esquema en: {url.split('?')[0]}")
 
 try:
@@ -78,7 +82,9 @@ if command -v flask >/dev/null 2>&1; then
 import os, sys
 from sqlalchemy import create_engine, inspect
 
-url = os.environ.get('DATABASE_URL', 'sqlite:///asadero.db')
+url = os.environ.get('DATABASE_URL', 'sqlite:////app/instance/asadero.db')
+if url == 'sqlite:///asadero.db':
+    url = 'sqlite:////app/instance/asadero.db'
 try:
     if url.startswith('sqlite'):
         engine = create_engine(url, connect_args={"check_same_thread": False})

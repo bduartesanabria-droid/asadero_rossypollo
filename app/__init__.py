@@ -15,6 +15,10 @@ def create_app(config_name='development'):
     # Cargar configuración
     app.config.from_object(config[config_name])
 
+    # ProxyFix: necesario para que Flask conozca HTTPS cuando está detrás de Traefik/nginx
+    from werkzeug.middleware.proxy_fix import ProxyFix
+    app.wsgi_app = ProxyFix(app.wsgi_app, x_for=1, x_proto=1, x_host=1, x_prefix=1)
+
     # Inicializar extensiones
     db.init_app(app)
 
