@@ -1,0 +1,83 @@
+{% extends 'base.html' %}
+{% block title %}Admin - Pronósticos Realizados{% endblock %}
+{% block content %}
+<div class="container py-4">
+  <div class="d-flex flex-column flex-md-row justify-content-between align-items-start gap-3 mb-4">
+    <div>
+      <h1 class="fw-bold mb-1"><i class="fas fa-list-ol me-2" style="color:var(--yellow);"></i>Pronósticos Realizados</h1>
+      <p class="text-secondary mb-0">Total: <strong>{{ total_predictions }}</strong> pronóstico(s) registrado(s)</p>
+    </div>
+    <div class="d-flex gap-2 flex-wrap">
+      <a href="{{ url_for('main.admin_matches') }}" class="btn btn-outline-yellow"><i class="fas fa-arrow-left me-2"></i>Partidos</a>
+      <a href="{{ url_for('main.fetch_scores_admin') }}" class="btn btn-yellow"><i class="fas fa-sync me-2"></i>Sync Resultados</a>
+    </div>
+  </div>
+
+  {% for match, preds in data %}
+  <div class="card mb-4">
+    <div class="card-header d-flex flex-wrap align-items-center gap-2">
+      <strong>{{ flag(match.home_team) }} {{ match.home_team }} vs {{ flag(match.away_team) }} {{ match.away_team }}</strong>
+      <span class="text-secondary small">{{ match.match_date.strftime('%d/%m/%Y %H:%M') }}</span>
+      {% if match.group %}<span class="badge badge-yellow">Grupo {{ match.group }}</span>{% endif %}
+      {% if match.result %}
+        <span class="badge" style="background:rgba(76,175,80,0.25);color:#4CAF50;border:1px solid #4CAF50;">{{ match.result }}</span>
+      {% endif %}
+      {% if match.status == 'finished' %}
+        <span class="badge" style="background:rgba(76,175,80,0.2);color:#4CAF50;">✅ Finalizado</span>
+      {% elif match.status == 'live' %}
+        <span class="badge" style="background:rgba(244,67,54,0.2);color:#EF5350;">🔴 En curso</span>
+      {% else %}
+        <span class="badge" style="background:rgba(255,152,0,0.2);color:#FF9800;">⏳ Pendiente</span>
+      {% endif %}
+      <span class="ms-auto badge" style="background:rgba(255,255,255,0.08);color:rgba(255,255,255,0.6);">{{ preds|length }} pronóstico(s)</span>
+    </div>
+    {% if preds %}
+    <div class="card-body p-0">
+      <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0">
+          <thead>
+            <tr>
+              <th>Usuario</th>
+              <th>Pronóstico</th>
+              <th>Fecha registro</th>
+              <th>Puntos</th>
+              <th>Estado</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for pred in preds %}
+            <tr>
+              <td><strong>{{ pred.user.username }}</strong></td>
+              <td>
+                <span class="badge badge-yellow" style="font-size:0.95rem;">
+                  {{ flag(match.home_team) }} {{ pred.predicted_home_score }} – {{ pred.predicted_away_score }} {{ flag(match.away_team) }}
+                </span>
+              </td>
+              <td><small class="text-secondary">{{ pred.created_at.strftime('%d/%m %H:%M') }}</small></td>
+              <td><strong>{{ pred.points_earned if pred.points_earned is not none else '—' }}</strong></td>
+              <td>
+                {% if pred.points_earned == 3 %}
+                  <span class="badge" style="background:#4CAF50;">🎯 Exacto +3</span>
+                {% elif pred.points_earned == 1 %}
+                  <span class="badge" style="background:#FF9800;">✅ Ganador +1</span>
+                {% elif pred.points_earned == 0 %}
+                  <span class="badge" style="background:#d32f2f;">❌ Perdió</span>
+                {% else %}
+                  <span class="badge" style="background:rgba(255,255,255,0.15);color:rgba(255,255,255,0.6);">⏳ Pendiente</span>
+                {% endif %}
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+    {% else %}
+    <div class="card-body text-center text-secondary py-3">
+      <small><i class="fas fa-info-circle me-1"></i>Sin pronósticos para este partido</small>
+    </div>
+    {% endif %}
+  </div>
+  {% endfor %}
+</div>
+{% endblock %}

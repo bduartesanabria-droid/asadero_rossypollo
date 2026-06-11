@@ -665,6 +665,159 @@ def delete_post(post_id):
         db.session.rollback()
         return jsonify({'error': str(e)}), 400
 
+@main_bp.route('/admin/predictions')
+@login_required
+def admin_predictions():
+    """Vista admin: todos los pronósticos realizados agrupados por partido"""
+    if not current_user.is_admin:
+        return jsonify({'error': 'Acceso denegado'}), 403
+    matches = Match.query.order_by(Match.match_date.asc()).all()
+    data = []
+    for match in matches:
+        preds = (Prediction.query.filter_by(match_id=match.id)
+                 .join(User).order_by(User.username).all())
+        data.append((match, preds))
+    total_predictions = Prediction.query.count()
+    return render_template('admin/predictions.html', data=data, total_predictions=total_predictions)
+
+
+@main_bp.route('/admin/clean_duplicates', methods=['POST'])
+@login_required
+def clean_duplicates_admin():
+    """Elimina partidos duplicados, conservando el que tiene más pronósticos"""
+    if not current_user.is_admin:
+        return jsonify({'error': 'Acceso denegado'}), 403
+    from sqlalchemy import text
+    deleted = 0
+    matches = Match.query.all()
+    seen = {}
+    for match in matches:
+        key = (match.home_team.strip().lower(), match.away_team.strip().lower())
+        if key not in seen:
+            seen[key] = match
+        else:
+            existing = seen[key]
+            existing_preds = len(existing.predictions)
+            current_preds = len(match.predictions)
+            if current_preds > existing_preds:
+                # keep current, delete existing
+                to_delete = existing
+                seen[key] = match
+            else:
+                to_delete = match
+            try:
+                Prediction.query.filter_by(match_id=to_delete.id).delete()
+                db.session.delete(to_delete)
+                deleted += 1
+            except Exception:
+                db.session.rollback()
+    db.session.commit()
+    flash(f'Duplicados eliminados: {deleted} partido(s) removido(s)', 'success')
+    return redirect(url_for('main.admin_matches'))
+
+
+# Mapeo nombres ESPN (inglés) → nombres en español usados en la app
+_ESPN_TEAM_MAP = {
+    'Mexico': 'México', 'South Africa': 'Sudáfrica', 'Korea Republic': 'Corea del Sur',
+    'Czech Republic': 'Rep. Checa', 'Canada': 'Canadá',
+    'Bosnia and Herzegovina': 'Bosnia y Herzegovina',
+    'Bosnia-Herzegovina': 'Bosnia y Herzegovina', 'Bosnia & Herz.': 'Bosnia y Herzegovina',
+    'Qatar': 'Qatar', 'Switzerland': 'Suiza', 'Brazil': 'Brasil',
+    'Morocco': 'Marruecos', 'Haiti': 'Haití', 'Scotland': 'Escocia',
+    'United States': 'Estados Unidos', 'USA': 'Estados Unidos', 'Paraguay': 'Paraguay',
+    'Australia': 'Australia', 'Turkey': 'Turquía', 'Türkiye': 'Turquía',
+    'Germany': 'Alemania', 'Curacao': 'Curazao', 'Curaçao': 'Curazao',
+    "Côte d'Ivoire": 'Costa de Marfil', 'Ivory Coast': 'Costa de Marfil',
+    'Ecuador': 'Ecuador', 'Netherlands': 'Países Bajos', 'Japan': 'Japón',
+    'Sweden': 'Suecia', 'Tunisia': 'Túnez', 'Spain': 'España',
+    'Cape Verde': 'Cabo Verde', 'Saudi Arabia': 'Arabia Saudí', 'Uruguay': 'Uruguay',
+    'Belgium': 'Bélgica', 'Egypt': 'Egipto', 'Iran': 'Irán',
+    'New Zealand': 'Nueva Zelanda', 'France': 'Francia', 'Senegal': 'Senegal',
+    'Iraq': 'Irak', 'Norway': 'Noruega', 'Argentina': 'Argentina',
+    'Algeria': 'Argelia', 'Austria': 'Austria', 'Jordan': 'Jordania',
+    'Portugal': 'Portugal', 'DR Congo': 'Rep. del Congo', 'Congo DR': 'Rep. del Congo',
+    'Uzbekistan': 'Uzbekistán', 'Colombia': 'Colombia', 'England': 'Inglaterra',
+    'Croatia': 'Croacia', 'Ghana': 'Ghana', 'Panama': 'Panamá',
+}
+
+
+def _apply_espn_scores():
+    """Llama a la API pública de ESPN y actualiza marcadores/estados en la BD.
+    Retorna (updated_count, error_message)."""
+    import urllib.request
+    import json
+    try:
+        url = 'https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.world/scoreboard'
+        req = urllib.request.Request(url, headers={'User-Agent': 'Mozilla/5.0'})
+        with urllib.request.urlopen(req, timeout=8) as resp:
+            data = json.loads(resp.read())
+    except Exception as e:
+        return 0, str(e)
+
+    updated = 0
+    for event in data.get('events', []):
+        try:
+            competition = event['competitions'][0]
+            competitors = competition['competitors']
+            home_c = next((c for c in competitors if c['homeAway'] == 'home'), None)
+            away_c = next((c for c in competitors if c['homeAway'] == 'away'), None)
+            if not home_c or not away_c:
+                continue
+            home_es = _ESPN_TEAM_MAP.get(home_c['team']['displayName'], home_c['team']['displayName'])
+            away_es = _ESPN_TEAM_MAP.get(away_c['team']['displayName'], away_c['team']['displayName'])
+            status_name = event['status']['type']['name']
+            match = Match.query.filter_by(home_team=home_es, away_team=away_es).first()
+            if not match:
+                continue
+            if status_name == 'STATUS_IN_PROGRESS' and match.status == 'scheduled':
+                match.status = 'live'
+                updated += 1
+            elif status_name == 'STATUS_FINAL':
+                home_score = int(home_c.get('score', 0) or 0)
+                away_score = int(away_c.get('score', 0) or 0)
+                changed = (match.home_score != home_score or match.away_score != away_score
+                           or match.status != 'finished')
+                if changed:
+                    match.home_score = home_score
+                    match.away_score = away_score
+                    match.status = 'finished'
+                    for pred in match.predictions:
+                        pred.calculate_points()
+                    updated += 1
+        except Exception:
+            continue
+
+    if updated:
+        # Recalcular rankings
+        user_points = db.session.query(
+            User.id.label('user_id'),
+            func.coalesce(func.sum(Prediction.points_earned), 0).label('total_points')
+        ).outerjoin(Prediction, Prediction.user_id == User.id).group_by(User.id).all()
+        from app.models import Ranking
+        for row in user_points:
+            ranking = Ranking.query.filter_by(user_id=row.user_id).first()
+            if ranking:
+                ranking.points = row.total_points
+            else:
+                db.session.add(Ranking(user_id=row.user_id, points=row.total_points))
+        db.session.commit()
+    return updated, None
+
+
+@main_bp.route('/admin/fetch_scores')
+@login_required
+def fetch_scores_admin():
+    """Sincroniza resultados en vivo desde la API pública de ESPN (FIFA World Cup)"""
+    if not current_user.is_admin:
+        return jsonify({'error': 'Acceso denegado'}), 403
+    updated, error = _apply_espn_scores()
+    if error:
+        flash(f'No se pudo conectar con la API de resultados: {error}', 'warning')
+    else:
+        flash(f'Resultados sincronizados: {updated} partido(s) actualizado(s)', 'success')
+    return redirect(url_for('main.admin_matches'))
+
+
 @main_bp.route('/api/search')
 def search():
     """API de búsqueda"""

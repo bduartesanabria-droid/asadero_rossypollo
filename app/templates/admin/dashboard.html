@@ -45,6 +45,9 @@
       <a href="{{ url_for('main.admin_matches') }}" class="btn btn-yellow w-100"><i class="fas fa-futbol me-2"></i>Partidos</a>
     </div>
     <div class="col-md-3">
+      <a href="{{ url_for('main.admin_predictions') }}" class="btn btn-yellow w-100"><i class="fas fa-list-ol me-2"></i>Pronósticos</a>
+    </div>
+    <div class="col-md-3">
       <a href="{{ url_for('main.admin_prizes') }}" class="btn btn-outline-yellow w-100"><i class="fas fa-gift me-2"></i>Premios</a>
     </div>
     <div class="col-md-3">
@@ -52,6 +55,9 @@
     </div>
     <div class="col-md-3">
       <a href="{{ url_for('main.admin_users') }}" class="btn btn-outline-yellow w-100"><i class="fas fa-users me-2"></i>Usuarios</a>
+    </div>
+    <div class="col-md-3">
+      <a href="{{ url_for('main.fetch_scores_admin') }}" class="btn btn-blue w-100"><i class="fas fa-cloud-download-alt me-2"></i>Sync Resultados</a>
     </div>
     <div class="col-md-3">
       <a href="{{ url_for('main.update_rankings_admin') }}" class="btn btn-blue w-100"><i class="fas fa-sync me-2"></i>Ranking</a>

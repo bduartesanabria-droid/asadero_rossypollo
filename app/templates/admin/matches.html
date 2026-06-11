@@ -9,8 +9,13 @@
     </div>
     <div class="d-flex flex-wrap gap-2">
       <a href="{{ url_for('main.create_match') }}" class="btn btn-yellow"><i class="fas fa-plus me-2"></i>Nuevo Partido</a>
+      <a href="{{ url_for('main.admin_predictions') }}" class="btn btn-yellow"><i class="fas fa-list-ol me-2"></i>Ver Pronósticos</a>
+      <a href="{{ url_for('main.fetch_scores_admin') }}" class="btn btn-blue"><i class="fas fa-cloud-download-alt me-2"></i>Sync Resultados</a>
       <a href="{{ url_for('main.seed_matches_admin') }}" class="btn btn-outline-yellow"><i class="fas fa-seedling me-2"></i>Seed Data</a>
       <a href="{{ url_for('main.update_rankings_admin') }}" class="btn btn-blue"><i class="fas fa-sync me-2"></i>Actualizar Ranking</a>
+      <form method="POST" action="{{ url_for('main.clean_duplicates_admin') }}" onsubmit="return confirm('¿Eliminar partidos duplicados? Se conservará el que tenga más pronósticos.')">
+        <button type="submit" class="btn btn-outline-danger"><i class="fas fa-broom me-2"></i>Limpiar Duplicados</button>
+      </form>
     </div>
   </div>
 
@@ -76,4 +81,26 @@
     </div>
   </div>
 </div>
+{% endblock %}
+{% block extra_js %}
+{% set live_matches = matches | selectattr('status', 'eq', 'live') | list %}
+{% if live_matches %}
+<script>
+  (function() {
+    var syncUrl = "{{ url_for('main.fetch_scores_admin') }}";
+    var countdown = 180;
+    var badge = document.createElement('div');
+    badge.style.cssText = 'position:fixed;bottom:20px;right:20px;background:rgba(244,67,54,0.9);color:#fff;padding:8px 14px;border-radius:10px;font-size:0.82rem;z-index:9999;display:flex;align-items:center;gap:8px;box-shadow:0 4px 15px rgba(0,0,0,0.3);';
+    badge.innerHTML = '<i class="fas fa-circle" style="color:#fff;font-size:0.6rem;animation:sync-blink 1s infinite;"></i> <span id="sync-countdown">Sync en ' + countdown + 's</span>';
+    document.body.appendChild(badge);
+    setInterval(function() {
+      countdown--;
+      var el = document.getElementById('sync-countdown');
+      if (el) el.textContent = 'Sync en ' + countdown + 's';
+      if (countdown <= 0) { window.location.href = syncUrl; }
+    }, 1000);
+  })();
+</script>
+<style>@keyframes sync-blink{0%,100%{opacity:1}50%{opacity:0.3}}</style>
+{% endif %}
 {% endblock %}
