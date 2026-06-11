@@ -35,20 +35,24 @@
         <div class="col-md-6 col-xl-4">
           <div class="match-card h-100">
             <div class="d-flex justify-content-between align-items-start mb-3">
-              <span class="match-status {{ 'locked' if match.is_locked else 'open' }}">
-                {{ 'Bloqueado' if match.is_locked else 'Abierto' }}
-              </span>
+              {% if match.status == 'finished' %}
+                <span class="match-status played">✅ Finalizado</span>
+              {% elif match.status == 'live' %}
+                <span class="match-status" style="background:rgba(244,67,54,0.2);color:#EF5350;border:1px solid rgba(244,67,54,0.3);">🔴 En curso</span>
+              {% else %}
+                <span class="match-status open">🟢 Abierto</span>
+              {% endif %}
               {% if match.group %}
                 <span class="match-info">Grupo {{ match.group }}</span>
               {% endif %}
             </div>
 
             <div class="match-teams mb-3">
-              <div class="team">{{ match.home_team }}</div>
+              <div class="team">{{ flag(match.home_team) }} {{ match.home_team }}</div>
               <div class="d-flex align-items-center justify-content-center">
                 <span class="vs-badge" style="width:36px;height:36px;font-size:0.9rem;">VS</span>
               </div>
-              <div class="team">{{ match.away_team }}</div>
+              <div class="team">{{ flag(match.away_team) }} {{ match.away_team }}</div>
             </div>
 
             <div class="d-flex justify-content-between align-items-center">

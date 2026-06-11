@@ -60,8 +60,55 @@ def create_app(config_name='development'):
     # Registrar blueprints (rutas)
     from app.routes.main import main_bp
     from app.routes.auth import auth_bp
-    
+
     app.register_blueprint(main_bp)
     app.register_blueprint(auth_bp, url_prefix='/auth')
-    
+
+    # Auto-transition matches from 'scheduled' → 'live' when their time passes
+    @app.before_request
+    def auto_update_match_status():
+        from flask import request as req
+        if req.path.startswith('/static') or req.path == '/service-worker.js':
+            return
+        from datetime import datetime
+        from app.models import Match
+        try:
+            now = datetime.now()
+            due = Match.query.filter(
+                Match.status == 'scheduled',
+                Match.match_date <= now
+            ).all()
+            if due:
+                for m in due:
+                    m.status = 'live'
+                db.session.commit()
+        except Exception:
+            db.session.rollback()
+
+    # Country flag emoji context processor — use {{ flag('México') }} in templates
+    COUNTRY_FLAGS = {
+        'México': '🇲🇽', 'Sudáfrica': '🇿🇦', 'Corea del Sur': '🇰🇷',
+        'Rep. Checa': '🇨🇿', 'Canadá': '🇨🇦', 'Bosnia y Herzegovina': '🇧🇦',
+        'Estados Unidos': '🇺🇸', 'Paraguay': '🇵🇾', 'Qatar': '🇶🇦',
+        'Suiza': '🇨🇭', 'Brasil': '🇧🇷', 'Marruecos': '🇲🇦',
+        'Haití': '🇭🇹', 'Escocia': '🏴󠁧󠁢󠁳󠁣󠁴󠁿', 'Australia': '🇦🇺',
+        'Turquía': '🇹🇷', 'Alemania': '🇩🇪', 'Curazao': '🇨🇼',
+        'Países Bajos': '🇳🇱', 'Japón': '🇯🇵', 'Costa de Marfil': '🇨🇮',
+        'Ecuador': '🇪🇨', 'Suecia': '🇸🇪', 'Túnez': '🇹🇳',
+        'España': '🇪🇸', 'Cabo Verde': '🇨🇻', 'Bélgica': '🇧🇪',
+        'Egipto': '🇪🇬', 'Arabia Saudí': '🇸🇦', 'Uruguay': '🇺🇾',
+        'Irán': '🇮🇷', 'Nueva Zelanda': '🇳🇿', 'Francia': '🇫🇷',
+        'Senegal': '🇸🇳', 'Irak': '🇮🇶', 'Noruega': '🇳🇴',
+        'Argentina': '🇦🇷', 'Argelia': '🇩🇿', 'Austria': '🇦🇹',
+        'Jordania': '🇯🇴', 'Portugal': '🇵🇹', 'Rep. del Congo': '🇨🇩',
+        'Inglaterra': '🏴󠁧󠁢󠁥󠁮󠁧󠁿', 'Croacia': '🇭🇷', 'Ghana': '🇬🇭',
+        'Panamá': '🇵🇦', 'Uzbekistán': '🇺🇿', 'Colombia': '🇨🇴',
+    }
+
+    @app.context_processor
+    def inject_flags():
+        def flag(team_name):
+            return COUNTRY_FLAGS.get(team_name, '')
+        return {'flag': flag}
+
     return app

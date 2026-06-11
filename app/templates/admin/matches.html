@@ -33,8 +33,8 @@
           <tbody>
             {% for match in matches %}
             <tr>
-              <td><strong>{{ match.home_team }}</strong></td>
-              <td><strong>{{ match.away_team }}</strong></td>
+              <td><strong>{{ flag(match.home_team) }} {{ match.home_team }}</strong></td>
+              <td><strong>{{ flag(match.away_team) }} {{ match.away_team }}</strong></td>
               <td><small>{{ match.match_date.strftime('%d/%m/%Y %H:%M') }}</small></td>
               <td>{% if match.group %}<span class="badge badge-yellow">{{ match.group }}</span>{% else %}—{% endif %}</td>
               <td>

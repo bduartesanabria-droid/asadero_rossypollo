@@ -28,11 +28,11 @@
               <label class="form-label fw-semibold" style="color:var(--yellow);">Resultado Oficial</label>
               <div class="row g-2">
                 <div class="col-6">
-                  <label class="form-label small text-secondary">Goles Local</label>
+                  <label class="form-label small text-secondary">{{ flag(match.home_team) }} {{ match.home_team }}</label>
                   <input type="number" name="home_score" class="form-control form-control-lg text-center" value="{{ match.home_score if match.home_score is not none else '' }}" min="0" placeholder="—">
                 </div>
                 <div class="col-6">
-                  <label class="form-label small text-secondary">Goles Visitante</label>
+                  <label class="form-label small text-secondary">{{ flag(match.away_team) }} {{ match.away_team }}</label>
                   <input type="number" name="away_score" class="form-control form-control-lg text-center" value="{{ match.away_score if match.away_score is not none else '' }}" min="0" placeholder="—">
                 </div>
               </div>

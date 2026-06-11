@@ -74,19 +74,49 @@
       <div class="row g-4">
         <div class="col-md-4">
           <h5><span class="brand-icon-sm"><img src="{{ url_for('static', filename='img/mascota_sin_fondo.png') }}" alt="Mascota" style="width:100%;height:100%;object-fit:cover;border-radius:50%;"></span> Rossypollo</h5>
-          <p class="text-secondary" style="font-size:0.9rem;">Vive la pasión del Mundial con Rossypollo. Registra tus pronósticos y gana premios exclusivos.</p>
+          <p style="font-size:0.9rem;color:rgba(255,255,255,0.6);">Vive la pasión del Mundial 2026 con Asadero Rossypollo. Registra tus pronósticos y gana premios exclusivos.</p>
         </div>
         <div class="col-md-4">
           <h5>Enlaces</h5>
-          <ul class="list-unstyled">
-            <li class="mb-2"><a href="{{ url_for('main.index') }}">Inicio</a></li>
-            <li class="mb-2"><a href="{{ url_for('main.list_matches') }}">Partidos</a></li>
-            <li class="mb-2"><a href="{{ url_for('main.leaderboard') }}">Ranking</a></li>
+          <ul class="list-unstyled" style="color:rgba(255,255,255,0.65);">
+            <li class="mb-2"><a href="{{ url_for('main.index') }}" style="color:rgba(255,255,255,0.65);">Inicio</a></li>
+            <li class="mb-2"><a href="{{ url_for('main.list_matches') }}" style="color:rgba(255,255,255,0.65);">Partidos</a></li>
+            <li class="mb-2"><a href="{{ url_for('main.leaderboard') }}" style="color:rgba(255,255,255,0.65);">Ranking</a></li>
+            {% if current_user.is_authenticated %}
+            <li class="mb-2"><a href="{{ url_for('main.dashboard') }}" style="color:rgba(255,255,255,0.65);">Mi Panel</a></li>
+            {% endif %}
+          </ul>
+        </div>
+        <div class="col-md-4">
+          <h5>Contáctanos</h5>
+          <ul class="list-unstyled" style="font-size:0.9rem;">
+            <li class="mb-3">
+              <a href="tel:+573123585411" style="color:rgba(255,255,255,0.65);text-decoration:none;display:flex;align-items:center;gap:8px;">
+                <span style="width:32px;height:32px;background:rgba(255,215,0,0.15);border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+                  <i class="fas fa-phone" style="color:var(--yellow);font-size:0.85rem;"></i>
+                </span>
+                <span>+57 312 358 5411</span>
+              </a>
+            </li>
+            <li class="mb-3">
+              <a href="https://maps.google.com/?q=Puente+Nacional+Santander+Colombia" target="_blank" rel="noopener" style="color:rgba(255,255,255,0.65);text-decoration:none;display:flex;align-items:flex-start;gap:8px;">
+                <span style="width:32px;height:32px;background:rgba(255,215,0,0.15);border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:2px;">
+                  <i class="fas fa-map-marker-alt" style="color:var(--yellow);font-size:0.85rem;"></i>
+                </span>
+                <span>Puente Nacional, Santander, Colombia</span>
+              </a>
+            </li>
+            <li>
+              <span style="color:rgba(255,255,255,0.4);font-size:0.8rem;display:flex;align-items:center;gap:6px;">
+                <i class="fas fa-clock" style="color:var(--yellow);"></i>
+                Lun–Dom: 11:00 AM – 10:00 PM
+              </span>
+            </li>
           </ul>
         </div>
       </div>
-      <div class="footer-bottom">
-        <p>&copy; 2026 Asadero Rossy Pollo. Todos los derechos reservados.</p>
+      <div class="footer-bottom" style="color:rgba(255,255,255,0.35);">
+        <p>&copy; 2026 Asadero Rossy Pollo. Todos los derechos reservados. 🇨🇴</p>
       </div>
     </div>
   </footer>

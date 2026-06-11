@@ -83,6 +83,9 @@ class Match(db.Model):
 
     @property
     def is_locked(self):
+        """Locked when status is live/finished OR match datetime has passed (Colombia local time)."""
+        if self.status in ('live', 'finished'):
+            return True
         from datetime import datetime
         return datetime.now() >= self.match_date
 

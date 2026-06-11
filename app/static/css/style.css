@@ -102,6 +102,25 @@ body::before {
 
 main { flex-grow: 1; position: relative; z-index: 1; }
 
+/* ========== LIGHT MODE MISSING VARIABLES ========== */
+:root[data-theme="light"] {
+  --yellow-light: #EDD700;
+  --yellow-dark: #B8930A;
+  --blue: #1A3A6B;
+  --blue-light: #2A4F8A;
+  --blue-dark: #0F2444;
+  --red-light: #E53935;
+  --red-dark: #B71C1C;
+  --black: #1A1A1A;
+  --white: #FFFFFF;
+  --glow-yellow: 0 0 20px rgba(212, 175, 55, 0.25);
+  --glow-red: 0 0 20px rgba(197, 48, 48, 0.2);
+  --glow-blue: 0 0 20px rgba(26, 58, 107, 0.2);
+  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.08);
+  --shadow-md: 0 8px 32px rgba(0, 0, 0, 0.12);
+  --shadow-lg: 0 16px 48px rgba(0, 0, 0, 0.15);
+}
+
 /* ========== SCROLLBAR ========== */
 ::-webkit-scrollbar { width: 8px; }
 ::-webkit-scrollbar-track { background: var(--bg-secondary); }
@@ -1498,4 +1517,304 @@ main { flex-grow: 1; position: relative; z-index: 1; }
   font-size: 0.85rem;
   color: var(--text-secondary);
   font-weight: 600;
+}
+
+/* ========================================
+   LIGHT MODE OVERRIDES — COMPLETE
+   ======================================== */
+
+/* Body text color in light mode */
+[data-theme="light"] body {
+  color: var(--text-primary);
+  background: rgba(240, 244, 248, 0.05);
+}
+
+/* html background overlay lightening in light mode */
+[data-theme="light"] html {
+  background-color: #e8eef6;
+}
+
+/* Lighter overlay in light mode */
+[data-theme="light"] body::before {
+  background:
+    radial-gradient(ellipse at 10% 60%, rgba(240,244,248,0.55) 0%, transparent 55%),
+    radial-gradient(ellipse at 90% 20%, rgba(255,200,100,0.05) 0%, transparent 45%);
+}
+
+/* ---- Cards in light mode ---- */
+[data-theme="light"] .card {
+  background: rgba(255, 255, 255, 0.93);
+  border-color: rgba(0, 0, 0, 0.08);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+}
+
+[data-theme="light"] .card-header {
+  border-bottom-color: rgba(0, 0, 0, 0.08);
+}
+
+/* ---- Match cards in light mode ---- */
+[data-theme="light"] .match-card {
+  background: rgba(255, 255, 255, 0.92);
+  border-color: rgba(0, 0, 0, 0.1);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+}
+
+[data-theme="light"] .match-card:hover {
+  border-color: var(--yellow);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12), var(--glow-yellow);
+}
+
+[data-theme="light"] .match-card .team {
+  color: var(--text-primary);
+}
+
+[data-theme="light"] .match-card .match-info {
+  color: var(--text-secondary);
+}
+
+[data-theme="light"] .match-status.open {
+  background: rgba(46, 125, 50, 0.12);
+  color: #2E7D32;
+  border-color: rgba(46, 125, 50, 0.25);
+}
+
+[data-theme="light"] .match-status.locked {
+  background: rgba(230, 81, 0, 0.1);
+  color: #E65100;
+  border-color: rgba(230, 81, 0, 0.2);
+}
+
+[data-theme="light"] .match-status.played {
+  background: rgba(21, 101, 192, 0.1);
+  color: #1565C0;
+  border-color: rgba(21, 101, 192, 0.2);
+}
+
+/* ---- Form controls in light mode ---- */
+[data-theme="light"] .form-control,
+[data-theme="light"] .form-select {
+  background: #F7FAFC;
+  border-color: rgba(0, 0, 0, 0.15);
+  color: #1A202C;
+}
+
+[data-theme="light"] .form-control:focus,
+[data-theme="light"] .form-select:focus {
+  background: #FFFFFF;
+  border-color: var(--yellow);
+  color: #1A202C;
+  box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.2);
+}
+
+[data-theme="light"] .form-control::placeholder {
+  color: #A0AEC0;
+}
+
+[data-theme="light"] .form-label {
+  color: #2D3748;
+}
+
+[data-theme="light"] .input-group-text {
+  background: #EDF2F7;
+  border-color: rgba(0, 0, 0, 0.15);
+  color: #4A5568;
+}
+
+[data-theme="light"] .form-check-input {
+  background-color: #F7FAFC;
+  border-color: rgba(0, 0, 0, 0.2);
+}
+
+/* ---- Tables in light mode ---- */
+[data-theme="light"] .table {
+  color: var(--text-primary);
+}
+
+[data-theme="light"] .table th {
+  color: #718096;
+  border-bottom-color: rgba(0, 0, 0, 0.1) !important;
+}
+
+[data-theme="light"] .table td {
+  border-bottom-color: rgba(0, 0, 0, 0.06);
+}
+
+[data-theme="light"] .table-hover tbody tr:hover {
+  background: rgba(0, 0, 0, 0.03);
+}
+
+/* ---- List group in light mode ---- */
+[data-theme="light"] .list-group-item {
+  background: rgba(255, 255, 255, 0.9);
+  border-color: rgba(0, 0, 0, 0.08);
+  color: var(--text-primary);
+}
+
+[data-theme="light"] .list-group-item-action:hover {
+  background: rgba(212, 175, 55, 0.08);
+  color: var(--yellow);
+}
+
+/* ---- Badges in light mode ---- */
+[data-theme="light"] .badge-yellow {
+  background: var(--yellow);
+  color: #0A1F44;
+}
+
+/* ---- Scoreboard in light mode (keep dark for readability) ---- */
+[data-theme="light"] .scoreboard {
+  background: linear-gradient(135deg, #1A2F5E 0%, #0F1E44 100%);
+}
+
+/* ---- Widgets in light mode ---- */
+[data-theme="light"] .widget {
+  background: rgba(255, 255, 255, 0.93);
+  border-color: rgba(0, 0, 0, 0.08);
+}
+
+[data-theme="light"] .widget .widget-label {
+  color: #4A5568;
+}
+
+/* ---- Stat cards in light mode ---- */
+[data-theme="light"] .stat-card {
+  background: rgba(255, 255, 255, 0.93);
+  border-color: rgba(0, 0, 0, 0.08);
+}
+
+[data-theme="light"] .stat-card .stat-label {
+  color: #4A5568;
+}
+
+/* ---- Ranking table in light mode ---- */
+[data-theme="light"] .ranking-table th {
+  color: #718096;
+}
+
+[data-theme="light"] .ranking-table td {
+  background: rgba(255, 255, 255, 0.9);
+}
+
+[data-theme="light"] .ranking-table tr:hover td {
+  background: rgba(0, 0, 0, 0.03);
+}
+
+/* ---- Prize cards in light mode ---- */
+[data-theme="light"] .prize-card {
+  background: rgba(255, 255, 255, 0.88);
+  border-color: rgba(0, 0, 0, 0.08);
+}
+
+[data-theme="light"] .prize-card .prize-desc {
+  color: #4A5568;
+}
+
+/* ---- Empty state in light mode ---- */
+[data-theme="light"] .empty-state h4 {
+  color: var(--text-primary);
+}
+
+[data-theme="light"] .empty-state p {
+  color: #4A5568;
+}
+
+/* ---- Pagination in light mode ---- */
+[data-theme="light"] .pagination .page-link {
+  background: rgba(255, 255, 255, 0.9);
+  border-color: rgba(0, 0, 0, 0.1);
+  color: var(--text-primary);
+}
+
+/* ---- Progress in light mode ---- */
+[data-theme="light"] .progress {
+  background: #EDF2F7;
+}
+
+/* ---- Custom toasts in light mode ---- */
+[data-theme="light"] .custom-toast {
+  background: rgba(255, 255, 255, 0.97);
+  border-color: rgba(0, 0, 0, 0.1);
+  color: var(--text-primary);
+}
+
+/* ---- Section titles in light mode ---- */
+[data-theme="light"] .section-title p {
+  color: #4A5568;
+}
+
+/* ---- Step cards in light mode ---- */
+[data-theme="light"] .step-card p {
+  color: #4A5568;
+}
+
+/* ---- Hero subtitle hardcoded white fix ---- */
+[data-theme="light"] .hero-subtitle {
+  color: rgba(255, 255, 255, 0.85) !important;
+}
+
+/* ---- Navbar in both modes: keep dark (always on stadium BG) ---- */
+[data-theme="light"] .navbar {
+  background: rgba(10, 25, 60, 0.78) !important;
+}
+
+/* ---- Footer: always dark regardless of mode ---- */
+.footer {
+  background: #06122B !important;
+  color: rgba(255,255,255,0.8);
+}
+
+[data-theme="light"] .footer h5 { color: var(--yellow); }
+[data-theme="light"] .footer a { color: rgba(255,255,255,0.65); }
+[data-theme="light"] .footer a:hover { color: var(--yellow); }
+[data-theme="light"] .footer .text-secondary { color: rgba(255,255,255,0.55) !important; }
+[data-theme="light"] .footer-bottom { color: rgba(255,255,255,0.4); }
+
+/* ---- Buttons in light mode ---- */
+[data-theme="light"] .btn-yellow {
+  color: #0A1F44 !important;
+}
+
+[data-theme="light"] .btn-outline-yellow {
+  color: var(--yellow);
+  border-color: var(--yellow);
+}
+
+[data-theme="light"] .btn-outline-yellow:hover {
+  background: var(--yellow);
+  color: #0A1F44 !important;
+}
+
+/* ---- Scrollbar in light mode ---- */
+[data-theme="light"] ::-webkit-scrollbar-track {
+  background: #EDF2F7;
+}
+
+[data-theme="light"] ::-webkit-scrollbar-thumb {
+  background: rgba(0,0,0,0.15);
+}
+
+/* ---- h2, h4, h5 text color in light mode ---- */
+[data-theme="light"] h1,
+[data-theme="light"] h2,
+[data-theme="light"] h3,
+[data-theme="light"] h4,
+[data-theme="light"] h5,
+[data-theme="light"] h6 {
+  color: var(--text-primary);
+}
+
+/* ---- Admin sidebar in light mode ---- */
+[data-theme="light"] .admin-sidebar {
+  background: rgba(255,255,255,0.9);
+  border-right-color: rgba(0,0,0,0.08);
+}
+
+[data-theme="light"] .admin-sidebar a {
+  color: #4A5568;
+}
+
+[data-theme="light"] .admin-sidebar a:hover,
+[data-theme="light"] .admin-sidebar a.active {
+  background: rgba(212, 175, 55, 0.1);
+  color: var(--yellow);
 }
