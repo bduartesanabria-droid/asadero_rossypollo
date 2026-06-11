@@ -80,6 +80,58 @@
     transform: translateY(-3px);
   }
   
+  .prize-grid {
+    display: grid;
+    grid-template-columns: repeat(5, minmax(150px, 1fr));
+    gap: 1rem;
+    margin-top: 2.5rem;
+  }
+  .prize-card {
+    padding: 1.8rem 1.4rem;
+    border-radius: 24px;
+    background: rgba(11, 24, 54, 0.85);
+    border: 1px solid rgba(255, 215, 0, 0.12);
+    box-shadow: 0 16px 40px rgba(0, 0, 0, 0.28);
+    transition: transform 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+  }
+  .prize-card:hover {
+    transform: translateY(-6px);
+    border-color: rgba(255, 215, 0, 0.3);
+    box-shadow: 0 20px 45px rgba(0, 0, 0, 0.35);
+  }
+  .prize-card.highlight {
+    border-color: rgba(255, 215, 0, 0.45);
+    background: linear-gradient(180deg, rgba(255, 215, 0, 0.16), rgba(10, 27, 60, 0.95));
+  }
+  .prize-card .prize-icon {
+    font-size: 2.25rem;
+    color: #fff;
+    margin-bottom: 1rem;
+  }
+  .prize-card .prize-label {
+    font-size: 0.95rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--yellow);
+    font-weight: 700;
+    margin-bottom: 0.9rem;
+  }
+  .prize-card .prize-title {
+    font-size: 1.25rem;
+    font-weight: 800;
+    color: #fff;
+    margin-bottom: 0.8rem;
+  }
+  .prize-card .prize-description {
+    color: rgba(255, 255, 255, 0.68);
+    font-size: 0.95rem;
+    line-height: 1.6;
+  }
+  
   .score-cards-container {
     display: flex;
     gap: 15px;
@@ -106,33 +158,6 @@
     font-size: 3rem;
     color: var(--yellow);
     text-shadow: 0 0 20px rgba(255,215,0,0.4);
-  }
-
-  .mascot-container {
-    position: relative;
-    width: 100%;
-    height: 100%;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-  }
-  .mascot-image {
-    max-height: 70vh;
-    filter: drop-shadow(0 20px 40px rgba(0,0,0,0.6));
-    z-index: 2;
-    position: relative;
-    animation: float 4s ease-in-out infinite;
-  }
-  .mascot-glow {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    width: 400px;
-    height: 400px;
-    background: radial-gradient(circle, rgba(255,215,0,0.15) 0%, rgba(0,0,0,0) 70%);
-    z-index: 1;
-    pointer-events: none;
   }
 
   .hero-logo-container {
@@ -176,6 +201,13 @@
     .hero-buttons, .score-cards-container {
       justify-content: center;
     }
+    .prize-grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 1rem;
+    }
+    .prize-card {
+      padding: 1.4rem 1rem;
+    }
     .mascot-image {
       max-height: 50vh;
       margin-top: 20px;
@@ -197,16 +229,9 @@
         </div>
       </div>
 
-      <!-- Centro-Derecha: Mascota 3D -->
-      <div class="col-lg-5 col-md-6 text-center z-1">
-        <div class="mascot-container animate-fade-up delay-2">
-          <div class="mascot-glow"></div>
-          <img src="{{ url_for('static', filename='img/mascota.png') }}" alt="Mascota Rossypollo Futbolista" class="img-fluid mascot-image">
-        </div>
-      </div>
     </div>
 
-    <!-- Botones debajo de las imágenes -->
+    <!-- Botones debajo del logo -->
     <div class="row mt-4">
       <div class="col-12 text-center">
         <div class="hero-buttons justify-content-center animate-fade-up delay-3">
@@ -238,8 +263,37 @@
       <div class="section-divider mx-auto mb-3" style="width: 60px; height: 3px; background: var(--yellow);"></div>
       <h2 style="font-weight:800;">Tabla de <span class="highlight" style="color:var(--yellow);">Premios</span></h2>
     </div>
-    <div class="animate-fade-up">
-      <img src="{{ url_for('static', filename='img/tabla_premios.jpg') }}" alt="Tabla de Premios" class="img-fluid rounded-4" style="max-width:900px; box-shadow:0 12px 40px rgba(0,0,0,0.5); border: 1px solid rgba(255,215,0,0.2);">
+    <div class="animate-fade-up prize-grid">
+      <div class="prize-card">
+        <div class="prize-icon"><i class="fas fa-drumstick-bite"></i></div>
+        <div class="prize-label">Fase de Grupos</div>
+        <div class="prize-title">Presas Broaster</div>
+        <div class="prize-description">Disfruta un combo especial de presas Rossy Pollo.</div>
+      </div>
+      <div class="prize-card">
+        <div class="prize-icon"><i class="fas fa-percent"></i></div>
+        <div class="prize-label">Octavos</div>
+        <div class="prize-title">5% Descuento</div>
+        <div class="prize-description">Gana un cupón para tu próxima orden.</div>
+      </div>
+      <div class="prize-card">
+        <div class="prize-icon"><i class="fas fa-percent"></i></div>
+        <div class="prize-label">Cuartos</div>
+        <div class="prize-title">25% Descuento</div>
+        <div class="prize-description">Aprovecha un ahorro especial en combos.</div>
+      </div>
+      <div class="prize-card">
+        <div class="prize-icon"><i class="fas fa-utensils"></i></div>
+        <div class="prize-label">Semifinal</div>
+        <div class="prize-title">Combo Familiar</div>
+        <div class="prize-description">Premio para compartir con tu familia.</div>
+      </div>
+      <div class="prize-card highlight">
+        <div class="prize-icon"><i class="fas fa-crown"></i></div>
+        <div class="prize-label">Final</div>
+        <div class="prize-title">50% Descuento</div>
+        <div class="prize-description">El máximo premio para cerrar la fase.</div>
+      </div>
     </div>
   </div>
 </section>
