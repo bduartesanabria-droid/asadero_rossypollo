@@ -16,7 +16,7 @@
   <nav class="navbar navbar-expand-lg">
     <div class="container">
       <a class="navbar-brand" href="{{ url_for('main.index') }}">
-        <span class="brand-icon"><img src="{{ url_for('static', filename='img/mascota.png') }}" alt="Mascota" style="width:100%;height:100%;object-fit:cover;border-radius:50%;"></span>
+        <span class="brand-icon"><img src="{{ url_for('static', filename='img/mascota_sin_fondo.png') }}" alt="Mascota" style="width:100%;height:100%;object-fit:cover;border-radius:50%;"></span>
         Rossypollo Mundial
       </a>
       <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
@@ -73,7 +73,7 @@
     <div class="container">
       <div class="row g-4">
         <div class="col-md-4">
-          <h5><span class="brand-icon-sm"><img src="{{ url_for('static', filename='img/mascota.png') }}" alt="Mascota" style="width:100%;height:100%;object-fit:cover;border-radius:50%;"></span> Rossypollo</h5>
+          <h5><span class="brand-icon-sm"><img src="{{ url_for('static', filename='img/mascota_sin_fondo.png') }}" alt="Mascota" style="width:100%;height:100%;object-fit:cover;border-radius:50%;"></span> Rossypollo</h5>
           <p class="text-secondary" style="font-size:0.9rem;">Vive la pasión del Mundial con Rossypollo. Registra tus pronósticos y gana premios exclusivos.</p>
         </div>
         <div class="col-md-4">
@@ -82,13 +82,6 @@
             <li class="mb-2"><a href="{{ url_for('main.index') }}">Inicio</a></li>
             <li class="mb-2"><a href="{{ url_for('main.list_matches') }}">Partidos</a></li>
             <li class="mb-2"><a href="{{ url_for('main.leaderboard') }}">Ranking</a></li>
-          </ul>
-        </div>
-        <div class="col-md-4">
-          <h5>Contacto</h5>
-          <ul class="list-unstyled">
-            <li class="mb-2"><a href="#"><i class="fab fa-facebook me-2"></i>Facebook</a></li>
-            <li class="mb-2"><a href="#"><i class="fab fa-instagram me-2"></i>Instagram</a></li>
           </ul>
         </div>
       </div>
