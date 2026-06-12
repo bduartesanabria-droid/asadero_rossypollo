@@ -5,7 +5,7 @@ from flask import Blueprint, render_template, request, jsonify, flash, redirect,
 from flask_login import login_required, current_user
 from sqlalchemy import func
 
-from app.models import db, Post, Category, Match, Prediction, User, Result, Prize, Ranking
+from app.models import db, Post, Category, Match, Prediction, User, Result, Prize, Ranking, WinnerPrize
 
 main_bp = Blueprint('main', __name__)
 
@@ -588,7 +588,139 @@ def admin_results():
 
     winners = Result.query.filter_by(is_winner=True).order_by(Result.created_at.desc()).all()
     all_results = Result.query.order_by(Result.created_at.desc()).all()
-    return render_template('admin/results.html', winners=winners, results=all_results)
+    bonos = WinnerPrize.query.order_by(WinnerPrize.created_at.desc()).all()
+    users = User.query.filter_by(is_active=True).order_by(User.username.asc()).all()
+    return render_template('admin/results.html', winners=winners, results=all_results, bonos=bonos, users=users)
+
+
+@main_bp.route('/admin/assign_bono', methods=['POST'])
+@login_required
+def assign_bono():
+    """Asignar bono de premio a un usuario y enviar correo"""
+    if not current_user.is_admin:
+        return jsonify({'error': 'Acceso denegado'}), 403
+
+    user_id = request.form.get('user_id')
+    prize_name = request.form.get('prize_name', '').strip()
+    image_url = request.form.get('image_url', '').strip()
+    send_email = request.form.get('send_email') == 'on'
+
+    if not user_id or not prize_name:
+        flash('Usuario y nombre del premio son requeridos.', 'danger')
+        return redirect(url_for('main.admin_results'))
+
+    user = User.query.get(user_id)
+    if not user:
+        flash('Usuario no encontrado.', 'danger')
+        return redirect(url_for('main.admin_results'))
+
+    # Generar código único
+    count = WinnerPrize.query.count() + 1
+    bono_code = f'MR-MUNDIAL-{count:03d}'
+    while WinnerPrize.query.filter_by(bono_code=bono_code).first():
+        count += 1
+        bono_code = f'MR-MUNDIAL-{count:03d}'
+
+    bono = WinnerPrize(
+        user_id=user.id,
+        bono_code=bono_code,
+        prize_name=prize_name,
+        image_url=image_url or None,
+        status='pendiente',
+    )
+    db.session.add(bono)
+    db.session.commit()
+
+    if send_email and user.email:
+        try:
+            _send_bono_email(user, bono)
+            bono.email_sent = True
+            db.session.commit()
+            flash(f'Bono {bono_code} asignado y correo enviado a {user.email}.', 'success')
+        except Exception as e:
+            flash(f'Bono asignado pero error al enviar correo: {e}', 'warning')
+    else:
+        flash(f'Bono {bono_code} asignado a {user.username}.', 'success')
+
+    return redirect(url_for('main.admin_results'))
+
+
+@main_bp.route('/admin/bono/<int:bono_id>/claim', methods=['POST'])
+@login_required
+def claim_bono(bono_id):
+    """Marcar un bono como reclamado"""
+    if not current_user.is_admin:
+        return jsonify({'error': 'Acceso denegado'}), 403
+
+    bono = WinnerPrize.query.get_or_404(bono_id)
+    bono.status = 'reclamado'
+    bono.claimed_at = datetime.now()
+    db.session.commit()
+    flash(f'Bono {bono.bono_code} marcado como reclamado.', 'success')
+    return redirect(url_for('main.admin_results'))
+
+
+@main_bp.route('/admin/bono/<int:bono_id>/resend', methods=['POST'])
+@login_required
+def resend_bono_email(bono_id):
+    """Reenviar el correo del bono al ganador"""
+    if not current_user.is_admin:
+        return jsonify({'error': 'Acceso denegado'}), 403
+
+    bono = WinnerPrize.query.get_or_404(bono_id)
+    try:
+        _send_bono_email(bono.user, bono)
+        bono.email_sent = True
+        db.session.commit()
+        flash(f'Correo reenviado a {bono.user.email}.', 'success')
+    except Exception as e:
+        flash(f'Error al reenviar correo: {e}', 'danger')
+    return redirect(url_for('main.admin_results'))
+
+
+def _send_bono_email(user, bono):
+    """Envía el bono de premio por correo al ganador."""
+    from flask_mail import Message
+    from app import mail
+    from flask import current_app, render_template_string
+
+    html_body = f"""
+    <div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;background:#1a1a2e;color:#fff;border-radius:12px;overflow:hidden;">
+      <div style="background:#b8860b;padding:20px;text-align:center;">
+        <h1 style="margin:0;color:#fff;font-size:28px;">¡FELICITACIONES!</h1>
+        <p style="margin:8px 0 0;color:#ffe;font-size:16px;">Has ganado un premio en Marcador Rossypollo</p>
+      </div>
+      <div style="padding:30px;text-align:center;">
+        <h2 style="color:#ffd700;">🏆 {bono.prize_name}</h2>
+        <div style="background:#16213e;border:2px solid #b8860b;border-radius:8px;padding:20px;margin:20px 0;display:inline-block;">
+          <p style="margin:0 0 8px;color:#aaa;font-size:12px;text-transform:uppercase;letter-spacing:1px;">Código del Bono</p>
+          <p style="margin:0;font-size:28px;font-weight:bold;color:#ffd700;letter-spacing:3px;">{bono.bono_code}</p>
+        </div>
+        {'<div style="margin:20px 0;"><img src="' + bono.image_url + '" alt="Bono Premio" style="max-width:100%;border-radius:8px;"></div>' if bono.image_url else ''}
+        <div style="background:#0f3460;border-radius:8px;padding:15px;margin-top:20px;text-align:left;">
+          <p style="margin:0 0 8px;color:#ffd700;font-weight:bold;">📋 Condiciones de uso:</p>
+          <ul style="margin:0;padding-left:18px;color:#ccc;font-size:14px;line-height:1.8;">
+            <li>Válido para una única redención.</li>
+            <li>Debe presentarse este bono (código: <strong style="color:#ffd700;">{bono.bono_code}</strong>).</li>
+            <li>El código del bono debe coincidir con el registro del sistema.</li>
+            <li>No acumulable con otras promociones.</li>
+            <li>Válido únicamente en Asadero Rossypollo.</li>
+          </ul>
+        </div>
+        <p style="margin-top:25px;color:#888;font-size:13px;">Emitido el {bono.created_at.strftime('%d de %B del %Y')} · Estado: <strong style="color:#ffd700;">PENDIENTE DE RECLAMAR</strong></p>
+      </div>
+      <div style="background:#b8860b;padding:15px;text-align:center;">
+        <p style="margin:0;color:#fff;font-size:13px;">Asadero Rossypollo · ¡Sabor que nos une! 🍗</p>
+      </div>
+    </div>
+    """
+
+    msg = Message(
+        subject=f'🏆 ¡Ganaste! Tu bono de premio - {bono.bono_code}',
+        recipients=[user.email],
+        html=html_body,
+    )
+    mail.send(msg)
 
 @main_bp.route('/admin/post/new', methods=['GET', 'POST'])
 @login_required

@@ -158,6 +158,25 @@ class Prize(db.Model):
     def __repr__(self):
         return f'<Prize {self.name} ({self.phase})>'
 
+class WinnerPrize(db.Model):
+    """Bono de premio asignado a un ganador"""
+    __tablename__ = 'winner_prizes'
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    bono_code = db.Column(db.String(50), unique=True, nullable=False)
+    prize_name = db.Column(db.String(150), nullable=False)
+    image_url = db.Column(db.String(500), nullable=True)
+    status = db.Column(db.String(20), default='pendiente', nullable=False)  # pendiente / reclamado
+    email_sent = db.Column(db.Boolean, default=False)
+    claimed_at = db.Column(db.DateTime, nullable=True)
+    created_at = db.Column(db.DateTime, default=datetime.now)
+
+    user = db.relationship('User', backref=db.backref('winner_prizes', lazy=True))
+
+    def __repr__(self):
+        return f'<WinnerPrize {self.bono_code} - {self.status}>'
+
+
 class Category(db.Model):
     """Modelo de categorías para los posts"""
     id = db.Column(db.Integer, primary_key=True)

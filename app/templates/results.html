@@ -10,6 +10,51 @@
     <a href="{{ url_for('main.dashboard') }}" class="btn btn-outline-yellow"><i class="fas fa-arrow-left me-2"></i>Volver</a>
   </div>
 
+  <!-- BONOS GANADOS -->
+  {% if current_user.winner_prizes %}
+  <div class="mb-4">
+    <h4 class="fw-bold mb-3"><i class="fas fa-gift me-2" style="color:var(--yellow);"></i>Tus Premios</h4>
+    <div class="row g-3">
+      {% for bono in current_user.winner_prizes %}
+      <div class="col-12 col-md-6">
+        <div class="card" style="border:2px solid {% if bono.status == 'reclamado' %}#4CAF50{% else %}var(--yellow){% endif %};">
+          <div class="card-body">
+            <div class="d-flex justify-content-between align-items-start mb-3">
+              <div>
+                <span class="badge badge-yellow mb-1" style="letter-spacing:1px;font-size:0.8em;">{{ bono.bono_code }}</span>
+                <h5 class="fw-bold mb-0">🏆 {{ bono.prize_name }}</h5>
+              </div>
+              {% if bono.status == 'reclamado' %}
+                <span class="badge" style="background:rgba(76,175,80,0.2);color:#4CAF50;white-space:nowrap;"><i class="fas fa-check-circle me-1"></i>Reclamado</span>
+              {% else %}
+                <span class="badge" style="background:rgba(255,193,7,0.2);color:#ffc107;white-space:nowrap;"><i class="fas fa-clock me-1"></i>Pendiente de reclamar</span>
+              {% endif %}
+            </div>
+
+            {% if bono.image_url %}
+            <div class="mb-3 text-center">
+              <img src="{{ bono.image_url }}" alt="Bono {{ bono.bono_code }}" class="img-fluid rounded" style="max-height:220px;object-fit:contain;">
+            </div>
+            {% endif %}
+
+            <div style="background:rgba(255,255,255,0.05);border-radius:8px;padding:12px;font-size:0.85em;">
+              <p class="mb-1 text-secondary"><strong style="color:var(--yellow);">Fecha de emisión:</strong> {{ bono.created_at.strftime('%d de %B del %Y') }}</p>
+              {% if bono.status == 'reclamado' and bono.claimed_at %}
+              <p class="mb-0 text-secondary"><strong style="color:#4CAF50;">Reclamado el:</strong> {{ bono.claimed_at.strftime('%d/%m/%Y') }}</p>
+              {% else %}
+              <p class="mb-1 text-secondary"><strong style="color:var(--yellow);">Cómo reclamar:</strong> Presenta este bono en Asadero Rossypollo.</p>
+              <p class="mb-0 text-secondary"><i class="fas fa-envelope me-1"></i>También lo recibirás en tu correo registrado.</p>
+              {% endif %}
+            </div>
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+  {% endif %}
+
+  <!-- TABLA DE RESULTADOS -->
   <div class="card">
     <div class="card-body p-0">
       {% if results %}

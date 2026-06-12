@@ -4,9 +4,12 @@ load_dotenv()  # Must run before Config class is evaluated below
 from flask import Flask
 import os
 from flask_login import LoginManager
+from flask_mail import Mail
 from sqlalchemy.exc import SQLAlchemyError
 from app.config import config
 from app.models import db, User
+
+mail = Mail()
 
 def create_app(config_name='development'):
 
@@ -21,6 +24,7 @@ def create_app(config_name='development'):
 
     # Inicializar extensiones
     db.init_app(app)
+    mail.init_app(app)
 
     # Inicializar migraciones
     from flask_migrate import Migrate
