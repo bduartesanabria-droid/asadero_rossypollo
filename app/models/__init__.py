@@ -163,6 +163,7 @@ class WinnerPrize(db.Model):
     __tablename__ = 'winner_prizes'
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    match_id = db.Column(db.Integer, db.ForeignKey('matches.id'), nullable=True)
     bono_code = db.Column(db.String(50), unique=True, nullable=False)
     prize_name = db.Column(db.String(150), nullable=False)
     image_url = db.Column(db.String(500), nullable=True)
@@ -172,6 +173,7 @@ class WinnerPrize(db.Model):
     created_at = db.Column(db.DateTime, default=datetime.now)
 
     user = db.relationship('User', backref=db.backref('winner_prizes', lazy=True))
+    match = db.relationship('Match', backref=db.backref('winner_prizes', lazy=True))
 
     def __repr__(self):
         return f'<WinnerPrize {self.bono_code} - {self.status}>'

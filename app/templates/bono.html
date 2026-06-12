@@ -1,0 +1,568 @@
+{% extends "base.html" %}
+{% block title %}Bono Premio - {{ bono.bono_code }}{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+  <div class="d-flex justify-content-between align-items-center mb-3 no-print">
+    <a href="{{ url_for('main.results') }}" class="btn btn-outline-yellow">
+      <i class="fas fa-arrow-left me-2"></i>Volver
+    </a>
+    <button onclick="window.print()" class="btn btn-yellow">
+      <i class="fas fa-print me-2"></i>Imprimir / Guardar PDF
+    </button>
+  </div>
+
+  <!-- BONO VISUAL -->
+  <div class="bono-wrapper">
+    <div class="bono-card">
+
+      <!-- LADO IZQUIERDO -->
+      <div class="bono-left">
+
+        <!-- Header logo -->
+        <div class="bono-header">
+          <div class="bono-logo">
+            <img src="/static/img/logo.png" alt="Logo" onerror="this.style.display='none'">
+            <div class="bono-logo-text">
+              <span class="bono-brand-name">ROSSYPOLLO</span>
+              <span class="bono-brand-sub">— ASADERO —</span>
+              <span class="bono-slogan">¡Sabor que nos une!</span>
+            </div>
+          </div>
+          {% if bono.match %}
+          <div class="bono-score-badge">
+            <div class="score-label-top">MARCADOR</div>
+            <div class="score-label-top">ROSSYPOLLO</div>
+            <div class="score-value">{{ bono.match.home_score }} - {{ bono.match.away_score }}</div>
+          </div>
+          {% endif %}
+        </div>
+
+        <!-- Título BONO DE PREMIO -->
+        <div class="bono-title-area">
+          <div class="bono-title-row">
+            <span class="bono-word-bono">BONO</span>
+            <span class="bono-word-de"> DE</span>
+          </div>
+          <div class="bono-word-premio">PREMIO</div>
+          <div class="bono-subtitle">MARCADOR ROSSYPOLLO</div>
+        </div>
+
+        <!-- Separador -->
+        <div class="bono-divider"></div>
+
+        <!-- Premio ganado -->
+        <div class="bono-prize-area">
+          <div class="bono-congrats">¡FELICITACIONES!</div>
+          <div class="bono-has-ganado">HAS GANADO:</div>
+          {% if bono.match %}
+          <div class="bono-match-teams">{{ bono.match.home_team }} vs {{ bono.match.away_team }}</div>
+          {% endif %}
+          <div class="bono-prize-name">{{ bono.prize_name }}</div>
+          <div class="bono-gratis-tag">DISFRUTA EL AUTÉNTICO SABOR <span style="color:#e8622a;">BROASTER</span></div>
+        </div>
+
+        <!-- Footer izquierdo -->
+        <div class="bono-footer-left">
+          <div class="bono-footer-left-text">
+            <i class="fas fa-trophy" style="color:#b8860b;"></i>
+            GRACIAS POR PARTICIPAR Y<br>DEMOSTRAR TU PASIÓN POR EL FÚTBOL
+          </div>
+          <div class="bono-footer-right-text">
+            <em>¡Seguimos celebrando<br><strong>juntos este Mundial!</strong></em>
+            <i class="fas fa-futbol" style="color:#fff;margin-left:6px;"></i>
+          </div>
+        </div>
+
+      </div><!-- /bono-left -->
+
+      <!-- LADO DERECHO: Info panel -->
+      <div class="bono-right">
+        <div class="bono-info-header">
+          <span>★</span> INFORMACIÓN DEL BONO <span>★</span>
+        </div>
+
+        <div class="bono-info-body">
+          <div class="bono-info-row">
+            <div class="bono-info-icon"><i class="fas fa-ticket-alt"></i></div>
+            <div>
+              <div class="bono-info-label">CÓDIGO DEL BONO:</div>
+              <div class="bono-info-value" style="color:#b8131a;font-size:1.3em;">{{ bono.bono_code }}</div>
+            </div>
+          </div>
+
+          <div class="bono-info-row">
+            <div class="bono-info-icon"><i class="fas fa-calendar-alt"></i></div>
+            <div>
+              <div class="bono-info-label">FECHA DE EMISIÓN:</div>
+              <div class="bono-info-value">{{ bono.created_at.strftime('%d DE %B DEL %Y').upper() }}</div>
+            </div>
+          </div>
+
+          {% if bono.match %}
+          <div class="bono-info-row">
+            <div class="bono-info-icon"><i class="fas fa-futbol"></i></div>
+            <div>
+              <div class="bono-info-label">PARTIDO:</div>
+              <div class="bono-info-value" style="font-size:0.95em;">{{ bono.match.home_team }} {{ bono.match.home_score }}-{{ bono.match.away_score }} {{ bono.match.away_team }}</div>
+            </div>
+          </div>
+          {% endif %}
+
+          <div class="bono-info-row">
+            <div class="bono-info-icon"><i class="fas fa-gift"></i></div>
+            <div>
+              <div class="bono-info-label">PREMIO:</div>
+              <div class="bono-info-value">{{ bono.prize_name }}</div>
+            </div>
+          </div>
+
+          <div class="bono-info-row">
+            <div class="bono-info-icon"><i class="fas fa-check-circle"></i></div>
+            <div>
+              <div class="bono-info-label">ESTADO:</div>
+              {% if bono.status == 'reclamado' %}
+                <div class="bono-status-badge bono-status-reclamado">RECLAMADO</div>
+              {% else %}
+                <div class="bono-status-badge bono-status-pendiente">PENDIENTE DE RECLAMAR</div>
+              {% endif %}
+            </div>
+          </div>
+        </div>
+
+        <!-- Condiciones -->
+        <div class="bono-conditions">
+          <div class="bono-conditions-title">— CONDICIONES DE USO —</div>
+          <ul class="bono-conditions-list">
+            <li><i class="fas fa-check-circle"></i> Válido para una única redención.</li>
+            <li><i class="fas fa-check-circle"></i> Debe presentarse este bono.</li>
+            <li><i class="fas fa-check-circle"></i> El código del bono debe coincidir con el registro del sistema.</li>
+            <li><i class="fas fa-check-circle"></i> No acumulable con otras promociones.</li>
+            <li><i class="fas fa-check-circle"></i> Válido únicamente en Asadero Rossypollo.</li>
+          </ul>
+        </div>
+
+        <!-- Barcode visual -->
+        <div class="bono-barcode">
+          <div class="barcode-lines">
+            {% for i in range(40) %}
+            <div class="barcode-line" style="height:{{ [20,35,25,40,20,35,30,40,25,20][(loop.index0 % 10)] }}px;width:{{ [2,1,3,1,2,1,2,1,3,1][(loop.index0 % 10)] }}px;"></div>
+            {% endfor %}
+          </div>
+          <div class="barcode-text">{{ bono.bono_code }}</div>
+        </div>
+
+      </div><!-- /bono-right -->
+
+    </div><!-- /bono-card -->
+  </div><!-- /bono-wrapper -->
+
+  <div class="text-center mt-3 no-print">
+    <p class="text-secondary" style="font-size:0.85em;">Presenta este bono en el local o muestra la pantalla al personal de Asadero Rossypollo.</p>
+  </div>
+</div>
+
+<style>
+/* ===== BONO ESTILOS ===== */
+.bono-wrapper {
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+.bono-card {
+  display: flex;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 8px 40px rgba(0,0,0,0.5);
+  min-height: 400px;
+}
+
+/* --- LADO IZQUIERDO --- */
+.bono-left {
+  flex: 1.4;
+  background: #0d0d1a;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  position: relative;
+  overflow: hidden;
+}
+
+.bono-left::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse at 60% 30%, rgba(184,134,11,0.08) 0%, transparent 70%),
+              radial-gradient(ellipse at 20% 80%, rgba(0,80,200,0.1) 0%, transparent 60%);
+  pointer-events: none;
+}
+
+.bono-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 10px;
+}
+
+.bono-logo {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.bono-logo img {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+}
+
+.bono-logo-text {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.1;
+}
+
+.bono-brand-name {
+  font-size: 1.2em;
+  font-weight: 900;
+  color: #ffd700;
+  letter-spacing: 1px;
+}
+
+.bono-brand-sub {
+  font-size: 0.65em;
+  color: #aaa;
+  letter-spacing: 2px;
+}
+
+.bono-slogan {
+  font-size: 0.7em;
+  color: #ccc;
+  font-style: italic;
+}
+
+.bono-score-badge {
+  background: linear-gradient(135deg, #1a3a6e, #0d1f3c);
+  border: 2px solid #b8860b;
+  border-radius: 8px;
+  padding: 6px 12px;
+  text-align: center;
+  min-width: 80px;
+}
+
+.score-label-top {
+  font-size: 0.55em;
+  color: #ffd700;
+  font-weight: 700;
+  letter-spacing: 1px;
+  line-height: 1.2;
+}
+
+.score-value {
+  font-size: 1.5em;
+  font-weight: 900;
+  color: #fff;
+  letter-spacing: 2px;
+}
+
+.bono-title-area {
+  text-align: center;
+  margin: 5px 0;
+}
+
+.bono-title-row {
+  display: flex;
+  align-items: baseline;
+  justify-content: center;
+  gap: 6px;
+}
+
+.bono-word-bono {
+  font-size: 2.2em;
+  font-weight: 900;
+  color: #fff;
+  text-shadow: 2px 2px 0 #b8860b;
+}
+
+.bono-word-de {
+  font-size: 1.2em;
+  font-weight: 700;
+  color: #ffd700;
+}
+
+.bono-word-premio {
+  font-size: 3em;
+  font-weight: 900;
+  color: #ffd700;
+  line-height: 0.95;
+  text-shadow: 3px 3px 0 #b8000b, -1px -1px 0 #8b6000;
+  letter-spacing: 2px;
+}
+
+.bono-subtitle {
+  font-size: 0.85em;
+  font-weight: 700;
+  color: #fff;
+  background: #b8000b;
+  display: inline-block;
+  padding: 3px 16px;
+  border-radius: 3px;
+  letter-spacing: 1px;
+  margin-top: 4px;
+}
+
+.bono-divider {
+  height: 2px;
+  background: linear-gradient(90deg, transparent, #b8860b, transparent);
+  margin: 10px 0;
+}
+
+.bono-prize-area {
+  text-align: center;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: rgba(245,235,200,0.07);
+  border-radius: 8px;
+  padding: 12px;
+}
+
+.bono-congrats {
+  font-size: 1.3em;
+  font-weight: 900;
+  color: #b8000b;
+  letter-spacing: 2px;
+}
+
+.bono-has-ganado {
+  font-size: 0.85em;
+  color: #888;
+  font-style: italic;
+  margin: 2px 0;
+}
+
+.bono-match-teams {
+  font-size: 0.75em;
+  color: #ffd700;
+  margin-bottom: 4px;
+}
+
+.bono-prize-name {
+  font-size: 1.5em;
+  font-weight: 900;
+  color: #1a1a1a;
+  background: #ffd700;
+  padding: 6px 18px;
+  border-radius: 6px;
+  text-align: center;
+  line-height: 1.2;
+  margin: 6px 0;
+}
+
+.bono-gratis-tag {
+  font-size: 0.75em;
+  color: #aaa;
+  margin-top: 6px;
+  font-weight: 600;
+  letter-spacing: 1px;
+}
+
+.bono-footer-left {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  margin-top: 10px;
+  padding-top: 8px;
+  border-top: 1px solid rgba(184,134,11,0.3);
+  font-size: 0.65em;
+  color: #888;
+  gap: 8px;
+}
+
+.bono-footer-left-text, .bono-footer-right-text {
+  line-height: 1.4;
+}
+
+.bono-footer-right-text {
+  text-align: right;
+  color: #aaa;
+}
+
+/* --- LADO DERECHO --- */
+.bono-right {
+  flex: 1;
+  background: #f5e8c8;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.bono-info-header {
+  background: #b8000b;
+  color: #fff;
+  text-align: center;
+  font-weight: 700;
+  font-size: 0.85em;
+  letter-spacing: 1px;
+  padding: 8px;
+  border-radius: 4px;
+  margin-bottom: 14px;
+}
+
+.bono-info-body {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  flex: 1;
+}
+
+.bono-info-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  background: #1a1a2e;
+  border-radius: 8px;
+  padding: 8px 10px;
+}
+
+.bono-info-icon {
+  width: 32px;
+  height: 32px;
+  background: #0d0d1a;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #ffd700;
+  font-size: 0.9em;
+  flex-shrink: 0;
+}
+
+.bono-info-label {
+  font-size: 0.65em;
+  color: #888;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  font-weight: 600;
+}
+
+.bono-info-value {
+  font-size: 1em;
+  font-weight: 700;
+  color: #fff;
+  line-height: 1.2;
+}
+
+.bono-status-badge {
+  font-weight: 700;
+  font-size: 0.85em;
+  padding: 4px 10px;
+  border-radius: 4px;
+  display: inline-block;
+  margin-top: 2px;
+}
+
+.bono-status-pendiente {
+  background: #b8000b;
+  color: #fff;
+}
+
+.bono-status-reclamado {
+  background: #2e7d32;
+  color: #fff;
+}
+
+/* Condiciones */
+.bono-conditions {
+  background: #1a1a2e;
+  border-radius: 8px;
+  padding: 10px;
+  margin-top: 10px;
+}
+
+.bono-conditions-title {
+  color: #ffd700;
+  font-size: 0.7em;
+  font-weight: 700;
+  text-align: center;
+  letter-spacing: 1px;
+  margin-bottom: 6px;
+}
+
+.bono-conditions-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.bono-conditions-list li {
+  font-size: 0.65em;
+  color: #bbb;
+  padding: 2px 0;
+  display: flex;
+  align-items: flex-start;
+  gap: 6px;
+  line-height: 1.4;
+}
+
+.bono-conditions-list li i {
+  color: #ffd700;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+/* Barcode */
+.bono-barcode {
+  text-align: center;
+  margin-top: 10px;
+  padding-top: 8px;
+  border-top: 1px solid rgba(184,134,11,0.3);
+}
+
+.barcode-lines {
+  display: flex;
+  justify-content: center;
+  align-items: flex-end;
+  gap: 2px;
+  height: 40px;
+  margin-bottom: 4px;
+}
+
+.barcode-line {
+  background: #1a1a2e;
+  border-radius: 1px;
+}
+
+.barcode-text {
+  font-size: 0.6em;
+  font-family: monospace;
+  color: #555;
+  letter-spacing: 2px;
+}
+
+/* ===== PRINT STYLES ===== */
+@media print {
+  .no-print { display: none !important; }
+  nav, footer, .navbar { display: none !important; }
+  body { background: white !important; }
+  .bono-wrapper { max-width: 100%; }
+  .bono-card {
+    box-shadow: none;
+    border: 1px solid #ccc;
+    page-break-inside: avoid;
+  }
+  .container { max-width: 100% !important; padding: 0 !important; }
+}
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 600px) {
+  .bono-card { flex-direction: column; }
+  .bono-right { border-top: 3px solid #b8860b; }
+  .bono-word-premio { font-size: 2.2em; }
+}
+</style>
+{% endblock %}

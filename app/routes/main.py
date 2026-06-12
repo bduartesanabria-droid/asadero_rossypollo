@@ -98,9 +98,13 @@ def calculate_points_admin():
     if not current_user.is_admin:
         return jsonify({'error': 'Acceso denegado'}), 403
     predictions = Prediction.query.filter(Prediction.points_earned.is_(None)).all()
+    affected_matches = set()
     for pred in predictions:
         if pred.match.home_score is not None and pred.match.away_score is not None:
             pred.calculate_points()
+            affected_matches.add(pred.match)
+    for match in affected_matches:
+        _auto_assign_bonos(match)
     db.session.commit()
     flash('Puntos recalculados para predicciones pendientes', 'success')
     return redirect(url_for('main.admin_matches'))
@@ -319,6 +323,8 @@ def edit_match(match_id):
                 match.status = 'finished'
                 for pred in match.predictions:
                     pred.calculate_points()
+                # Auto-assign bonos to exact-score winners
+                _auto_assign_bonos(match)
                 # Update rankings
                 user_points = db.session.query(
                     User.id.label('user_id'),
@@ -572,6 +578,17 @@ def dashboard():
         upcoming_matches=upcoming_matches
     )
 
+@main_bp.route('/bono/<bono_code>')
+@login_required
+def ver_bono(bono_code):
+    """Ver e imprimir el bono de premio del ganador"""
+    bono = WinnerPrize.query.filter_by(bono_code=bono_code).first_or_404()
+    if bono.user_id != current_user.id and not current_user.is_admin:
+        flash('No tienes permiso para ver este bono.', 'danger')
+        return redirect(url_for('main.results'))
+    return render_template('bono.html', bono=bono)
+
+
 @main_bp.route('/results')
 @login_required
 def results():
@@ -676,6 +693,37 @@ def resend_bono_email(bono_id):
     except Exception as e:
         flash(f'Error al reenviar correo: {e}', 'danger')
     return redirect(url_for('main.admin_results'))
+
+
+def _generate_bono_code():
+    """Genera un código de bono único secuencial."""
+    count = WinnerPrize.query.count() + 1
+    code = f'MR-MUNDIAL-{count:03d}'
+    while WinnerPrize.query.filter_by(bono_code=code).first():
+        count += 1
+        code = f'MR-MUNDIAL-{count:03d}'
+    return code
+
+
+def _auto_assign_bonos(match):
+    """Crea bonos automáticamente para quienes acertaron el marcador exacto."""
+    prize = Prize.query.first()
+    prize_name = prize.name if prize else '2 Presas Broaster de Pollo Gratis'
+
+    for pred in match.predictions:
+        if pred.points_earned == 3:
+            already = WinnerPrize.query.filter_by(
+                user_id=pred.user_id, match_id=match.id
+            ).first()
+            if not already:
+                bono = WinnerPrize(
+                    user_id=pred.user_id,
+                    match_id=match.id,
+                    bono_code=_generate_bono_code(),
+                    prize_name=prize_name,
+                    status='pendiente',
+                )
+                db.session.add(bono)
 
 
 def _send_bono_email(user, bono):
