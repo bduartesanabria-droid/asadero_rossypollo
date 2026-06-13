@@ -1928,18 +1928,17 @@ main { flex-grow: 1; position: relative; z-index: 1; }
   color: #4A5568 !important;
 }
 
-/* ---- Cards: ensure text-primary adapts in both themes ---- */
-[data-theme="light"] .card strong,
-[data-theme="light"] .card td,
-[data-theme="light"] .card p {
-  color: var(--text-primary);
-}
+/* ---- Cards: table cell and paragraph base color (not badges) ---- */
+[data-theme="light"] .card td { color: var(--text-primary); }
+[data-theme="dark"]  .card td { color: var(--text-primary); }
 
-[data-theme="dark"] .card strong,
-[data-theme="dark"] .card td,
-[data-theme="dark"] .card p {
-  color: var(--text-primary);
-}
+/* Ensure inline badge spans inside td are NOT overridden */
+[data-theme="light"] .card td .badge,
+[data-theme="dark"]  .card td .badge,
+[data-theme="light"] .card td .check-entregado,
+[data-theme="dark"]  .card td .check-entregado,
+[data-theme="light"] .card td .check-entrega,
+[data-theme="dark"]  .card td .check-entrega { color: inherit; }
 
 /* ---- Modal text in both themes ---- */
 [data-theme="light"] .modal-content {
