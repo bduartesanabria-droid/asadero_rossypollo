@@ -5,6 +5,8 @@
   --bg-primary: #0A1F44; /* Fallback */
   --bg-secondary: #0D2857;
   --bg-card: rgba(13, 40, 87, 0.9);
+  --card-bg: rgba(13, 40, 87, 0.9);
+  --input-bg: #0D2857;
   --text-primary: #FFFFFF;
   --text-secondary: #A0B4D8;
   --yellow: #FFD700;
@@ -42,6 +44,8 @@
   --bg-primary: #F0F4F8; /* Fallback */
   --bg-secondary: #FFFFFF;
   --bg-card: rgba(255, 255, 255, 0.9);
+  --card-bg: rgba(255, 255, 255, 0.9);
+  --input-bg: #F7FAFC;
   --text-primary: #1A202C;
   --text-secondary: #4A5568;
   --yellow: #D4AF37;
@@ -1904,6 +1908,58 @@ main { flex-grow: 1; position: relative; z-index: 1; }
 
 [data-theme="light"] ::-webkit-scrollbar-thumb {
   background: rgba(0,0,0,0.15);
+}
+
+/* ---- Bootstrap text-secondary override for both themes ---- */
+[data-theme="dark"] .text-secondary {
+  color: #A0B4D8 !important;
+}
+
+[data-theme="light"] .text-secondary {
+  color: #4A5568 !important;
+}
+
+/* ---- Table header text visibility ---- */
+[data-theme="dark"] .table th {
+  color: rgba(255, 255, 255, 0.65) !important;
+}
+
+[data-theme="light"] .table th {
+  color: #4A5568 !important;
+}
+
+/* ---- Cards: ensure text-primary adapts in both themes ---- */
+[data-theme="light"] .card strong,
+[data-theme="light"] .card td,
+[data-theme="light"] .card p {
+  color: var(--text-primary);
+}
+
+[data-theme="dark"] .card strong,
+[data-theme="dark"] .card td,
+[data-theme="dark"] .card p {
+  color: var(--text-primary);
+}
+
+/* ---- Modal text in both themes ---- */
+[data-theme="light"] .modal-content {
+  background: #fff !important;
+  color: #1A202C;
+  border-color: rgba(0,0,0,0.15) !important;
+}
+
+[data-theme="light"] .modal-content .modal-header,
+[data-theme="light"] .modal-content .modal-footer {
+  border-color: rgba(0,0,0,0.1) !important;
+}
+
+[data-theme="light"] .modal-content .btn-close-white {
+  filter: invert(1);
+}
+
+[data-theme="light"] .modal-content label,
+[data-theme="light"] .modal-content small {
+  color: #4A5568;
 }
 
 /* ---- h2, h4, h5 text color in light mode ---- */

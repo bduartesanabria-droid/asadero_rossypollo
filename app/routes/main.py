@@ -87,7 +87,7 @@ def leaderboard():
         func.coalesce(Ranking.points, 0).label('total_points')
     ).outerjoin(Ranking, User.id == Ranking.user_id)\
      .filter(User.is_admin == False, User.is_active == True)\
-     .order_by(Ranking.points.desc()).all()
+     .order_by(func.coalesce(Ranking.points, 0).desc()).all()
 
     return render_template('leaderboard.html', users_points=users_points)
 
@@ -103,10 +103,22 @@ def calculate_points_admin():
         if pred.match.home_score is not None and pred.match.away_score is not None:
             pred.calculate_points()
             affected_matches.add(pred.match)
+    db.session.flush()
     for match in affected_matches:
         _auto_assign_bonos(match)
+    # Actualizar rankings después de calcular puntos
+    user_points = db.session.query(
+        User.id.label('user_id'),
+        func.coalesce(func.sum(Prediction.points_earned), 0).label('total_points')
+    ).outerjoin(Prediction, Prediction.user_id == User.id).group_by(User.id).all()
+    for row in user_points:
+        ranking = Ranking.query.filter_by(user_id=row.user_id).first()
+        if ranking:
+            ranking.points = row.total_points
+        else:
+            db.session.add(Ranking(user_id=row.user_id, points=row.total_points))
     db.session.commit()
-    flash('Puntos recalculados para predicciones pendientes', 'success')
+    flash('Puntos recalculados y ranking actualizado', 'success')
     return redirect(url_for('main.admin_matches'))
 
 @main_bp.route('/admin/seed_matches')
@@ -323,6 +335,8 @@ def edit_match(match_id):
                 match.status = 'finished'
                 for pred in match.predictions:
                     pred.calculate_points()
+                # Flush points to DB before reading them back for bonos/rankings
+                db.session.flush()
                 # Auto-assign bonos to exact-score winners
                 _auto_assign_bonos(match)
                 # Update rankings
@@ -603,11 +617,30 @@ def admin_results():
     if not current_user.is_admin:
         return jsonify({'error': 'Acceso denegado'}), 403
 
-    winners = Result.query.filter_by(is_winner=True).order_by(Result.created_at.desc()).all()
-    all_results = Result.query.order_by(Result.created_at.desc()).all()
     bonos = WinnerPrize.query.order_by(WinnerPrize.created_at.desc()).all()
     users = User.query.filter_by(is_active=True).order_by(User.username.asc()).all()
-    return render_template('admin/results.html', winners=winners, results=all_results, bonos=bonos, users=users)
+    prizes = Prize.query.order_by(Prize.phase.asc(), Prize.name.asc()).all()
+
+    # Ganadores: usuarios con bonos agrupados
+    winners = db.session.query(
+        User.username,
+        User.email,
+        func.count(WinnerPrize.id).label('bono_count'),
+        func.count(WinnerPrize.claimed_at).label('claimed_count')
+    ).join(WinnerPrize, WinnerPrize.user_id == User.id)\
+     .group_by(User.id, User.username, User.email)\
+     .order_by(func.count(WinnerPrize.id).desc()).all()
+
+    # Resultados: partidos terminados con resumen
+    finished_matches = Match.query.filter_by(status='finished')\
+        .order_by(Match.match_date.desc()).all()
+
+    return render_template('admin/results.html',
+                           winners=winners,
+                           finished_matches=finished_matches,
+                           bonos=bonos,
+                           users=users,
+                           prizes=prizes)
 
 
 @main_bp.route('/admin/assign_bono', methods=['POST'])
@@ -618,12 +651,11 @@ def assign_bono():
         return jsonify({'error': 'Acceso denegado'}), 403
 
     user_id = request.form.get('user_id')
-    prize_name = request.form.get('prize_name', '').strip()
-    image_url = request.form.get('image_url', '').strip()
+    prize_id = request.form.get('prize_id', '').strip()
     send_email = request.form.get('send_email') == 'on'
 
-    if not user_id or not prize_name:
-        flash('Usuario y nombre del premio son requeridos.', 'danger')
+    if not user_id or not prize_id:
+        flash('Debes seleccionar un usuario y un premio.', 'danger')
         return redirect(url_for('main.admin_results'))
 
     user = User.query.get(user_id)
@@ -631,18 +663,19 @@ def assign_bono():
         flash('Usuario no encontrado.', 'danger')
         return redirect(url_for('main.admin_results'))
 
+    prize = Prize.query.get(prize_id)
+    if not prize:
+        flash('Premio no encontrado.', 'danger')
+        return redirect(url_for('main.admin_results'))
+
     # Generar código único
-    count = WinnerPrize.query.count() + 1
-    bono_code = f'MR-MUNDIAL-{count:03d}'
-    while WinnerPrize.query.filter_by(bono_code=bono_code).first():
-        count += 1
-        bono_code = f'MR-MUNDIAL-{count:03d}'
+    bono_code = _generate_bono_code()
 
     bono = WinnerPrize(
         user_id=user.id,
         bono_code=bono_code,
-        prize_name=prize_name,
-        image_url=image_url or None,
+        prize_name=prize.name,
+        image_url=prize.image_url or None,
         status='pendiente',
     )
     db.session.add(bono)
@@ -674,6 +707,28 @@ def claim_bono(bono_id):
     bono.claimed_at = datetime.now()
     db.session.commit()
     flash(f'Bono {bono.bono_code} marcado como reclamado.', 'success')
+    return redirect(url_for('main.admin_results'))
+
+
+@main_bp.route('/admin/bono/<int:bono_id>/edit', methods=['POST'])
+@login_required
+def edit_bono(bono_id):
+    """Editar el nombre del premio y URL de imagen de un bono"""
+    if not current_user.is_admin:
+        return jsonify({'error': 'Acceso denegado'}), 403
+
+    bono = WinnerPrize.query.get_or_404(bono_id)
+    prize_name = request.form.get('prize_name', '').strip()
+    image_url = request.form.get('image_url', '').strip()
+
+    if not prize_name:
+        flash('El nombre del premio es requerido.', 'danger')
+        return redirect(url_for('main.admin_results'))
+
+    bono.prize_name = prize_name
+    bono.image_url = image_url or None
+    db.session.commit()
+    flash(f'Bono {bono.bono_code} actualizado exitosamente.', 'success')
     return redirect(url_for('main.admin_results'))
 
 
@@ -964,10 +1019,13 @@ def _apply_espn_scores():
                     for pred in match.predictions:
                         pred.calculate_points()
                     updated += 1
+                    _auto_assign_bonos(match)
         except Exception:
             continue
 
     if updated:
+        # Flush point calculations before reading them back for rankings
+        db.session.flush()
         # Recalcular rankings
         user_points = db.session.query(
             User.id.label('user_id'),

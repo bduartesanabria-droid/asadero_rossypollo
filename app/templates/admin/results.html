@@ -5,7 +5,7 @@
   <div class="d-flex justify-content-between align-items-center mb-4">
     <div>
       <h1 class="fw-bold mb-1">Resultados y Ganadores</h1>
-      <p class="text-secondary mb-0">Gestiona los resultados de la competencia</p>
+      <p class="mb-0" style="color:var(--text-secondary);">Gestiona los resultados de la competencia</p>
     </div>
     <a href="{{ url_for('main.admin_dashboard') }}" class="btn btn-outline-yellow"><i class="fas fa-arrow-left me-2"></i>Admin</a>
   </div>
@@ -16,9 +16,15 @@
       <div class="card">
         <div class="card-header d-flex justify-content-between align-items-center">
           <h5 class="mb-0 fw-bold"><i class="fas fa-gift me-2" style="color:var(--yellow);"></i>Bonos de Premio</h5>
+          {% if prizes %}
           <button class="btn btn-yellow btn-sm" data-bs-toggle="modal" data-bs-target="#modalAsignarBono">
             <i class="fas fa-plus me-1"></i>Asignar Bono
           </button>
+          {% else %}
+          <a href="{{ url_for('main.create_prize') }}" class="btn btn-outline-yellow btn-sm">
+            <i class="fas fa-exclamation-circle me-1"></i>Crear premios primero
+          </a>
+          {% endif %}
         </div>
         <div class="card-body p-0">
           {% if bonos %}
@@ -27,48 +33,61 @@
               <thead>
                 <tr>
                   <th>Ganador</th>
-                  <th>Correo</th>
                   <th>Código</th>
                   <th>Premio</th>
-                  <th>Estado</th>
+                  <th style="text-align:center;">Entregado</th>
                   <th>Email</th>
-                  <th>Fecha</th>
                   <th>Acciones</th>
                 </tr>
               </thead>
               <tbody>
                 {% for bono in bonos %}
                 <tr>
-                  <td><strong>{{ bono.user.username }}</strong></td>
-                  <td><small class="text-secondary">{{ bono.user.email }}</small></td>
-                  <td><span class="badge badge-yellow" style="letter-spacing:1px;font-size:0.85em;">{{ bono.bono_code }}</span></td>
+                  <td>
+                    <div>
+                      <strong>{{ bono.user.username }}</strong><br>
+                      <small style="color:var(--text-secondary);">{{ bono.user.email }}</small>
+                    </div>
+                  </td>
+                  <td><span class="badge badge-yellow" style="letter-spacing:1px;font-size:0.8em;">{{ bono.bono_code }}</span></td>
                   <td><small>{{ bono.prize_name }}</small></td>
-                  <td>
+
+                  <!-- CHECKLIST DE ENTREGA -->
+                  <td style="text-align:center;">
                     {% if bono.status == 'reclamado' %}
-                      <span class="badge" style="background:rgba(76,175,80,0.2);color:#4CAF50;"><i class="fas fa-check-circle me-1"></i>Reclamado</span>
+                      <span class="entrega-badge entregado" title="Entregado el {{ bono.claimed_at.strftime('%d/%m/%Y') if bono.claimed_at else '' }}">
+                        <i class="fas fa-check-circle"></i> Entregado
+                      </span>
                     {% else %}
-                      <span class="badge" style="background:rgba(255,193,7,0.2);color:#ffc107;"><i class="fas fa-clock me-1"></i>Pendiente</span>
-                    {% endif %}
-                  </td>
-                  <td>
-                    {% if bono.email_sent %}
-                      <span class="badge" style="background:rgba(76,175,80,0.15);color:#4CAF50;"><i class="fas fa-envelope-open me-1"></i>Enviado</span>
-                    {% else %}
-                      <span class="badge" style="background:rgba(255,255,255,0.08);color:var(--text-muted);"><i class="fas fa-envelope me-1"></i>No enviado</span>
-                    {% endif %}
-                  </td>
-                  <td><small class="text-secondary">{{ bono.created_at.strftime('%d/%m/%Y') }}</small></td>
-                  <td>
-                    <div class="d-flex gap-1">
-                      {% if bono.status == 'pendiente' %}
                       <form method="POST" action="{{ url_for('main.claim_bono', bono_id=bono.id) }}" class="d-inline">
-                        <button type="submit" class="btn btn-sm btn-outline-success" title="Marcar como Reclamado" onclick="return confirm('¿Marcar este bono como reclamado?')">
-                          <i class="fas fa-check"></i>
+                        <button type="submit" class="entrega-badge pendiente"
+                          onclick="return confirm('¿Confirmar entrega del bono {{ bono.bono_code }} a {{ bono.user.username }}?')"
+                          title="Clic para marcar como entregado">
+                          <i class="fas fa-circle me-1"></i> Pendiente
                         </button>
                       </form>
-                      {% endif %}
+                    {% endif %}
+                  </td>
+
+                  <td>
+                    {% if bono.email_sent %}
+                      <span style="color:#4CAF50;font-size:0.8rem;"><i class="fas fa-envelope-open me-1"></i>Enviado</span>
+                    {% else %}
+                      <span style="color:var(--text-secondary);font-size:0.8rem;"><i class="fas fa-envelope me-1"></i>No enviado</span>
+                    {% endif %}
+                  </td>
+
+                  <td>
+                    <div class="d-flex gap-1">
+                      <button type="button" class="btn btn-sm btn-outline-yellow"
+                        title="Editar bono"
+                        onclick="abrirEditarBono({{ bono.id }}, '{{ bono.bono_code }}', {{ bono.prize_name|tojson }}, {{ (bono.image_url or '')|tojson }})"
+                        data-bs-toggle="modal" data-bs-target="#modalEditarBono">
+                        <i class="fas fa-edit"></i>
+                      </button>
                       <form method="POST" action="{{ url_for('main.resend_bono_email', bono_id=bono.id) }}" class="d-inline">
-                        <button type="submit" class="btn btn-sm btn-outline-yellow" title="Reenviar correo" onclick="return confirm('¿Reenviar el correo a {{ bono.user.email }}?')">
+                        <button type="submit" class="btn btn-sm" style="border:1px solid var(--yellow);color:var(--yellow);background:transparent;"
+                          title="Reenviar correo" onclick="return confirm('¿Reenviar el correo a {{ bono.user.email }}?')">
                           <i class="fas fa-paper-plane"></i>
                         </button>
                       </form>
@@ -90,7 +109,7 @@
       </div>
     </div>
 
-    <!-- GANADORES (Result model) -->
+    <!-- GANADORES -->
     <div class="col-12">
       <div class="card">
         <div class="card-header">
@@ -100,14 +119,29 @@
           {% if winners %}
           <div class="table-responsive">
             <table class="table table-hover align-middle mb-0">
-              <thead><tr><th>Usuario</th><th>Evento</th><th>Puntaje</th><th>Fecha</th></tr></thead>
-              <tbody>
-                {% for result in winners %}
+              <thead>
                 <tr>
-                  <td><strong>{{ result.user.username }}</strong></td>
-                  <td>{{ result.event }}</td>
-                  <td><span class="badge badge-yellow">{{ result.score }}</span></td>
-                  <td><small class="text-secondary">{{ result.created_at.strftime('%d/%m/%Y') }}</small></td>
+                  <th>#</th>
+                  <th>Usuario</th>
+                  <th>Correo</th>
+                  <th>Bonos</th>
+                  <th>Reclamados</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for w in winners %}
+                <tr>
+                  <td><span class="badge" style="background:rgba(255,215,0,0.15);color:var(--yellow);border:1px solid rgba(255,215,0,0.3);">{{ loop.index }}</span></td>
+                  <td><strong>{{ w.username }}</strong></td>
+                  <td><small style="color:var(--text-secondary);">{{ w.email }}</small></td>
+                  <td><span class="badge badge-yellow"><i class="fas fa-gift me-1"></i>{{ w.bono_count }}</span></td>
+                  <td>
+                    {% if w.claimed_count and w.claimed_count > 0 %}
+                      <span class="badge" style="background:rgba(76,175,80,0.2);color:#4CAF50;border:1px solid rgba(76,175,80,0.3);">{{ w.claimed_count }} reclamado{{ 's' if w.claimed_count > 1 else '' }}</span>
+                    {% else %}
+                      <span class="badge" style="background:rgba(255,193,7,0.15);color:#ffc107;border:1px solid rgba(255,193,7,0.25);">Pendiente</span>
+                    {% endif %}
+                  </td>
                 </tr>
                 {% endfor %}
               </tbody>
@@ -117,7 +151,7 @@
           <div class="empty-state">
             <div class="empty-icon"><i class="fas fa-medal"></i></div>
             <h4>Sin ganadores aún</h4>
-            <p>Los ganadores aparecerán aquí cuando la competencia avance</p>
+            <p>Los ganadores aparecerán aquí cuando se asignen bonos de premio</p>
           </div>
           {% endif %}
         </div>
@@ -131,18 +165,43 @@
           <h5 class="mb-0 fw-bold"><i class="fas fa-table me-2" style="color:var(--yellow);"></i>Todos los Resultados</h5>
         </div>
         <div class="card-body p-0">
-          {% if results %}
+          {% if finished_matches %}
           <div class="table-responsive">
             <table class="table table-hover align-middle mb-0">
-              <thead><tr><th>Usuario</th><th>Evento</th><th>Puntaje</th><th>Ganador</th><th>Fecha</th></tr></thead>
-              <tbody>
-                {% for result in results %}
+              <thead>
                 <tr>
-                  <td><strong>{{ result.user.username }}</strong></td>
-                  <td>{{ result.event }}</td>
-                  <td><span class="badge badge-yellow">{{ result.score }}</span></td>
-                  <td>{% if result.is_winner %}<span class="badge" style="background:#4CAF50;">Sí</span>{% else %}<span class="badge" style="background:var(--text-muted);">No</span>{% endif %}</td>
-                  <td><small class="text-secondary">{{ result.created_at.strftime('%d/%m/%Y') }}</small></td>
+                  <th>Partido</th>
+                  <th>Resultado</th>
+                  <th>Grupo</th>
+                  <th>Fecha</th>
+                  <th>Pronósticos</th>
+                  <th>Exactos</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for match in finished_matches %}
+                {% set exact_count = match.predictions | selectattr('points_earned', 'equalto', 3) | list | length %}
+                <tr>
+                  <td><strong>{{ match.home_team }} vs {{ match.away_team }}</strong></td>
+                  <td>
+                    <span class="badge badge-yellow" style="font-family:'Black Ops One',cursive;font-size:1rem;letter-spacing:2px;">
+                      {{ match.home_score }} - {{ match.away_score }}
+                    </span>
+                  </td>
+                  <td>
+                    {% if match.group %}
+                    <span class="badge" style="background:rgba(255,255,255,0.12);color:var(--text-primary);border:1px solid var(--border-color);">G-{{ match.group }}</span>
+                    {% else %}<small style="color:var(--text-secondary);">—</small>{% endif %}
+                  </td>
+                  <td><small style="color:var(--text-secondary);">{{ match.match_date.strftime('%d/%m/%Y') }}</small></td>
+                  <td><small>{{ match.predictions | length }}</small></td>
+                  <td>
+                    {% if exact_count > 0 %}
+                    <span class="badge" style="background:rgba(76,175,80,0.2);color:#4CAF50;border:1px solid rgba(76,175,80,0.3);">{{ exact_count }} exacto{{ 's' if exact_count > 1 else '' }}</span>
+                    {% else %}
+                    <small style="color:var(--text-secondary);">Ninguno</small>
+                    {% endif %}
+                  </td>
                 </tr>
                 {% endfor %}
               </tbody>
@@ -152,7 +211,7 @@
           <div class="empty-state">
             <div class="empty-icon"><i class="fas fa-table"></i></div>
             <h4>Sin resultados</h4>
-            <p>No hay resultados registrados aún</p>
+            <p>Los resultados de los partidos aparecerán aquí cuando se ingresen los marcadores</p>
           </div>
           {% endif %}
         </div>
@@ -161,47 +220,206 @@
   </div>
 </div>
 
-<!-- Modal: Asignar Bono -->
-<div class="modal fade" id="modalAsignarBono" tabindex="-1" aria-labelledby="modalAsignarBonoLabel" aria-hidden="true">
+<!-- ===== Modal: Asignar Bono (simplificado con premios pre-definidos) ===== -->
+<div class="modal fade" id="modalAsignarBono" tabindex="-1" aria-modal="true" role="dialog">
   <div class="modal-dialog modal-dialog-centered">
-    <div class="modal-content" style="background:var(--card-bg);border:1px solid rgba(255,255,255,0.1);">
-      <div class="modal-header" style="border-bottom:1px solid rgba(255,255,255,0.1);">
-        <h5 class="modal-title fw-bold" id="modalAsignarBonoLabel"><i class="fas fa-gift me-2" style="color:var(--yellow);"></i>Asignar Bono de Premio</h5>
-        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+    <div class="modal-content modal-dark-custom">
+      <div class="modal-header">
+        <h5 class="modal-title fw-bold"><i class="fas fa-gift me-2" style="color:var(--yellow);"></i>Asignar Bono de Premio</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Cerrar"></button>
       </div>
       <form method="POST" action="{{ url_for('main.assign_bono') }}">
         <div class="modal-body">
-          <div class="mb-3">
-            <label class="form-label">Ganador</label>
-            <select name="user_id" class="form-select" required style="background:var(--input-bg);color:var(--text-primary);border-color:rgba(255,255,255,0.2);">
-              <option value="">Selecciona un usuario...</option>
+
+          <!-- Seleccionar ganador -->
+          <div class="mb-4">
+            <label class="form-label fw-bold"><i class="fas fa-user me-1" style="color:var(--yellow);"></i> Ganador</label>
+            <select name="user_id" class="form-select modal-select" required>
+              <option value="">— Selecciona un participante —</option>
               {% for user in users %}
-              <option value="{{ user.id }}">{{ user.username }} — {{ user.email }}</option>
+              <option value="{{ user.id }}">{{ user.username }} ({{ user.email }})</option>
               {% endfor %}
             </select>
           </div>
-          <div class="mb-3">
-            <label class="form-label">Premio / Descripción del bono</label>
-            <input type="text" name="prize_name" class="form-control" placeholder="Ej: 2 Presas Broaster de Pollo Gratis" required style="background:var(--input-bg);color:var(--text-primary);border-color:rgba(255,255,255,0.2);">
+
+          <!-- Seleccionar premio pre-definido -->
+          <div class="mb-4">
+            <label class="form-label fw-bold"><i class="fas fa-trophy me-1" style="color:var(--yellow);"></i> Premio</label>
+            {% if prizes %}
+            <select name="prize_id" class="form-select modal-select" required>
+              <option value="">— Selecciona el premio —</option>
+              {% for prize in prizes %}
+              <option value="{{ prize.id }}">{{ prize.name }}{% if prize.phase %} · {{ prize.phase }}{% endif %}</option>
+              {% endfor %}
+            </select>
+            {% else %}
+            <div class="alert" style="background:rgba(255,193,7,0.15);border:1px solid rgba(255,193,7,0.4);color:var(--yellow);border-radius:8px;padding:12px;">
+              <i class="fas fa-exclamation-triangle me-2"></i>
+              No hay premios creados. <a href="{{ url_for('main.create_prize') }}" class="fw-bold" style="color:var(--yellow);">Crear premios</a>
+            </div>
+            {% endif %}
           </div>
-          <div class="mb-3">
-            <label class="form-label">URL de la imagen del bono <small class="text-secondary">(opcional)</small></label>
-            <input type="url" name="image_url" class="form-control" placeholder="https://..." style="background:var(--input-bg);color:var(--text-primary);border-color:rgba(255,255,255,0.2);">
-            <div class="form-text text-secondary">Si tienes la imagen del bono subida a un hosting, pega aquí su URL.</div>
-          </div>
-          <div class="form-check">
-            <input class="form-check-input" type="checkbox" name="send_email" id="sendEmailCheck" checked>
-            <label class="form-check-label" for="sendEmailCheck">
-              Enviar correo automáticamente al ganador
+
+          <!-- Enviar correo -->
+          <div class="form-check form-switch" style="padding-left:2.5rem;">
+            <input class="form-check-input" type="checkbox" name="send_email" id="sendEmailCheck" checked style="width:2.5em;height:1.3em;cursor:pointer;">
+            <label class="form-check-label ms-2" for="sendEmailCheck" style="font-size:0.95rem;">
+              Enviar correo con el bono al ganador
             </label>
           </div>
         </div>
-        <div class="modal-footer" style="border-top:1px solid rgba(255,255,255,0.1);">
+
+        <div class="modal-footer">
           <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancelar</button>
-          <button type="submit" class="btn btn-yellow"><i class="fas fa-paper-plane me-2"></i>Asignar y Enviar</button>
+          {% if prizes %}
+          <button type="submit" class="btn btn-yellow"><i class="fas fa-paper-plane me-2"></i>Asignar Bono</button>
+          {% endif %}
         </div>
       </form>
     </div>
   </div>
 </div>
+
+<!-- ===== Modal: Editar Bono ===== -->
+<div class="modal fade" id="modalEditarBono" tabindex="-1" aria-modal="true" role="dialog">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content modal-dark-custom">
+      <div class="modal-header">
+        <h5 class="modal-title fw-bold" id="editBonoTitulo"><i class="fas fa-edit me-2" style="color:var(--yellow);"></i>Editar Bono</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+      </div>
+      <form method="POST" id="formEditarBono" action="#">
+        <div class="modal-body">
+          <p id="editBonoCodeLabel" class="mb-3" style="color:var(--text-secondary);font-size:0.9rem;"></p>
+          <div class="mb-3">
+            <label class="form-label fw-bold">Premio / Descripción</label>
+            <input type="text" name="prize_name" id="editBonoPrizeName" class="form-control modal-input" required placeholder="Nombre del premio">
+          </div>
+          <div class="mb-1">
+            <label class="form-label fw-bold">URL Imagen <small style="color:var(--text-secondary);font-weight:400;">(opcional)</small></label>
+            <input type="url" name="image_url" id="editBonoImageUrl" class="form-control modal-input" placeholder="https://...">
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancelar</button>
+          <button type="submit" class="btn btn-yellow"><i class="fas fa-save me-2"></i>Guardar</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<style>
+/* Checklist de entrega */
+.entrega-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 14px;
+  border-radius: 20px;
+  font-weight: 700;
+  font-size: 0.82rem;
+  letter-spacing: 0.3px;
+  border: none;
+  cursor: default;
+  white-space: nowrap;
+}
+
+.entrega-badge.entregado {
+  background: rgba(76,175,80,0.15);
+  color: #4CAF50;
+  border: 2px solid rgba(76,175,80,0.4);
+}
+
+.entrega-badge.pendiente {
+  background: rgba(255,193,7,0.12);
+  color: #e6a800;
+  border: 2px dashed rgba(255,193,7,0.5);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.entrega-badge.pendiente:hover {
+  background: rgba(76,175,80,0.15);
+  color: #4CAF50;
+  border: 2px solid rgba(76,175,80,0.5);
+  transform: scale(1.05);
+}
+
+/* Modal con estilos propios para funcionar en ambos temas */
+.modal-dark-custom {
+  background: #0e2454;
+  border: 1px solid rgba(255,215,0,0.2);
+  border-radius: 16px;
+  color: #fff;
+}
+
+.modal-dark-custom .modal-header {
+  border-bottom: 1px solid rgba(255,255,255,0.1);
+  padding: 1.25rem 1.5rem;
+}
+
+.modal-dark-custom .modal-footer {
+  border-top: 1px solid rgba(255,255,255,0.1);
+  padding: 1rem 1.5rem;
+}
+
+.modal-dark-custom .modal-body {
+  padding: 1.5rem;
+}
+
+.modal-dark-custom .form-label {
+  color: rgba(255,255,255,0.9);
+  font-size: 0.9rem;
+  margin-bottom: 0.5rem;
+}
+
+.modal-select,
+.modal-input {
+  background: rgba(255,255,255,0.08) !important;
+  border: 1px solid rgba(255,255,255,0.25) !important;
+  color: #fff !important;
+  border-radius: 10px !important;
+  padding: 0.75rem 1rem !important;
+  font-size: 0.95rem !important;
+  width: 100%;
+  appearance: auto;
+}
+
+.modal-select:focus,
+.modal-input:focus {
+  background: rgba(255,255,255,0.12) !important;
+  border-color: rgba(255,215,0,0.6) !important;
+  box-shadow: 0 0 0 3px rgba(255,215,0,0.15) !important;
+  color: #fff !important;
+  outline: none;
+}
+
+.modal-select option {
+  background: #0e2454;
+  color: #fff;
+}
+
+.modal-dark-custom .form-check-input:checked {
+  background-color: #FFD700;
+  border-color: #FFD700;
+}
+
+.modal-dark-custom .alert {
+  font-size: 0.9rem;
+}
+</style>
+
+{% block extra_js %}
+<script>
+function abrirEditarBono(id, code, prizeName, imageUrl) {
+  document.getElementById('formEditarBono').action = '/admin/bono/' + id + '/edit';
+  document.getElementById('editBonoPrizeName').value = prizeName;
+  document.getElementById('editBonoImageUrl').value = imageUrl || '';
+  document.getElementById('editBonoTitulo').innerHTML =
+    '<i class="fas fa-edit me-2" style="color:var(--yellow);"></i>Editar · ' + code;
+  document.getElementById('editBonoCodeLabel').textContent = 'Código: ' + code;
+}
+</script>
+{% endblock %}
 {% endblock %}
