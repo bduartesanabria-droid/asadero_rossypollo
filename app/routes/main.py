@@ -710,6 +710,44 @@ def claim_bono(bono_id):
     return redirect(url_for('main.admin_results'))
 
 
+@main_bp.route('/admin/backfill_bonos', methods=['POST'])
+@login_required
+def backfill_bonos():
+    """Genera bonos para todos los ganadores de marcador exacto que aún no tienen uno."""
+    if not current_user.is_admin:
+        return jsonify({'error': 'Acceso denegado'}), 403
+
+    prize = Prize.query.first()
+    prize_name = prize.name if prize else '2 Presas Broaster de Pollo Gratis'
+
+    winners = Prediction.query.filter_by(points_earned=3)\
+        .order_by(Prediction.match_id.asc(), Prediction.created_at.asc()).all()
+
+    created = 0
+    for pred in winners:
+        already = WinnerPrize.query.filter_by(
+            user_id=pred.user_id, match_id=pred.match_id
+        ).first()
+        if not already:
+            bono = WinnerPrize(
+                user_id=pred.user_id,
+                match_id=pred.match_id,
+                bono_code=_generate_bono_code(),
+                prize_name=prize_name,
+                status='pendiente',
+            )
+            db.session.add(bono)
+            db.session.flush()
+            created += 1
+
+    db.session.commit()
+    if created:
+        flash(f'Se generaron {created} bono(s) para ganadores sin bono asignado.', 'success')
+    else:
+        flash('Todos los ganadores ya tienen su bono. No se crearon nuevos.', 'info')
+    return redirect(url_for('main.admin_results'))
+
+
 @main_bp.route('/admin/bono/<int:bono_id>/edit', methods=['POST'])
 @login_required
 def edit_bono(bono_id):

@@ -305,15 +305,24 @@
           <h5 class="mb-0 fw-bold">
             <i class="fas fa-gift me-2" style="color:var(--yellow);"></i>Bonos de Premio
           </h5>
-          {% if prizes %}
-          <button class="btn btn-yellow btn-sm" data-bs-toggle="modal" data-bs-target="#modalAsignarBono">
-            <i class="fas fa-plus me-1"></i>Asignar Bono
-          </button>
-          {% else %}
-          <a href="{{ url_for('main.create_prize') }}" class="btn btn-outline-yellow btn-sm">
-            <i class="fas fa-exclamation-circle me-1"></i>Crear premios primero
-          </a>
-          {% endif %}
+          <div class="d-flex gap-2 flex-wrap">
+            <form method="POST" action="{{ url_for('main.backfill_bonos') }}" style="margin:0;">
+              <button type="submit" class="btn btn-outline-yellow btn-sm"
+                onclick="return confirm('¿Generar bonos para todos los ganadores sin bono aún?')"
+                title="Escanea todas las predicciones exactas y crea bonos para quienes no tienen uno">
+                <i class="fas fa-sync-alt me-1"></i>Generar bonos pendientes
+              </button>
+            </form>
+            {% if prizes %}
+            <button class="btn btn-yellow btn-sm" data-bs-toggle="modal" data-bs-target="#modalAsignarBono">
+              <i class="fas fa-plus me-1"></i>Asignar Bono
+            </button>
+            {% else %}
+            <a href="{{ url_for('main.create_prize') }}" class="btn btn-outline-yellow btn-sm">
+              <i class="fas fa-exclamation-circle me-1"></i>Crear premios primero
+            </a>
+            {% endif %}
+          </div>
         </div>
         <div class="card-body p-0">
           {% if bonos %}
